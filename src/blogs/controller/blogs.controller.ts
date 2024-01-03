@@ -28,6 +28,7 @@ export class BlogsController {
   ) {}
 
   @Get()
+  @HttpCode(200)
   async getAllBlogs(
     @Query()
     query: {
@@ -48,11 +49,13 @@ export class BlogsController {
   }
 
   @Post()
+  @HttpCode(201)
   async createBlog(@Body() inputData: createBlogModel) {
     return this.blogsService.createBlog(inputData);
   }
 
   @Get(':blogId/posts')
+  @HttpCode(200)
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
     @Query()
@@ -64,17 +67,19 @@ export class BlogsController {
       pageSize: number;
     },
   ) {
-    return this.postsQueryRepository.getPostByBlogId(
+    const posts = await this.postsQueryRepository.getPostByBlogId(
       blogId,
-      query.searchNameTerm,
       query.sortBy,
       query.sortDirection,
       query.pageNumber ? +query.pageNumber : 1,
       query.pageSize ? +query.pageSize : 10,
     );
+    if (!posts) throw new NotFoundException("Blog doesn't exists");
+    return posts;
   }
 
   @Post(':blogId/posts')
+  @HttpCode(201)
   async createPostForBlog(
     @Param('blogId') blogId: string,
     @Body() inputData: createPostModel,
@@ -85,6 +90,7 @@ export class BlogsController {
   }
 
   @Get(':id')
+  @HttpCode(200)
   async getBlogById(@Param('id') blogId: string) {
     const blog = await this.blogsQueryRepository.getBlogById(blogId);
     if (!blog) throw new NotFoundException("Blog doesn't exists");
@@ -92,6 +98,7 @@ export class BlogsController {
   }
 
   @Put(':id')
+  @HttpCode(204)
   async updateBlog(
     @Param('id') blogId: string,
     @Body() inputData: createBlogModel,

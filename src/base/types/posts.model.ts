@@ -11,9 +11,15 @@ export type postModel = {
   title: string;
   shortDescription: string;
   content: string;
-  blogId: string;
+  blogId: ObjectId;
   blogName: string;
   createdAt: string;
+  extendedLikesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: string;
+    newestLikes: [];
+  };
 };
 
 export type updatePostModel = {

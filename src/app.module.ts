@@ -17,6 +17,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './blogs/domain/blogs.entity';
 import { ConfigModule } from '@nestjs/config';
 import * as process from 'process';
+import { Post, PostSchema } from './posts/domain/posts.entity';
 
 @Module({
   imports: [
@@ -27,10 +28,8 @@ import * as process from 'process';
     //@ts-expect-error I don't know why he throws me an error
     MongooseModule.forRoot(process.env.MONGO_URL),
     MongooseModule.forFeature([
-      {
-        name: Blog.name,
-        schema: BlogSchema,
-      },
+      { name: Blog.name, schema: BlogSchema },
+      { name: Post.name, schema: PostSchema },
     ]),
   ],
   controllers: [

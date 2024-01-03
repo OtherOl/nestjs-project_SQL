@@ -3,6 +3,7 @@ import { blogModel, createBlogModel } from '../../base/types/blogs.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog } from '../domain/blogs.entity';
 import { Model } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class BlogsRepository {
@@ -11,7 +12,17 @@ export class BlogsRepository {
   async createBlog(blog: blogModel): Promise<blogModel> {
     return await this.blogModel.create(blog);
   }
-  async updateBlog(id: string, inputData: createBlogModel) {
-    return inputData;
+  async updateBlog(blogId: string, inputData: createBlogModel) {
+    const updatedBlog = await this.blogModel.updateOne(
+      { _id: new ObjectId(blogId) },
+      {
+        $set: {
+          name: inputData.name,
+          description: inputData.description,
+          websiteUrl: inputData.websiteUrl,
+        },
+      },
+    );
+    return updatedBlog.modifiedCount === 1;
   }
 }

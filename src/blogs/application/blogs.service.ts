@@ -20,7 +20,7 @@ export class BlogsService {
     return this.blogsRepository.createBlog(newBlog);
   }
 
-  async updateBlog(id: string, inputData: createBlogModel) {
-    return this.blogsRepository.updateBlog(id, inputData);
+  async updateBlog(blogId: string, inputData: createBlogModel) {
+    return this.blogsRepository.updateBlog(blogId, inputData);
   }
 }

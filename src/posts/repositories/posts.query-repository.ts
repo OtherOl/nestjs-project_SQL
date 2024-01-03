@@ -11,7 +11,6 @@ export class PostsQueryRepository {
   ) {
     const sortQuery: any = {};
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
-    console.log(pageNumber, pageSize);
 
     // const filter = { postId: postId };
     return sortQuery;
@@ -24,7 +23,6 @@ export class PostsQueryRepository {
     pageNumber: number,
     pageSize: number,
   ) {
-    console.log(pageNumber, pageSize);
     const sortQuery: any = {};
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
   }
@@ -37,7 +35,6 @@ export class PostsQueryRepository {
     pageNumber: number,
     pageSize: number,
   ) {
-    console.log(pageNumber, pageSize);
     const sortQuery: any = {};
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
 

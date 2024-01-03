@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog } from '../domain/blogs.entity';
+import { Blog, BlogDocument } from '../domain/blogs.entity';
 import { Model } from 'mongoose';
 import { blogModel } from '../../base/types/blogs.model';
+import { paginationModel } from '../../base/types/pagination.model';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class BlogsQueryRepository {
-  constructor(@InjectModel(Blog.name) private blogModel: Model<Blog>) {}
+  constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
 
-  getAllBlogs(
+  async getAllBlogs(
     searchNameTerm: string,
-    sortBy: string,
-    sortDirection: string,
+    sortBy: string = 'createdAt',
+    sortDirection: string = 'desc',
     pageNumber: number,
     pageSize: number,
   ) {
@@ -19,12 +21,31 @@ export class BlogsQueryRepository {
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
 
     const filter = { name: RegExp(searchNameTerm, 'i') };
-    return "it's Okey";
+    const countBlogs: number = await this.blogModel.countDocuments(filter);
+    const foundedBlogs: blogModel[] = await this.blogModel
+      .find(filter)
+      .sort(sortQuery)
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize);
+
+    const blogs: paginationModel<blogModel> = {
+      pagesCount: Math.ceil(countBlogs / pageSize),
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount: countBlogs,
+      items: foundedBlogs,
+    };
+    return blogs;
   }
 
-  getBlogById(blogId: string): Promise<blogModel | null> {
-    return this.blogModel.findById(blogId, { __v: false });
+  async getBlogById(blogId: string): Promise<blogModel | null> {
+    return this.blogModel.findOne({ _id: new ObjectId(blogId) });
   }
 
-  deleteBlogById(blogId: string) {}
+  async deleteBlogById(blogId: string) {
+    const deletedBlog = await this.blogModel.deleteOne({
+      _id: new ObjectId(blogId),
+    });
+    return deletedBlog.deletedCount === 1;
+  }
 }

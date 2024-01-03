@@ -4,24 +4,24 @@ import { HydratedDocument } from 'mongoose';
 
 export type BlogDocument = HydratedDocument<Blog>;
 
-@Schema()
+@Schema({ versionKey: false })
 export class Blog {
-  @Prop()
+  @Prop({ required: true })
   _id: ObjectId;
 
-  @Prop()
+  @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true })
   description: string;
 
-  @Prop()
+  @Prop({ required: true })
   websiteUrl: string;
 
-  @Prop()
+  @Prop({ required: true })
   createdAt: string;
 
-  @Prop()
+  @Prop({ required: true })
   isMembership: boolean;
 }
 

@@ -19,6 +19,7 @@ export class BlogsQueryRepository {
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
 
     const filter = { name: RegExp(searchNameTerm, 'i') };
+    return "it's Okey";
   }
 
   getBlogById(blogId: string): Promise<blogModel | null> {

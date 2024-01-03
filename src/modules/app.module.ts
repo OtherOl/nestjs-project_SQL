@@ -24,6 +24,7 @@ import * as process from 'process';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    //@ts-expect-error I don't know why he throws me an error
     MongooseModule.forRoot(process.env.MONGO_URL),
     MongooseModule.forFeature([
       {

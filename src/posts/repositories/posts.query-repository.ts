@@ -7,11 +7,16 @@ import { paginationModel } from '../../base/types/pagination.model';
 import { BlogsQueryRepository } from '../../blogs/repositories/blogs.query-repository';
 import { ObjectId } from 'mongodb';
 import { commentsModel } from '../../base/types/comments.model';
+import {
+  Comment,
+  CommentDocument,
+} from '../../comments/domain/comments.entity';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
+    @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     private blogsQueryRepository: BlogsQueryRepository,
   ) {}
 
@@ -27,8 +32,11 @@ export class PostsQueryRepository {
 
     const filter = { postId: postId };
 
-    const countComments: number = await this.postModel.countDocuments(filter);
-    const foundedComments: commentsModel[] = await this.postModel
+    const isExists = await this.postModel.findOne(filter);
+    if (!isExists) return null;
+    const countComments: number =
+      await this.commentModel.countDocuments(filter);
+    const foundedComments: commentsModel[] = await this.commentModel
       .find(filter)
       .sort(sortQuery)
       .skip((pageNumber - 1) * pageSize)

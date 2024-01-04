@@ -11,19 +11,19 @@ export class UsersService {
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  createUser(inputData: createUserModel) {
+  async createUser(inputData: createUserModel) {
     const newUser = {
       _id: new ObjectId(),
       login: inputData.login,
       email: inputData.email,
       createdAt: new Date().toISOString(),
     };
-    return this.usersRepository.createUser(newUser);
+    return await this.usersRepository.createUser(newUser);
   }
 
-  deleteUser(id: string) {
-    const user = this.usersQueryRepository.getUserById(id);
+  async deleteUser(_id: string) {
+    const user = await this.usersQueryRepository.getUserById(_id);
     if (!user) return false;
-    return this.usersRepository.deleteUser(id);
+    return await this.usersRepository.deleteUser(_id);
   }
 }

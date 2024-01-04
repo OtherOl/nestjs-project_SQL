@@ -18,6 +18,10 @@ import { Blog, BlogSchema } from './blogs/domain/blogs.entity';
 import { ConfigModule } from '@nestjs/config';
 import * as process from 'process';
 import { Post, PostSchema } from './posts/domain/posts.entity';
+import { Comment, CommentSchema } from './comments/domain/comments.entity';
+import { User, UserSchema } from './users/domain/users.entity';
+import { TestingController } from './testing/controller/testing.controller';
+import { TestingRepository } from './testing/repositories/testing.repository';
 
 @Module({
   imports: [
@@ -30,6 +34,8 @@ import { Post, PostSchema } from './posts/domain/posts.entity';
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
+      { name: Comment.name, schema: CommentSchema },
+      { name: User.name, schema: UserSchema },
     ]),
   ],
   controllers: [
@@ -37,6 +43,7 @@ import { Post, PostSchema } from './posts/domain/posts.entity';
     PostsController,
     CommentsController,
     UsersController,
+    TestingController,
   ],
   providers: [
     BlogsService,
@@ -49,6 +56,7 @@ import { Post, PostSchema } from './posts/domain/posts.entity';
     UsersQueryRepository,
     UsersService,
     UsersRepository,
+    TestingRepository,
   ],
 })
 export class AppModule {}

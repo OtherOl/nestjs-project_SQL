@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Comment, CommentDocument } from '../domain/comments.entity';
+import { Model } from 'mongoose';
+import { commentsModel } from '../../base/types/comments.model';
 
 @Injectable()
 export class CommentsQueryRepository {
-  getCommentById(id: string) {
-    return id;
+  constructor(
+    @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
+  ) {}
+  async getCommentById(id: string): Promise<commentsModel | null> {
+    return this.commentModel.findOne({ _id: id });
   }
 }

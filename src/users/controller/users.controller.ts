@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   Post,
@@ -20,7 +21,8 @@ export class UsersController {
   ) {}
 
   @Get()
-  getAllUsers(
+  @HttpCode(200)
+  async getAllUsers(
     @Query()
     query: {
       sortBy: string;
@@ -31,7 +33,7 @@ export class UsersController {
       searchEmailTerm: string;
     },
   ) {
-    return this.usersQueryRepository.getAllUsers(
+    return await this.usersQueryRepository.getAllUsers(
       query.sortBy,
       query.sortDirection,
       query.pageNumber ? +query.pageNumber : 1,
@@ -42,13 +44,15 @@ export class UsersController {
   }
 
   @Post()
-  createUser(@Body() inputData: createUserModel) {
-    return this.usersService.createUser(inputData);
+  @HttpCode(201)
+  async createUser(@Body() inputData: createUserModel) {
+    return await this.usersService.createUser(inputData);
   }
 
   @Delete(':id')
-  deleteUser(@Param('id') id: string) {
-    const user = this.usersService.deleteUser(id);
+  @HttpCode(204)
+  async deleteUser(@Param('id') _id: string) {
+    const user = await this.usersService.deleteUser(_id);
     if (!user) throw new NotFoundException("User doesn't exists");
     return user;
   }

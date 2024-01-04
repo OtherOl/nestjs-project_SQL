@@ -36,13 +36,15 @@ export class PostsController {
       pageSize: number;
     },
   ) {
-    return this.postsQueryRepository.getCommentsByPostId(
+    const comments = await this.postsQueryRepository.getCommentsByPostId(
       postId,
       query.sortBy,
       query.sortDirection,
       query.pageNumber ? +query.pageNumber : 1,
       query.pageSize ? +query.pageSize : 10,
     );
+    if (!comments) throw new NotFoundException("Pos doesn't exists");
+    return comments;
   }
   @Get()
   @HttpCode(200)

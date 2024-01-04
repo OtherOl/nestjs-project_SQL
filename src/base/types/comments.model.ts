@@ -1,5 +1,8 @@
+import { ObjectId } from 'mongodb';
+
 export type commentsModel = {
-  id: string;
+  postId: string;
+  _id: ObjectId;
   content: string;
   commentatorInfo: {
     userId: string;

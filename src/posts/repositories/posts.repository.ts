@@ -8,7 +8,7 @@ import { ObjectId } from 'mongodb';
 @Injectable()
 export class PostsRepository {
   constructor(@InjectModel(Post.name) private postModel: Model<PostDocument>) {}
-  async createPost(newPost: postModel) {
+  async createPost(newPost: postModel): Promise<postModel | null> {
     await this.postModel.create(newPost);
     return newPost;
   }

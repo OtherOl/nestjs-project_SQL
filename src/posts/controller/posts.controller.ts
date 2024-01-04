@@ -26,32 +26,29 @@ export class PostsController {
 
   @Get(':postId/comments')
   @HttpCode(200)
-  // async getCommentsByPostId(
-  //   @Param('postId') postId: string,
-  //   @Query()
-  //   query: {
-  //     searchNameTerm: string;
-  //     sortBy: string;
-  //     sortDirection: string;
-  //     pageNumber: number;
-  //     pageSize: number;
-  //   },
-  // ) {
-  //   const comment = this.postsQueryRepository.getCommentsByPostId(
-  //     query.searchNameTerm,
-  //     query.sortBy,
-  //     query.sortDirection,
-  //     query.pageNumber ? +query.pageNumber : 1,
-  //     query.pageSize ? +query.pageSize : 10,
-  //   );
-  //   return comment;
-  // }
+  async getCommentsByPostId(
+    @Param('postId') postId: string,
+    @Query()
+    query: {
+      sortBy: string;
+      sortDirection: string;
+      pageNumber: number;
+      pageSize: number;
+    },
+  ) {
+    return this.postsQueryRepository.getCommentsByPostId(
+      postId,
+      query.sortBy,
+      query.sortDirection,
+      query.pageNumber ? +query.pageNumber : 1,
+      query.pageSize ? +query.pageSize : 10,
+    );
+  }
   @Get()
   @HttpCode(200)
   async getAllPosts(
     @Query()
     query: {
-      searchNameTerm: string;
       sortBy: string;
       sortDirection: string;
       pageNumber: number;
@@ -68,11 +65,8 @@ export class PostsController {
 
   @Post()
   @HttpCode(201)
-  async createPostForBlog(
-    @Param('blogId') blogId: string,
-    @Body() inputData: createPostModel,
-  ) {
-    const newPost = this.postsService.createPost(blogId, inputData);
+  async createPostForBlog(@Body() inputData: createPostModel) {
+    const newPost = this.postsService.createPost(inputData);
     if (!newPost) throw new BadRequestException("Blog doesn't exists");
     return newPost;
   }

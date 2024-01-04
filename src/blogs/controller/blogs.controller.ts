@@ -15,8 +15,7 @@ import { BlogsService } from '../application/blogs.service';
 import { BlogsQueryRepository } from '../repositories/blogs.query-repository';
 import { createBlogModel } from '../../base/types/blogs.model';
 import { PostsQueryRepository } from '../../posts/repositories/posts.query-repository';
-import { createPostModel } from '../../base/types/posts.model';
-import { PostsService } from '../../posts/application/posts.service';
+import { createBlogPostModel } from '../../base/types/posts.model';
 
 @Controller('blogs')
 export class BlogsController {
@@ -24,7 +23,6 @@ export class BlogsController {
     private blogsService: BlogsService,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
-    private postsService: PostsService,
   ) {}
 
   @Get()
@@ -82,10 +80,13 @@ export class BlogsController {
   @HttpCode(201)
   async createPostForBlog(
     @Param('blogId') blogId: string,
-    @Body() inputData: createPostModel,
+    @Body() inputData: createBlogPostModel,
   ) {
-    const newPost = this.postsService.createPost(blogId, inputData);
-    if (!newPost) throw new BadRequestException("Blog doesn't exists");
+    const newPost = await this.blogsService.createPostForBlog(
+      blogId,
+      inputData,
+    );
+    if (!newPost) throw new NotFoundException("Blog doesn't exists");
     return newPost;
   }
 

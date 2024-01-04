@@ -1,9 +1,17 @@
 import { ObjectId } from 'mongodb';
+import { likesInfo } from './likes.model';
+
+export type createBlogPostModel = {
+  title: string;
+  shortDescription: string;
+  content: string;
+};
 
 export type createPostModel = {
   title: string;
   shortDescription: string;
   content: string;
+  blogId: string;
 };
 
 export type postModel = {
@@ -14,12 +22,7 @@ export type postModel = {
   blogId: ObjectId;
   blogName: string;
   createdAt: string;
-  extendedLikesInfo: {
-    likesCount: number;
-    dislikesCount: number;
-    myStatus: string;
-    newestLikes: [];
-  };
+  extendedLikesInfo: likesInfo;
 };
 
 export type updatePostModel = {

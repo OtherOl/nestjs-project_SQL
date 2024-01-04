@@ -6,6 +6,7 @@ import { postModel } from '../../base/types/posts.model';
 import { paginationModel } from '../../base/types/pagination.model';
 import { BlogsQueryRepository } from '../../blogs/repositories/blogs.query-repository';
 import { ObjectId } from 'mongodb';
+import { commentsModel } from '../../base/types/comments.model';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -14,19 +15,35 @@ export class PostsQueryRepository {
     private blogsQueryRepository: BlogsQueryRepository,
   ) {}
 
-  // async getCommentsByPostId(
-  //   searchNameTerm: string,
-  //   sortBy: string,
-  //   sortDirection: string,
-  //   pageNumber: number,
-  //   pageSize: number,
-  // ) {
-  //   const sortQuery: any = {};
-  //   sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
-  //
-  //   // const filter = { postId: postId };
-  //   return sortQuery;
-  // }
+  async getCommentsByPostId(
+    postId: string,
+    sortBy: string = 'createdAt',
+    sortDirection: string = 'desc',
+    pageNumber: number,
+    pageSize: number,
+  ) {
+    const sortQuery: any = {};
+    sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
+
+    const filter = { postId: postId };
+
+    const countComments: number = await this.postModel.countDocuments(filter);
+    const foundedComments: commentsModel[] = await this.postModel
+      .find(filter)
+      .sort(sortQuery)
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .lean();
+
+    const posts: paginationModel<commentsModel> = {
+      pagesCount: Math.ceil(countComments / pageSize),
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount: countComments,
+      items: foundedComments,
+    };
+    return posts;
+  }
 
   async getAllPosts(
     sortBy: string = 'createdAt',

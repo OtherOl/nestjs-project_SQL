@@ -13,9 +13,10 @@ export class PostsService {
     private postsQueryRepository: PostsQueryRepository,
     private blogsQueryRepository: BlogsQueryRepository,
   ) {}
-  async createPost(blogId: string, inputData: createPostModel) {
-    const blog: blogModel | null =
-      await this.blogsQueryRepository.getBlogById(blogId);
+  async createPost(inputData: createPostModel) {
+    const blog: blogModel | null = await this.blogsQueryRepository.getBlogById(
+      inputData.blogId,
+    );
     if (!blog) return null;
 
     const newPost: postModel = {
@@ -33,6 +34,7 @@ export class PostsService {
         newestLikes: [],
       },
     };
+
     return this.postsRepository.createPost(newPost);
   }
 }

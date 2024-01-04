@@ -4,6 +4,23 @@ import { HydratedDocument } from 'mongoose';
 
 export type PostDocument = HydratedDocument<Post>;
 
+@Schema({ versionKey: false, _id: false })
+export class LikesInfo {
+  @Prop({ required: true })
+  likesCount: number;
+
+  @Prop({ required: true })
+  dislikesCount: number;
+
+  @Prop({ required: true })
+  myStatus: string;
+
+  @Prop({ required: true })
+  newestLikes: [];
+}
+
+export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
+
 @Schema({ versionKey: false })
 export class Post {
   @Prop({ required: true })
@@ -27,12 +44,7 @@ export class Post {
   @Prop({ required: true })
   createdAt: string;
 
-  @Prop({ required: true })
-  extendedLikesInfo: {
-    likesCount: number;
-    dislikesCount: number;
-    myStatus: string;
-    newestLikes: [];
-  };
+  @Prop({ required: true, type: LikesInfoSchema })
+  extendedLikesInfo: LikesInfo;
 }
 export const PostSchema = SchemaFactory.createForClass(Post);

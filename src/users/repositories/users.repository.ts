@@ -8,7 +8,8 @@ import { ObjectId } from 'mongodb';
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
   async createUser(newUser: any) {
-    return await this.userModel.create(newUser);
+    await this.userModel.create(newUser);
+    return newUser;
   }
 
   async deleteUser(id: string) {

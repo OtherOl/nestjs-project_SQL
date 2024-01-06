@@ -39,22 +39,22 @@ export class User {
   @Prop({ required: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop()
   passwordHash: string;
 
-  @Prop({ required: true })
+  @Prop()
   passwordSalt: string;
 
   @Prop({ required: true })
   createdAt: string;
 
-  @Prop({ required: true, type: EmailConfirmationSchema })
+  @Prop({ type: EmailConfirmationSchema })
   emailConfirmation: EmailConfirmation;
 
-  @Prop({ required: true, type: RecoveryConfirmationSchema })
+  @Prop({ type: RecoveryConfirmationSchema })
   recoveryConfirmation: RecoveryConfirmation;
 
-  @Prop({ required: true })
+  @Prop()
   isConfirmed: boolean;
 }
 

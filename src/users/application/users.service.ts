@@ -13,7 +13,7 @@ export class UsersService {
 
   async createUser(inputData: createUserModel) {
     const newUser = {
-      _id: new ObjectId(),
+      id: new ObjectId(),
       login: inputData.login,
       email: inputData.email,
       createdAt: new Date().toISOString(),

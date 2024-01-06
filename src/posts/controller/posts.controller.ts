@@ -99,7 +99,7 @@ export class PostsController {
   @HttpCode(204)
   async deletePost(@Param('id') postId: string) {
     const deletedPost = this.postsQueryRepository.deletePostById(postId);
-    if (!deletedPost) throw new BadRequestException("Post doesn't exists");
+    if (!deletedPost) throw new NotFoundException("Post doesn't exists");
     return;
   }
 }

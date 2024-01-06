@@ -114,7 +114,7 @@ export class PostsQueryRepository {
   }
 
   async getPostById(postId: string): Promise<postModel | null> {
-    return this.postModel.findOne({ id: new ObjectId(postId) });
+    return this.postModel.findOne({ id: new ObjectId(postId) }, { _id: 0 });
   }
 
   async deletePostById(postId: string) {

@@ -39,7 +39,7 @@ export class BlogsQueryRepository {
   }
 
   async getBlogById(blogId: string): Promise<blogModel | null> {
-    return this.blogModel.findOne({ id: new ObjectId(blogId) });
+    return this.blogModel.findOne({ id: new ObjectId(blogId) }, { _id: 0 });
   }
 
   async deleteBlogById(blogId: string) {

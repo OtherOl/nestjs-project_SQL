@@ -54,6 +54,6 @@ export class UsersQueryRepository {
   }
 
   async getUserById(id: string) {
-    return this.userModel.findOne({ id: new ObjectId(id) });
+    return this.userModel.findOne({ id: new ObjectId(id) }, { _id: 0 });
   }
 }

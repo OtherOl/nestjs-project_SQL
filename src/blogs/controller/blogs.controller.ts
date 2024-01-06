@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -37,7 +36,7 @@ export class BlogsController {
       pageSize: number;
     },
   ) {
-    return this.blogsQueryRepository.getAllBlogs(
+    return await this.blogsQueryRepository.getAllBlogs(
       query.searchNameTerm,
       query.sortBy,
       query.sortDirection,
@@ -49,7 +48,7 @@ export class BlogsController {
   @Post()
   @HttpCode(201)
   async createBlog(@Body() inputData: createBlogModel) {
-    return this.blogsService.createBlog(inputData);
+    return await this.blogsService.createBlog(inputData);
   }
 
   @Get(':blogId/posts')
@@ -105,7 +104,7 @@ export class BlogsController {
     @Body() inputData: createBlogModel,
   ) {
     const updatedBlog = await this.blogsService.updateBlog(blogId, inputData);
-    if (!updatedBlog) throw new BadRequestException('Incorrect inputdata');
+    if (!updatedBlog) throw new NotFoundException("Blog doesn't exists");
     return;
   }
 

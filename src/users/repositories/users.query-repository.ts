@@ -10,8 +10,8 @@ import { ObjectId } from 'mongodb';
 export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
   async getAllUsers(
-    sortBy: string,
-    sortDirection: string,
+    sortBy: string = 'createdAt',
+    sortDirection: string = 'desc',
     pageNumber: number,
     pageSize: number,
     searchLoginTerm: string,

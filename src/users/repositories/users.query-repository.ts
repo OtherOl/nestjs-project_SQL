@@ -4,6 +4,7 @@ import { User, UserDocument } from '../domain/users.entity';
 import { Model } from 'mongoose';
 import { userModel } from '../../base/types/users.model';
 import { paginationModel } from '../../base/types/pagination.model';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -52,7 +53,7 @@ export class UsersQueryRepository {
     return users;
   }
 
-  async getUserById(_id: string) {
-    return this.userModel.findOne({ _id: _id });
+  async getUserById(id: string) {
+    return this.userModel.findOne({ id: new ObjectId(id) });
   }
 }

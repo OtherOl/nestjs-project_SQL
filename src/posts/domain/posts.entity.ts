@@ -24,7 +24,7 @@ export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
 @Schema({ versionKey: false })
 export class Post {
   @Prop({ required: true })
-  _id: ObjectId;
+  id: ObjectId;
 
   @Prop({ required: true })
   title: string;

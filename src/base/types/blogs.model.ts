@@ -7,7 +7,7 @@ export type createBlogModel = {
 };
 
 export type blogModel = {
-  _id: ObjectId;
+  id: ObjectId;
   name: string;
   description: string;
   websiteUrl: string;

@@ -20,11 +20,11 @@ export class PostsService {
     if (!blog) return null;
 
     const newPost: postModel = {
-      _id: new ObjectId(),
+      id: new ObjectId(),
       title: inputData.title,
       shortDescription: inputData.shortDescription,
       content: inputData.content,
-      blogId: blog._id,
+      blogId: blog.id,
       blogName: blog.name,
       createdAt: new Date().toISOString(),
       extendedLikesInfo: {

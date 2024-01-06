@@ -4,7 +4,7 @@ import { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema({ versionKey: false })
+@Schema({ versionKey: false, _id: false })
 export class EmailConfirmation {
   @Prop({ required: true })
   confirmationCode: string;
@@ -16,7 +16,7 @@ export class EmailConfirmation {
 export const EmailConfirmationSchema =
   SchemaFactory.createForClass(EmailConfirmation);
 
-@Schema({ versionKey: false })
+@Schema({ versionKey: false, _id: false })
 export class RecoveryConfirmation {
   @Prop({ required: true })
   recoveryCode: string;
@@ -31,7 +31,7 @@ export const RecoveryConfirmationSchema =
 @Schema({ versionKey: false })
 export class User {
   @Prop({ required: true })
-  _id: ObjectId;
+  id: ObjectId;
 
   @Prop({ required: true })
   login: string;

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../domain/users.entity';
 import { Model } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UsersRepository {
@@ -10,8 +11,10 @@ export class UsersRepository {
     return await this.userModel.create(newUser);
   }
 
-  async deleteUser(_id: string) {
-    const deletedUser = await this.userModel.deleteOne({ _id: _id });
+  async deleteUser(id: string) {
+    const deletedUser = await this.userModel.deleteOne({
+      id: new ObjectId(id),
+    });
     return deletedUser.deletedCount === 1;
   }
 }

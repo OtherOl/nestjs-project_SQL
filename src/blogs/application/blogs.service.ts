@@ -16,12 +16,12 @@ export class BlogsService {
 
   async createBlog(inputData: createBlogModel) {
     const newBlog = {
-      _id: new ObjectId(),
+      id: new ObjectId(),
       name: inputData.name,
       description: inputData.description,
       websiteUrl: inputData.websiteUrl,
       createdAt: new Date().toISOString(),
-      isMembership: true,
+      isMembership: false,
     };
 
     return this.blogsRepository.createBlog(newBlog);
@@ -40,7 +40,7 @@ export class BlogsService {
       title: inputData.title,
       shortDescription: inputData.shortDescription,
       content: inputData.content,
-      blogId: blog._id,
+      blogId: blog.id,
       blogName: blog.name,
       createdAt: new Date().toISOString(),
       extendedLikesInfo: {

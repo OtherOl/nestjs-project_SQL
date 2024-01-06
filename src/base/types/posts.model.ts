@@ -15,7 +15,7 @@ export type createPostModel = {
 };
 
 export type postModel = {
-  _id: ObjectId;
+  id: ObjectId;
   title: string;
   shortDescription: string;
   content: string;

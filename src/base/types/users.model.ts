@@ -7,7 +7,7 @@ export type createUserModel = {
 };
 
 export type userModel = {
-  _id: ObjectId;
+  id: ObjectId;
   login: string;
   email: string;
   passwordHash: string;

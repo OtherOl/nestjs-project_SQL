@@ -114,12 +114,12 @@ export class PostsQueryRepository {
   }
 
   async getPostById(postId: string): Promise<postModel | null> {
-    return this.postModel.findOne({ _id: new ObjectId(postId) });
+    return this.postModel.findOne({ id: new ObjectId(postId) });
   }
 
   async deletePostById(postId: string) {
     const deletedPost = await this.postModel.deleteOne({
-      _id: new ObjectId(postId),
+      id: new ObjectId(postId),
     });
     return deletedPost.deletedCount === 1;
   }

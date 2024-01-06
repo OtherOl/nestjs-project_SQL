@@ -15,7 +15,7 @@ export class PostsRepository {
 
   async updatePost(postId: string, inputData: updatePostModel) {
     const updatedPost = await this.postModel.updateOne(
-      { _id: new ObjectId(postId) },
+      { id: new ObjectId(postId) },
       { $set: { ...inputData } },
     );
     return updatedPost.modifiedCount === 1;

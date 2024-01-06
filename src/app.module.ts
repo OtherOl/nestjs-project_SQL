@@ -29,7 +29,7 @@ import { TestingRepository } from './testing/repositories/testing.repository';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    //@ts-expect-error I don't know why he throws me an error
+    //@ts-expect-error I don't know why he throws me an error there
     MongooseModule.forRoot(process.env.MONGO_URL),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },

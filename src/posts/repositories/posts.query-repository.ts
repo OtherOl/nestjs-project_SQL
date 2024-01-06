@@ -90,7 +90,7 @@ export class PostsQueryRepository {
     const sortQuery: any = {};
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
 
-    const filter = { blogId: blogId };
+    const filter = { blogId: new ObjectId(blogId) };
 
     const isExists = await this.blogsQueryRepository.getBlogById(blogId);
     if (!isExists) return null;

@@ -5,6 +5,30 @@ import { HydratedDocument } from 'mongoose';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ versionKey: false })
+export class EmailConfirmation {
+  @Prop({ required: true })
+  confirmationCode: string;
+
+  @Prop({ required: true })
+  expirationDate: string;
+}
+
+export const EmailConfirmationSchema =
+  SchemaFactory.createForClass(EmailConfirmation);
+
+@Schema({ versionKey: false })
+export class RecoveryConfirmation {
+  @Prop({ required: true })
+  recoveryCode: string;
+
+  @Prop({ required: true })
+  expirationDate: string;
+}
+
+export const RecoveryConfirmationSchema =
+  SchemaFactory.createForClass(RecoveryConfirmation);
+
+@Schema({ versionKey: false })
 export class User {
   @Prop({ required: true })
   _id: ObjectId;
@@ -24,17 +48,11 @@ export class User {
   @Prop({ required: true })
   createdAt: string;
 
-  @Prop({ required: true })
-  emailConfirmation: {
-    confirmationCode: string;
-    expirationDate: any;
-  };
+  @Prop({ required: true, type: EmailConfirmationSchema })
+  emailConfirmation: EmailConfirmation;
 
-  @Prop({ required: true })
-  recoveryConfirmation: {
-    recoveryCode: string;
-    expirationDate: any;
-  };
+  @Prop({ required: true, type: RecoveryConfirmationSchema })
+  recoveryConfirmation: RecoveryConfirmation;
 
   @Prop({ required: true })
   isConfirmed: boolean;

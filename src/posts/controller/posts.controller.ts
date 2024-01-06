@@ -68,7 +68,7 @@ export class PostsController {
   @Post()
   @HttpCode(201)
   async createPostForBlog(@Body() inputData: createPostModel) {
-    const newPost = this.postsService.createPost(inputData);
+    const newPost = await this.postsService.createPost(inputData);
     if (!newPost) throw new BadRequestException("Blog doesn't exists");
     return newPost;
   }
@@ -98,7 +98,7 @@ export class PostsController {
   @Delete(':id')
   @HttpCode(204)
   async deletePost(@Param('id') postId: string) {
-    const deletedPost = this.postsQueryRepository.deletePostById(postId);
+    const deletedPost = await this.postsQueryRepository.deletePostById(postId);
     if (!deletedPost) throw new NotFoundException("Post doesn't exists");
     return;
   }

@@ -11,6 +11,6 @@ export class CommentsQueryRepository {
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
   ) {}
   async getCommentById(id: string): Promise<commentsModel | null> {
-    return this.commentModel.findOne({ id: new ObjectId(id) });
+    return this.commentModel.findOne({ id: new ObjectId(id) }, { _id: 0 });
   }
 }

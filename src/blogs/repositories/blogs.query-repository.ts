@@ -23,7 +23,7 @@ export class BlogsQueryRepository {
     const filter = { name: RegExp(searchNameTerm, 'i') };
     const countBlogs: number = await this.blogModel.countDocuments(filter);
     const foundedBlogs: blogModel[] = await this.blogModel
-      .find(filter)
+      .find(filter, { _id: 0 })
       .sort(sortQuery)
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
@@ -39,12 +39,12 @@ export class BlogsQueryRepository {
   }
 
   async getBlogById(blogId: string): Promise<blogModel | null> {
-    return this.blogModel.findOne({ _id: new ObjectId(blogId) });
+    return this.blogModel.findOne({ id: new ObjectId(blogId) });
   }
 
   async deleteBlogById(blogId: string) {
     const deletedBlog = await this.blogModel.deleteOne({
-      _id: new ObjectId(blogId),
+      id: new ObjectId(blogId),
     });
     return deletedBlog.deletedCount === 1;
   }

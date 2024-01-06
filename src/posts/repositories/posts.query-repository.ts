@@ -30,14 +30,14 @@ export class PostsQueryRepository {
     const sortQuery: any = {};
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
 
-    const filter = { postId: postId };
+    const filter = { postId: new ObjectId(postId) };
 
-    const isExists = await this.postModel.findOne(filter);
+    const isExists = await this.postModel.findOne({ id: new ObjectId(postId) });
     if (!isExists) return null;
     const countComments: number =
       await this.commentModel.countDocuments(filter);
     const foundedComments: commentsModel[] = await this.commentModel
-      .find(filter)
+      .find(filter, { _id: 0 })
       .sort(sortQuery)
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -64,7 +64,7 @@ export class PostsQueryRepository {
 
     const countPosts: number = await this.postModel.countDocuments();
     const foundedPosts: postModel[] = await this.postModel
-      .find({})
+      .find({}, { _id: 0 })
       .sort(sortQuery)
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
@@ -97,7 +97,7 @@ export class PostsQueryRepository {
 
     const countPosts: number = await this.postModel.countDocuments(filter);
     const foundedPosts: postModel[] = await this.postModel
-      .find(filter)
+      .find(filter, { _id: 0 })
       .sort(sortQuery)
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)

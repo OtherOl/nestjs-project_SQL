@@ -10,11 +10,12 @@ export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: Model<Blog>) {}
 
   async createBlog(blog: blogModel): Promise<blogModel> {
-    return await this.blogModel.create(blog);
+    await this.blogModel.create(blog);
+    return blog;
   }
   async updateBlog(blogId: string, inputData: createBlogModel) {
     const updatedBlog = await this.blogModel.updateOne(
-      { _id: new ObjectId(blogId) },
+      { id: new ObjectId(blogId) },
       {
         $set: {
           name: inputData.name,

@@ -36,7 +36,7 @@ export class BlogsService {
     if (!blog) return null;
 
     const newPost: postModel = {
-      _id: new ObjectId(),
+      id: new ObjectId(),
       title: inputData.title,
       shortDescription: inputData.shortDescription,
       content: inputData.content,

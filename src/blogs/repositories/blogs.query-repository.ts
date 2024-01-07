@@ -35,7 +35,10 @@ export class BlogsQueryRepository {
       totalCount: countBlogs,
       items: foundedBlogs,
     };
-    return blogs;
+    return `<div>
+  <h1>Your blogs</h1>
+  <h2>${blogs}</h2>
+  </div>`;
   }
 
   async getBlogById(blogId: string): Promise<blogModel | null> {

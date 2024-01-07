@@ -22,6 +22,8 @@ import { Comment, CommentSchema } from './comments/domain/comments.entity';
 import { User, UserSchema } from './users/domain/users.entity';
 import { TestingController } from './testing/controller/testing.controller';
 import { TestingRepository } from './testing/repositories/testing.repository';
+import { CommentsService } from './comments/application/comments.service';
+import { CommentsRepository } from './comments/repositories/comments.repository';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { TestingRepository } from './testing/repositories/testing.repository';
     PostsService,
     PostsRepository,
     PostsQueryRepository,
+    CommentsService,
+    CommentsRepository,
     CommentsQueryRepository,
     UsersQueryRepository,
     UsersService,

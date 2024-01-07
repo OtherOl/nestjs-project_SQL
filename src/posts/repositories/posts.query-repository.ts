@@ -37,7 +37,7 @@ export class PostsQueryRepository {
     const countComments: number =
       await this.commentModel.countDocuments(filter);
     const foundedComments: commentsModel[] = await this.commentModel
-      .find(filter, { _id: 0 })
+      .find(filter, { _id: 0, postId: 0 })
       .sort(sortQuery)
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)

@@ -46,6 +46,18 @@ export class PostsController {
     if (!comments) throw new NotFoundException("Pos doesn't exists");
     return comments;
   }
+
+  @Post(':postId/comments')
+  @HttpCode(201)
+  async createCommentForPost(
+    @Param('id') postId: string,
+    @Body() content: string,
+  ) {
+    const comment = await this.postsService.createComment(postId, content);
+    if (!comment) throw new NotFoundException("Post doesn't exists");
+    return comment;
+  }
+
   @Get()
   @HttpCode(200)
   async getAllPosts(

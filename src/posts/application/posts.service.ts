@@ -5,6 +5,7 @@ import { PostsRepository } from '../repositories/posts.repository';
 import { PostsQueryRepository } from '../repositories/posts.query-repository';
 import { BlogsQueryRepository } from '../../blogs/repositories/blogs.query-repository';
 import { blogModel } from '../../base/types/blogs.model';
+import { commentsModel } from '../../base/types/comments.model';
 
 @Injectable()
 export class PostsService {
@@ -36,5 +37,26 @@ export class PostsService {
     };
 
     return this.postsRepository.createPost(newPost);
+  }
+
+  async createComment(postId: string, content: string) {
+    const post = await this.postsQueryRepository.getPostById(postId);
+    if (!post) return null;
+    const comment: commentsModel = {
+      postId: new ObjectId(postId),
+      id: new ObjectId(),
+      content: content,
+      commentatorInfo: {
+        userId: '',
+        userLogin: '',
+      },
+      createdAt: new Date().toISOString(),
+      likesInfo: {
+        likesCount: 0,
+        dislikesCount: 0,
+        myStatus: 'None',
+      },
+    };
+    return await this.postsRepository.createComment(comment);
   }
 }

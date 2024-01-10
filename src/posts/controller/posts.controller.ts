@@ -10,11 +10,14 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { createPostModel, updatePostModel } from '../../base/types/posts.model';
 import { PostsService } from '../application/posts.service';
 import { PostsQueryRepository } from '../repositories/posts.query-repository';
 import { PostsRepository } from '../repositories/posts.repository';
+import { createCommentModel } from '../../base/types/comments.model';
+import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -43,17 +46,17 @@ export class PostsController {
       query.pageNumber ? +query.pageNumber : 1,
       query.pageSize ? +query.pageSize : 10,
     );
-    if (!comments) throw new NotFoundException("Pos doesn't exists");
+    if (!comments) throw new NotFoundException("Post doesn't exists");
     return comments;
   }
 
   @Post(':postId/comments')
   @HttpCode(201)
   async createCommentForPost(
-    @Param('id') postId: string,
-    @Body() content: string,
+    @Param('postId') postId: string,
+    @Body() inputData: createCommentModel,
   ) {
-    const comment = await this.postsService.createComment(postId, content);
+    const comment = await this.postsService.createComment(postId, inputData);
     if (!comment) throw new NotFoundException("Post doesn't exists");
     return comment;
   }
@@ -77,11 +80,12 @@ export class PostsController {
     );
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
   async createPostForBlog(@Body() inputData: createPostModel) {
     const newPost = await this.postsService.createPost(inputData);
-    if (!newPost) throw new BadRequestException("Blog doesn't exists");
+    if (!newPost) throw new NotFoundException("Blog doesn't exists");
     return newPost;
   }
 
@@ -93,6 +97,7 @@ export class PostsController {
     return post;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updatePost(
@@ -107,6 +112,7 @@ export class PostsController {
     return;
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deletePost(@Param('id') postId: string) {

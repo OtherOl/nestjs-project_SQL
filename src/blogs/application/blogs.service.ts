@@ -15,7 +15,7 @@ export class BlogsService {
   ) {}
 
   async createBlog(inputData: createBlogModel) {
-    const newBlog = {
+    const newBlog: blogModel = {
       id: new ObjectId(),
       name: inputData.name,
       description: inputData.description,

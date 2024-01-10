@@ -1,20 +1,39 @@
 import { ObjectId } from 'mongodb';
 import { likesInfo } from './likes.model';
+import { IsString, Length } from 'class-validator';
 
-export type createBlogPostModel = {
+export class createBlogPostModel {
+  @IsString()
+  @Length(1, 30)
   title: string;
-  shortDescription: string;
-  content: string;
-};
 
-export type createPostModel = {
-  title: string;
+  @IsString()
+  @Length(1, 100)
   shortDescription: string;
+
+  @IsString()
+  @Length(1, 1000)
   content: string;
+}
+
+export class createPostModel {
+  @IsString()
+  @Length(1, 30)
+  title: string;
+
+  @IsString()
+  @Length(1, 100)
+  shortDescription: string;
+
+  @IsString()
+  @Length(1, 1000)
+  content: string;
+
+  @IsString()
   blogId: string;
-};
+}
 
-export type postModel = {
+export class postModel {
   id: ObjectId;
   title: string;
   shortDescription: string;
@@ -23,11 +42,21 @@ export type postModel = {
   blogName: string;
   createdAt: string;
   extendedLikesInfo: likesInfo;
-};
+}
 
-export type updatePostModel = {
+export class updatePostModel {
+  @IsString()
+  @Length(1, 30)
   title: string;
+
+  @IsString()
+  @Length(1, 100)
   shortDescription: string;
+
+  @IsString()
+  @Length(1, 1000)
   content: string;
+
+  @IsString()
   blogId: string;
-};
+}

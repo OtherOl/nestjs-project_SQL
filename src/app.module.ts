@@ -24,15 +24,17 @@ import { TestingController } from './testing/controller/testing.controller';
 import { TestingRepository } from './testing/repositories/testing.repository';
 import { CommentsService } from './comments/application/comments.service';
 import { CommentsRepository } from './comments/repositories/comments.repository';
+import { BasicStrategy } from './auth/strategies/basic.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
+    PassportModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
-    //@ts-expect-error I don't know why he throws me an error there
-    MongooseModule.forRoot(process.env.MONGO_URL),
+    MongooseModule.forRoot(process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'),
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
@@ -61,6 +63,7 @@ import { CommentsRepository } from './comments/repositories/comments.repository'
     UsersService,
     UsersRepository,
     TestingRepository,
+    BasicStrategy,
   ],
 })
 export class AppModule {}

@@ -8,10 +8,12 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersQueryRepository } from '../repositories/users.query-repository';
 import { createUserModel } from '../../base/types/users.model';
 import { UsersService } from '../application/users.service';
+import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -20,6 +22,7 @@ export class UsersController {
     private usersService: UsersService,
   ) {}
 
+  @UseGuards(BasicAuthGuard)
   @Get()
   @HttpCode(200)
   async getAllUsers(
@@ -43,12 +46,14 @@ export class UsersController {
     );
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
   async createUser(@Body() inputData: createUserModel) {
     return await this.usersService.createUser(inputData);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteUser(@Param('id') _id: string) {

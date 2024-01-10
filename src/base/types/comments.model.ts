@@ -1,6 +1,13 @@
 import { ObjectId } from 'mongodb';
+import { IsString, Length } from 'class-validator';
 
-export type commentsModel = {
+export class createCommentModel {
+  @IsString()
+  @Length(20, 300)
+  content: string;
+}
+
+export class commentsModel {
   postId: ObjectId;
   id: ObjectId;
   content: string;
@@ -14,4 +21,4 @@ export type commentsModel = {
     dislikesCount: number;
     myStatus: string;
   };
-};
+}

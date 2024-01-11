@@ -13,8 +13,7 @@ export class EmailConfirmation {
   expirationDate: string;
 }
 
-export const EmailConfirmationSchema =
-  SchemaFactory.createForClass(EmailConfirmation);
+export const EmailConfirmationSchema = SchemaFactory.createForClass(EmailConfirmation);
 
 @Schema({ versionKey: false, _id: false })
 export class RecoveryConfirmation {
@@ -25,8 +24,7 @@ export class RecoveryConfirmation {
   expirationDate: string;
 }
 
-export const RecoveryConfirmationSchema =
-  SchemaFactory.createForClass(RecoveryConfirmation);
+export const RecoveryConfirmationSchema = SchemaFactory.createForClass(RecoveryConfirmation);
 
 @Schema({ versionKey: false })
 export class User {

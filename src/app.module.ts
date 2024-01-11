@@ -26,10 +26,15 @@ import { CommentsService } from './comments/application/comments.service';
 import { CommentsRepository } from './comments/repositories/comments.repository';
 import { BasicStrategy } from './auth/strategies/basic.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { AuthController } from './auth/controller/auth.controller';
+import { JwtModule } from '@nestjs/jwt';
+import { Security, SecuritySchema } from './securityDevices/domain/security.entity';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthService } from './auth/application/auth.service';
 
 @Module({
   imports: [
-    PassportModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -40,7 +45,15 @@ import { PassportModule } from '@nestjs/passport';
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: User.name, schema: UserSchema },
+      { name: Security.name, schema: SecuritySchema },
     ]),
+    PassportModule,
+    JwtModule.register({
+      global: true,
+      secret: process.env.SECRET,
+      signOptions: { expiresIn: '10m' },
+    }),
+    ThrottlerModule.forRoot([{ ttl: 10000, limit: 5 }]),
   ],
   controllers: [
     BlogsController,
@@ -48,6 +61,7 @@ import { PassportModule } from '@nestjs/passport';
     CommentsController,
     UsersController,
     TestingController,
+    AuthController,
   ],
   providers: [
     BlogsService,
@@ -64,6 +78,8 @@ import { PassportModule } from '@nestjs/passport';
     UsersRepository,
     TestingRepository,
     BasicStrategy,
+    AuthService,
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })
 export class AppModule {}

@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Delete, Get } from '@nestjs/common';
 import { SecurityQueryRepository } from '../repositories/security.query-repository';
 import { SecurityRepository } from '../repositories/security.repository';
 
@@ -9,5 +9,16 @@ export class SecurityController {
     private securityRepository: SecurityRepository,
   ) {}
 
-  async getAllSessions() {}
+  @Get()
+  async getAllSessions() {
+    return await this.securityQueryRepository.getAllSessions();
+  }
+
+  @Delete()
+  async deleteAllExceptOne(): Promise<any> {
+    return await this.securityRepository.deleteAllSessions();
+  }
+
+  @Delete(':deviceId')
+  async deleteSessionById() {}
 }

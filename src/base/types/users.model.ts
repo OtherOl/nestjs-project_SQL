@@ -1,17 +1,32 @@
 import { ObjectId } from 'mongodb';
+import { IsEmail, IsString, Length, Matches } from 'class-validator';
 
-export type createUserModel = {
-  login: string;
+export class UserLogin {
+  @IsString()
+  loginOrEmail: string;
+
+  @IsString()
   password: string;
-  email: string;
-};
+}
 
-export type userModel = {
+export class createUserModel {
+  @IsString()
+  @Length(3, 10)
+  @Matches('^[a-zA-Z0-9_-]*$')
+  login: string;
+
+  @Length(6, 20)
+  password: string;
+
+  @IsEmail()
+  email: string;
+}
+
+export class userModel {
   id: ObjectId;
   login: string;
   email: string;
   passwordHash: string;
-  passwordSalt: string;
   createdAt: string;
   emailConfirmation: {
     confirmationCode: string;
@@ -22,4 +37,4 @@ export type userModel = {
     expirationDate: any;
   };
   isConfirmed: boolean;
-};
+}

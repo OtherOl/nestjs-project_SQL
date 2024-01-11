@@ -21,10 +21,7 @@ export class UsersQueryRepository {
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
 
     const filter = {
-      $or: [
-        { login: RegExp(searchLoginTerm, 'i') },
-        { email: RegExp(searchEmailTerm, 'i') },
-      ],
+      $or: [{ login: RegExp(searchLoginTerm, 'i') }, { email: RegExp(searchEmailTerm, 'i') }],
     };
 
     const countUsers: number = await this.userModel.countDocuments(filter);
@@ -55,5 +52,15 @@ export class UsersQueryRepository {
 
   async getUserById(id: string) {
     return this.userModel.findOne({ id: new ObjectId(id) }, { _id: 0 });
+  }
+
+  async findByLoginOrEmail(loginOrEmail: string) {
+    const foundedUser: userModel | null = await this.userModel.findOne(
+      {
+        $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
+      },
+      { _id: 0 },
+    );
+    return foundedUser;
   }
 }

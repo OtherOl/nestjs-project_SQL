@@ -49,4 +49,8 @@ export class AuthService {
 
     return await this.usersRepository.updateConfirmation(user.id);
   }
+
+  async verifyToken(token: string) {
+    return this.jwtService.verify(token);
+  }
 }

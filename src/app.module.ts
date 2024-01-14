@@ -34,6 +34,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthService } from './auth/application/auth.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailManager } from './email/emailManager';
+import { SecurityController } from './securityDevices/controller/security.controller';
+import { SecurityService } from './securityDevices/application/security.service';
+import { SecurityRepository } from './securityDevices/repositories/security.repository';
+import { SecurityQueryRepository } from './securityDevices/repositories/security.query-repository';
 
 @Module({
   imports: [
@@ -74,6 +78,7 @@ import { EmailManager } from './email/emailManager';
     UsersController,
     TestingController,
     AuthController,
+    SecurityController,
   ],
   providers: [
     BlogsService,
@@ -92,6 +97,9 @@ import { EmailManager } from './email/emailManager';
     BasicStrategy,
     AuthService,
     EmailManager,
+    SecurityService,
+    SecurityRepository,
+    SecurityQueryRepository,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

@@ -32,6 +32,8 @@ import { Security, SecuritySchema } from './securityDevices/domain/security.enti
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthService } from './auth/application/auth.service';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EmailManager } from './email/emailManager';
 
 @Module({
   imports: [
@@ -47,6 +49,16 @@ import { AuthService } from './auth/application/auth.service';
       { name: User.name, schema: UserSchema },
       { name: Security.name, schema: SecuritySchema },
     ]),
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.gmail.com',
+        auth: {
+          user: 'dmitrybackenddev@gmail.com',
+          pass: 'tzcjafbdsjqrpmwl',
+        },
+        service: 'gmail',
+      },
+    }),
     PassportModule,
     JwtModule.register({
       global: true,
@@ -79,6 +91,7 @@ import { AuthService } from './auth/application/auth.service';
     TestingRepository,
     BasicStrategy,
     AuthService,
+    EmailManager,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../domain/users.entity';
 import { Model } from 'mongoose';
-import { userModel } from '../../base/types/users.model';
+import { ConfirmationCode, userModel } from '../../base/types/users.model';
 import { paginationModel } from '../../base/types/pagination.model';
 import { ObjectId } from 'mongodb';
 
@@ -32,7 +32,6 @@ export class UsersQueryRepository {
         passwordSalt: 0,
         emailConfirmation: 0,
         recoveryConfirmation: 0,
-        isConfirmed: 0,
       })
       .sort(sortQuery)
       .skip((pageNumber - 1) * pageSize)
@@ -62,5 +61,9 @@ export class UsersQueryRepository {
       { _id: 0 },
     );
     return foundedUser;
+  }
+
+  async findUserByConfirmationCode(code: ConfirmationCode): Promise<userModel | null> {
+    return this.userModel.findOne({ 'emailConfirmation.confirmationCode': code.code });
   }
 }

@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns/add';
 import { AuthService } from '../../auth/application/auth.service';
+import { EmailManager } from '../../email/emailManager';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +14,7 @@ export class UsersService {
     private usersRepository: UsersRepository,
     private usersQueryRepository: UsersQueryRepository,
     private authService: AuthService,
+    private emailManager: EmailManager,
   ) {}
 
   async createUserForRegistration(inputData: createUserModel) {
@@ -41,7 +43,7 @@ export class UsersService {
       },
       isConfirmed: false,
     };
-    //There should be sent email message !!!
+    await this.emailManager.sendEmailConfirmationCode(newUser);
     await this.usersRepository.createUser(newUser);
     return;
   }

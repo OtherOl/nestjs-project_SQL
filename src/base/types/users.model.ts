@@ -1,6 +1,11 @@
 import { ObjectId } from 'mongodb';
 import { IsEmail, IsString, Length, Matches } from 'class-validator';
 
+export class ConfirmationCode {
+  @IsString()
+  code: string;
+}
+
 export class UserLogin {
   @IsString()
   loginOrEmail: string;

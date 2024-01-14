@@ -18,4 +18,8 @@ export class UsersRepository {
     });
     return deletedUser.deletedCount === 1;
   }
+
+  async updateConfirmation(userId: ObjectId) {
+    return this.userModel.updateOne({ id: userId }, { $set: { isConfirmed: true } });
+  }
 }

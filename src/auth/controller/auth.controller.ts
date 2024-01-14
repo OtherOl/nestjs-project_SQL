@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post, Res } from '@nestjs/common';
-import { createUserModel, UserLogin } from '../../base/types/users.model';
+import { ConfirmationCode, createUserModel, UserLogin } from '../../base/types/users.model';
 import { UsersService } from '../../users/application/users.service';
 import { AuthService } from '../application/auth.service';
 import { Response } from 'express';
@@ -36,7 +36,9 @@ export class AuthController {
   async refreshToken() {}
 
   @Post('registration-confirmation')
-  async registrationConfirmation() {}
+  async registrationConfirmation(@Body() code: ConfirmationCode) {
+    return await this.authService.confirmEmail(code);
+  }
 
   @HttpCode(204)
   @Post('registration')

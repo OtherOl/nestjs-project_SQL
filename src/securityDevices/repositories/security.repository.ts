@@ -5,9 +5,7 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class SecurityRepository {
-  constructor(
-    @InjectModel(Security.name) private securityModel: Model<SecurityDocument>,
-  ) {}
+  constructor(@InjectModel(Security.name) private securityModel: Model<SecurityDocument>) {}
 
   async deleteAllSessions(): Promise<any> {
     return this.securityModel.deleteMany({});

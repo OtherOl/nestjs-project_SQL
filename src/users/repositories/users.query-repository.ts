@@ -66,4 +66,8 @@ export class UsersQueryRepository {
   async findUserByConfirmationCode(code: ConfirmationCode): Promise<userModel | null> {
     return this.userModel.findOne({ 'emailConfirmation.confirmationCode': code.code });
   }
+
+  async findUserByRecoveryCode(recoveryCode: string): Promise<userModel | null> {
+    return this.userModel.findOne({ 'recoveryConfirmation.recoveryCode': recoveryCode });
+  }
 }

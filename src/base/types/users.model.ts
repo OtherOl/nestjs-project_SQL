@@ -1,6 +1,20 @@
 import { ObjectId } from 'mongodb';
 import { IsEmail, IsString, Length, Matches } from 'class-validator';
 
+export class createNewPassword {
+  @IsString()
+  @Length(6, 20)
+  password: string;
+
+  @IsString()
+  recoveryCode: string;
+}
+
+export class resendConfirmation {
+  @IsEmail()
+  email: string;
+}
+
 export class ConfirmationCode {
   @IsString()
   code: string;

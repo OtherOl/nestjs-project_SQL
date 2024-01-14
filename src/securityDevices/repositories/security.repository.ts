@@ -15,4 +15,12 @@ export class SecurityRepository {
   async createSession(newSession: securityViewModel) {
     return await this.securityModel.create(newSession);
   }
+
+  async updateSession(deviceId: string) {
+    const updatedSession = await this.securityModel.updateOne(
+      { deviceId: deviceId },
+      { $set: { lastActivateDate: new Date().toISOString() } },
+    );
+    return updatedSession.modifiedCount === 1;
+  }
 }

@@ -22,4 +22,12 @@ export class UsersRepository {
   async updateConfirmation(userId: ObjectId) {
     return this.userModel.updateOne({ id: userId }, { $set: { isConfirmed: true } });
   }
+
+  async changeConfirmationCode(userId: ObjectId, code: string) {
+    return this.userModel.updateOne({ id: userId }, { $set: { 'emailConfirmation.confirmationCode': code } });
+  }
+
+  async updatePassword(userId: ObjectId, passwordHash: string) {
+    return this.userModel.updateOne({ id: userId }, { $set: { passwordHash: passwordHash } });
+  }
 }

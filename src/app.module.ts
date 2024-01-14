@@ -38,6 +38,8 @@ import { SecurityController } from './securityDevices/controller/security.contro
 import { SecurityService } from './securityDevices/application/security.service';
 import { SecurityRepository } from './securityDevices/repositories/security.repository';
 import { SecurityQueryRepository } from './securityDevices/repositories/security.query-repository';
+import { Auth, AuthSchema } from './auth/domain/auth.entity';
+import { AuthRepository } from './auth/repositories/auth.repository';
 
 @Module({
   imports: [
@@ -52,6 +54,7 @@ import { SecurityQueryRepository } from './securityDevices/repositories/security
       { name: Comment.name, schema: CommentSchema },
       { name: User.name, schema: UserSchema },
       { name: Security.name, schema: SecuritySchema },
+      { name: Auth.name, schema: AuthSchema },
     ]),
     MailerModule.forRoot({
       transport: {
@@ -96,6 +99,7 @@ import { SecurityQueryRepository } from './securityDevices/repositories/security
     TestingRepository,
     BasicStrategy,
     AuthService,
+    AuthRepository,
     EmailManager,
     SecurityService,
     SecurityRepository,

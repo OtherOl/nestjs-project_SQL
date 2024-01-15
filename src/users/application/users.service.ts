@@ -66,9 +66,11 @@ export class UsersService {
 
   async createNewPassword(inputData: createNewPassword) {
     const user = await this.usersQueryRepository.findUserByRecoveryCode(inputData.recoveryCode);
-    if (!user) throw new BadRequestException([]);
-    if (user.recoveryConfirmation.recoveryCode !== inputData.recoveryCode) throw new BadRequestException([]);
-    if (user.recoveryConfirmation.expirationDate < new Date()) throw new BadRequestException();
+    if (!user) throw new BadRequestException([{ message: 'User not found', field: 'login' }]);
+    if (user.recoveryConfirmation.recoveryCode !== inputData.recoveryCode)
+      throw new BadRequestException([{ message: 'RecoveryCode is false', field: 'recoveryCode' }]);
+    if (user.recoveryConfirmation.expirationDate < new Date())
+      throw new BadRequestException([{ message: 'Date has expired', field: 'expirationDate' }]);
 
     const newPassword = await this.authService.createPasswordHash(inputData.password);
     await this.usersRepository.updatePassword(user.id, newPassword);

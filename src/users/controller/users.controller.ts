@@ -14,6 +14,7 @@ import { UsersQueryRepository } from '../repositories/users.query-repository';
 import { createUserModel } from '../../base/types/users.model';
 import { UsersService } from '../application/users.service';
 import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('users')
 export class UsersController {
@@ -22,6 +23,7 @@ export class UsersController {
     private usersService: UsersService,
   ) {}
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Get()
   @HttpCode(200)
@@ -46,6 +48,7 @@ export class UsersController {
     );
   }
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
@@ -53,6 +56,7 @@ export class UsersController {
     return await this.usersService.createUser(inputData);
   }
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)

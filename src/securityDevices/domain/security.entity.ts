@@ -16,7 +16,7 @@ export class Security {
   title: string;
 
   @Prop({ required: true })
-  lastActivateDate: Date;
+  lastActivateDate: string;
 
   @Prop({ required: true })
   deviceId: string;

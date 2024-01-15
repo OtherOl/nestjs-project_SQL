@@ -17,7 +17,7 @@ export class SecurityService {
       id: new ObjectId(),
       ip: ip,
       title: title,
-      lastActiveDate: new Date(verifiedToken.iat * 1000).toISOString(),
+      lastActivateDate: new Date(verifiedToken.iat * 1000).toISOString(),
       deviceId: verifiedToken.deviceId,
       userId: verifiedToken.userId,
     };

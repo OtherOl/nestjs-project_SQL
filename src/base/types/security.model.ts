@@ -4,7 +4,7 @@ export type securityViewModel = {
   id: ObjectId;
   ip: string;
   title: string;
-  lastActiveDate: string;
+  lastActivateDate: string;
   deviceId: string;
   userId: string;
 };

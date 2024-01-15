@@ -69,7 +69,7 @@ import { AuthRepository } from './auth/repositories/auth.repository';
     PassportModule,
     JwtModule.register({
       global: true,
-      secret: process.env.SECRET,
+      secret: process.env.SECRET || '123',
       signOptions: { expiresIn: '10m' },
     }),
     ThrottlerModule.forRoot([{ ttl: 10000, limit: 5 }]),

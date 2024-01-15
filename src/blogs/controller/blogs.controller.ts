@@ -81,14 +81,8 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @Post(':blogId/posts')
   @HttpCode(201)
-  async createPostForBlog(
-    @Param('blogId') blogId: string,
-    @Body() inputData: createBlogPostModel,
-  ) {
-    const newPost = await this.blogsService.createPostForBlog(
-      blogId,
-      inputData,
-    );
+  async createPostForBlog(@Param('blogId') blogId: string, @Body() inputData: createBlogPostModel) {
+    const newPost = await this.blogsService.createPostForBlog(blogId, inputData);
     if (!newPost) throw new NotFoundException("Blog doesn't exists");
     return newPost;
   }
@@ -104,10 +98,7 @@ export class BlogsController {
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
-  async updateBlog(
-    @Param('id') blogId: string,
-    @Body() inputData: createBlogModel,
-  ) {
+  async updateBlog(@Param('id') blogId: string, @Body() inputData: createBlogModel) {
     const updatedBlog = await this.blogsService.updateBlog(blogId, inputData);
     if (!updatedBlog) throw new NotFoundException("Blog doesn't exists");
     return;

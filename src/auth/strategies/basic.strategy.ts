@@ -9,14 +9,8 @@ export class BasicStrategy extends PassportStrategy(Strategy) {
     super();
   }
 
-  public validate = async (
-    username: string,
-    password: string,
-  ): Promise<boolean> => {
-    if (
-      process.env.BASICUSERNAME === username &&
-      process.env.PASSWORD === password
-    ) {
+  public validate = async (username: string, password: string): Promise<boolean> => {
+    if (process.env.BASICUSERNAME === username && process.env.PASSWORD === password) {
       return true;
     }
 

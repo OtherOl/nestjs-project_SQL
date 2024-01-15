@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { BasicStrategy as Strategy } from 'passport-http';
-import * as process from 'process';
 
 @Injectable()
 export class BasicStrategy extends PassportStrategy(Strategy) {
@@ -10,7 +9,7 @@ export class BasicStrategy extends PassportStrategy(Strategy) {
   }
 
   public validate = async (username: string, password: string): Promise<boolean> => {
-    if (process.env.BASICUSERNAME === username && process.env.PASSWORD === password) {
+    if ('admin' === username && 'qwerty' === password) {
       return true;
     }
 

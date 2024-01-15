@@ -41,7 +41,7 @@ export class AuthService {
 
   async confirmEmail(code: ConfirmationCode) {
     const user = await this.usersQueryRepository.findUserByConfirmationCode(code);
-    if (!user) throw new BadRequestException();
+    if (!user) throw new BadRequestException([{ message: 'User not found', field: 'code' }]);
     if (user.isConfirmed)
       throw new BadRequestException([{ message: 'User already confirmed', field: 'code' }]);
     if (user.emailConfirmation.confirmationCode !== code.code)

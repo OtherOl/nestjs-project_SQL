@@ -3,11 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../domain/users.entity';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { userModel } from '../../base/types/users.model';
 
 @Injectable()
 export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
-  async createUser(newUser: any) {
+  async createUser(newUser: userModel) {
     await this.userModel.create(newUser);
     return newUser;
   }

@@ -49,11 +49,23 @@ export class UsersService {
   }
 
   async createUser(inputData: createUserModel) {
-    const newUser = {
+    const passwordHash = await this.authService.createPasswordHash(inputData.password);
+
+    const newUser: userModel = {
       id: new ObjectId(),
       login: inputData.login,
       email: inputData.email,
+      passwordHash: passwordHash,
       createdAt: new Date().toISOString(),
+      emailConfirmation: {
+        confirmationCode: uuidv4(),
+        expirationDate: add(new Date(), { minutes: 3 }),
+      },
+      recoveryConfirmation: {
+        recoveryCode: uuidv4(),
+        expirationDate: add(new Date(), { minutes: 1000 }),
+      },
+      isConfirmed: true,
     };
     return await this.usersRepository.createUser(newUser);
   }

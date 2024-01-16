@@ -10,7 +10,12 @@ export class UsersRepository {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
   async createUser(newUser: userModel) {
     await this.userModel.create(newUser);
-    return newUser;
+    return {
+      id: newUser.id,
+      login: newUser.login,
+      email: newUser.email,
+      createdAt: newUser.createdAt,
+    };
   }
 
   async deleteUser(id: string) {

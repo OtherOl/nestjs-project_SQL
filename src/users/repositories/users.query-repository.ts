@@ -32,6 +32,7 @@ export class UsersQueryRepository {
         passwordSalt: 0,
         emailConfirmation: 0,
         recoveryConfirmation: 0,
+        isConfirmed: 0,
       })
       .sort(sortQuery)
       .skip((pageNumber - 1) * pageSize)

@@ -2,11 +2,9 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { createNewPassword, createUserModel, userModel } from '../../base/types/users.model';
 import { UsersRepository } from '../repositories/users.repository';
 import { UsersQueryRepository } from '../repositories/users.query-repository';
-import { ObjectId } from 'mongodb';
-import { v4 as uuidv4 } from 'uuid';
-import { add } from 'date-fns/add';
 import { AuthService } from '../../auth/application/auth.service';
 import { EmailManager } from '../../email/emailManager';
+import { User } from '../domain/users.entity';
 
 @Injectable()
 export class UsersService {
@@ -27,22 +25,8 @@ export class UsersService {
 
     const passwordHash = await this.authService.createPasswordHash(inputData.password);
 
-    const newUser: userModel = {
-      id: new ObjectId(),
-      login: inputData.login,
-      email: inputData.email,
-      passwordHash: passwordHash,
-      createdAt: new Date().toISOString(),
-      emailConfirmation: {
-        confirmationCode: uuidv4(),
-        expirationDate: add(new Date(), { minutes: 3 }),
-      },
-      recoveryConfirmation: {
-        recoveryCode: uuidv4(),
-        expirationDate: add(new Date(), { minutes: 1000 }),
-      },
-      isConfirmed: false,
-    };
+    const newUser: userModel = User.createNewUser(inputData.login, inputData.email, passwordHash, false);
+
     await this.emailManager.sendEmailConfirmationCode(newUser);
     await this.usersRepository.createUser(newUser);
     return;
@@ -51,22 +35,7 @@ export class UsersService {
   async createUser(inputData: createUserModel) {
     const passwordHash = await this.authService.createPasswordHash(inputData.password);
 
-    const newUser: userModel = {
-      id: new ObjectId(),
-      login: inputData.login,
-      email: inputData.email,
-      passwordHash: passwordHash,
-      createdAt: new Date().toISOString(),
-      emailConfirmation: {
-        confirmationCode: uuidv4(),
-        expirationDate: add(new Date(), { minutes: 3 }),
-      },
-      recoveryConfirmation: {
-        recoveryCode: uuidv4(),
-        expirationDate: add(new Date(), { minutes: 1000 }),
-      },
-      isConfirmed: true,
-    };
+    const newUser: userModel = User.createNewUser(inputData.login, inputData.email, passwordHash, true);
     return await this.usersRepository.createUser(newUser);
   }
 

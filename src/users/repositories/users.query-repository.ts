@@ -29,7 +29,6 @@ export class UsersQueryRepository {
       .find(filter, {
         _id: 0,
         passwordHash: 0,
-        passwordSalt: 0,
         emailConfirmation: 0,
         recoveryConfirmation: 0,
         isConfirmed: 0,

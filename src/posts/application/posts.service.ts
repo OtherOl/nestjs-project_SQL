@@ -1,14 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { createPostModel, postModel } from '../../base/types/posts.model';
+import { createPostModel } from '../../base/types/posts.model';
 import { ObjectId } from 'mongodb';
 import { PostsRepository } from '../repositories/posts.repository';
 import { PostsQueryRepository } from '../repositories/posts.query-repository';
 import { BlogsQueryRepository } from '../../blogs/repositories/blogs.query-repository';
 import { blogModel } from '../../base/types/blogs.model';
-import {
-  commentsModel,
-  createCommentModel,
-} from '../../base/types/comments.model';
+import { commentsModel, createCommentModel } from '../../base/types/comments.model';
+import { Post } from '../domain/posts.entity';
 
 @Injectable()
 export class PostsService {
@@ -18,26 +16,16 @@ export class PostsService {
     private blogsQueryRepository: BlogsQueryRepository,
   ) {}
   async createPost(inputData: createPostModel) {
-    const blog: blogModel | null = await this.blogsQueryRepository.getBlogById(
-      inputData.blogId,
-    );
+    const blog: blogModel | null = await this.blogsQueryRepository.getBlogById(inputData.blogId);
     if (!blog) return null;
 
-    const newPost: postModel = {
-      id: new ObjectId(),
-      title: inputData.title,
-      shortDescription: inputData.shortDescription,
-      content: inputData.content,
-      blogId: blog.id,
-      blogName: blog.name,
-      createdAt: new Date().toISOString(),
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [],
-      },
-    };
+    const newPost = Post.createNewPost(
+      inputData.title,
+      inputData.shortDescription,
+      inputData.content,
+      blog.id,
+      blog.name,
+    );
 
     return this.postsRepository.createPost(newPost);
   }
@@ -51,7 +39,7 @@ export class PostsService {
       content: content.content,
       commentatorInfo: {
         userId: 'dsa',
-        userLogin: 'dsada',
+        userLogin: 'dsa',
       },
       createdAt: new Date().toISOString(),
       likesInfo: {

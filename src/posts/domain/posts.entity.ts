@@ -46,5 +46,26 @@ export class Post {
 
   @Prop({ required: true, type: LikesInfoSchema })
   extendedLikesInfo: LikesInfo;
+
+  static createNewPost(
+    title: string,
+    shortDescription: string,
+    content: string,
+    blogId: ObjectId,
+    blogName: string,
+  ) {
+    const post = new Post();
+
+    post.id = new ObjectId();
+    post.title = title;
+    post.shortDescription = shortDescription;
+    post.content = content;
+    post.blogId = blogId;
+    post.blogName = blogName;
+    post.createdAt = new Date().toISOString();
+    post.extendedLikesInfo = { likesCount: 0, dislikesCount: 0, myStatus: 'None', newestLikes: [] };
+
+    return post;
+  }
 }
 export const PostSchema = SchemaFactory.createForClass(Post);

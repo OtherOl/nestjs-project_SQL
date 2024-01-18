@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { blogModel, createBlogModel } from '../../base/types/blogs.model';
 import { BlogsRepository } from '../repositories/blogs.repository';
-import { ObjectId } from 'mongodb';
 import { createBlogPostModel, postModel } from '../../base/types/posts.model';
 import { BlogsQueryRepository } from '../repositories/blogs.query-repository';
 import { PostsRepository } from '../../posts/repositories/posts.repository';
+import { Blog } from '../domain/blogs.entity';
+import { Post } from '../../posts/domain/posts.entity';
 
 @Injectable()
 export class BlogsService {
@@ -15,41 +16,22 @@ export class BlogsService {
   ) {}
 
   async createBlog(inputData: createBlogModel) {
-    const newBlog: blogModel = {
-      id: new ObjectId(),
-      name: inputData.name,
-      description: inputData.description,
-      websiteUrl: inputData.websiteUrl,
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-    };
+    const newBlog: blogModel = Blog.createNewBlog(inputData);
 
     return this.blogsRepository.createBlog(newBlog);
   }
 
-  async createPostForBlog(
-    blogId: string,
-    inputData: createBlogPostModel,
-  ): Promise<postModel | null> {
-    const blog: blogModel | null =
-      await this.blogsQueryRepository.getBlogById(blogId);
+  async createPostForBlog(blogId: string, inputData: createBlogPostModel): Promise<postModel | null> {
+    const blog: blogModel | null = await this.blogsQueryRepository.getBlogById(blogId);
     if (!blog) return null;
 
-    const newPost: postModel = {
-      id: new ObjectId(),
-      title: inputData.title,
-      shortDescription: inputData.shortDescription,
-      content: inputData.content,
-      blogId: blog.id,
-      blogName: blog.name,
-      createdAt: new Date().toISOString(),
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [],
-      },
-    };
+    const newPost = Post.createNewPost(
+      inputData.title,
+      inputData.shortDescription,
+      inputData.content,
+      blog.id,
+      blog.name,
+    );
 
     return this.postsRepository.createPost(newPost);
   }

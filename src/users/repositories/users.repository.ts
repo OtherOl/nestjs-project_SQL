@@ -18,9 +18,9 @@ export class UsersRepository {
     };
   }
 
-  async deleteUser(id: string) {
+  async deleteUser(id: ObjectId) {
     const deletedUser = await this.userModel.deleteOne({
-      id: new ObjectId(id),
+      id: id,
     });
     return deletedUser.deletedCount === 1;
   }

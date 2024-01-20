@@ -5,6 +5,7 @@ import { UsersQueryRepository } from '../repositories/users.query-repository';
 import { AuthService } from '../../auth/application/auth.service';
 import { EmailManager } from '../../email/emailManager';
 import { User } from '../domain/users.entity';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UsersService {
@@ -39,10 +40,10 @@ export class UsersService {
     return await this.usersRepository.createUser(newUser);
   }
 
-  async deleteUser(_id: string) {
-    const user = await this.usersQueryRepository.getUserById(_id);
+  async deleteUser(id: ObjectId) {
+    const user = await this.usersQueryRepository.getUserById(id);
     if (!user) return false;
-    return await this.usersRepository.deleteUser(_id);
+    return await this.usersRepository.deleteUser(id);
   }
 
   async createNewPassword(inputData: createNewPassword) {

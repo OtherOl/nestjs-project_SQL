@@ -12,7 +12,22 @@ export class commentsModel {
   id: ObjectId;
   content: string;
   commentatorInfo: {
-    userId: string;
+    userId: ObjectId;
+    userLogin: string;
+  };
+  createdAt: string;
+  likesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: string;
+  };
+}
+
+export class CommentViewModel {
+  id: ObjectId;
+  content: string;
+  commentatorInfo: {
+    userId: ObjectId;
     userLogin: string;
   };
   createdAt: string;

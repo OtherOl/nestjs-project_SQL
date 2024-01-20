@@ -40,6 +40,10 @@ import { SecurityRepository } from './securityDevices/repositories/security.repo
 import { SecurityQueryRepository } from './securityDevices/repositories/security.query-repository';
 import { Auth, AuthSchema } from './auth/domain/auth.entity';
 import { AuthRepository } from './auth/repositories/auth.repository';
+import { LikesService } from './likes/application/likes.service';
+import { LikesQueryRepository } from './likes/repositories/likes.query-repository';
+import { Likes, LikesSchema } from './likes/domain/likes.entity';
+import { LikesRepository } from './likes/repositories/likes.repository';
 
 @Module({
   imports: [
@@ -55,6 +59,7 @@ import { AuthRepository } from './auth/repositories/auth.repository';
       { name: User.name, schema: UserSchema },
       { name: Security.name, schema: SecuritySchema },
       { name: Auth.name, schema: AuthSchema },
+      { name: Likes.name, schema: LikesSchema },
     ]),
     MailerModule.forRoot({
       transport: {
@@ -104,6 +109,9 @@ import { AuthRepository } from './auth/repositories/auth.repository';
     SecurityService,
     SecurityRepository,
     SecurityQueryRepository,
+    LikesService,
+    LikesQueryRepository,
+    LikesRepository,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

@@ -6,9 +6,7 @@ import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class CommentsRepository {
-  constructor(
-    @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
-  ) {}
+  constructor(@InjectModel(Comment.name) private commentModel: Model<CommentDocument>) {}
 
   async updateComment(commentId: string, content: string) {
     const comment = await this.commentModel.updateOne(
@@ -25,5 +23,21 @@ export class CommentsRepository {
       id: new ObjectId(commentId),
     });
     return comment.deletedCount === 1;
+  }
+
+  async addLike(commentId: ObjectId) {
+    return this.commentModel.updateOne({ id: commentId }, { $inc: { 'likesInfo.likesCount': +1 } });
+  }
+
+  async decreaseLike(commentId: ObjectId) {
+    return this.commentModel.updateOne({ id: commentId }, { $inc: { 'likesInfo.likesCount': -1 } });
+  }
+
+  async addDislike(commentId: ObjectId) {
+    return this.commentModel.updateOne({ id: commentId }, { $inc: { 'likesInfo.dislikesCount': +1 } });
+  }
+
+  async decreaseDislike(commentId: ObjectId) {
+    return this.commentModel.updateOne({ id: commentId }, { $inc: { 'likesInfo.dislikesCount': -1 } });
   }
 }

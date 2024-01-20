@@ -7,10 +7,8 @@ import { paginationModel } from '../../base/types/pagination.model';
 import { BlogsQueryRepository } from '../../blogs/repositories/blogs.query-repository';
 import { ObjectId } from 'mongodb';
 import { commentsModel } from '../../base/types/comments.model';
-import {
-  Comment,
-  CommentDocument,
-} from '../../comments/domain/comments.entity';
+import { Comment, CommentDocument } from '../../comments/domain/comments.entity';
+import { LikesQueryRepository } from '../../likes/repositories/likes.query-repository';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -18,6 +16,7 @@ export class PostsQueryRepository {
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     private blogsQueryRepository: BlogsQueryRepository,
+    private likesQueryRepository: LikesQueryRepository,
   ) {}
 
   async getCommentsByPostId(
@@ -26,6 +25,7 @@ export class PostsQueryRepository {
     sortDirection: string = 'desc',
     pageNumber: number,
     pageSize: number,
+    userId: string,
   ) {
     const sortQuery: any = {};
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
@@ -34,8 +34,7 @@ export class PostsQueryRepository {
 
     const isExists = await this.postModel.findOne({ id: new ObjectId(postId) });
     if (!isExists) return null;
-    const countComments: number =
-      await this.commentModel.countDocuments(filter);
+    const countComments: number = await this.commentModel.countDocuments(filter);
     const foundedComments: commentsModel[] = await this.commentModel
       .find(filter, { _id: 0, postId: 0 })
       .sort(sortQuery)
@@ -43,12 +42,38 @@ export class PostsQueryRepository {
       .limit(pageSize)
       .lean();
 
+    const like = await this.likesQueryRepository.getLikeByUserId(new ObjectId(userId));
+    const commentsQuery: any[] = foundedComments.map((comment) => {
+      let likeStatus = '';
+      const status = like.find((like) => like.commentId.equals(comment.id));
+      if (!status) {
+        likeStatus = 'None';
+      } else {
+        likeStatus = status.type;
+      }
+
+      return {
+        id: comment.id,
+        content: comment.content,
+        commentatorInfo: {
+          userId: comment.commentatorInfo.userId,
+          userLogin: comment.commentatorInfo.userLogin,
+        },
+        createdAt: comment.createdAt,
+        likesInfo: {
+          likesCount: comment.likesInfo.likesCount,
+          dislikesCount: comment.likesInfo.dislikesCount,
+          myStatus: likeStatus,
+        },
+      };
+    });
+
     const posts: paginationModel<commentsModel> = {
       pagesCount: Math.ceil(countComments / pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: countComments,
-      items: foundedComments,
+      items: commentsQuery,
     };
     return posts;
   }

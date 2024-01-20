@@ -15,6 +15,7 @@ import { createUserModel } from '../../base/types/users.model';
 import { UsersService } from '../application/users.service';
 import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
+import { ObjectId } from 'mongodb';
 
 @Controller('users')
 export class UsersController {
@@ -60,8 +61,8 @@ export class UsersController {
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteUser(@Param('id') _id: string) {
-    const user = await this.usersService.deleteUser(_id);
+  async deleteUser(@Param('id') id: string) {
+    const user = await this.usersService.deleteUser(new ObjectId(id));
     if (!user) throw new NotFoundException("User doesn't exists");
     return user;
   }

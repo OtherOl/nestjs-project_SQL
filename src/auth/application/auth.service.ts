@@ -75,13 +75,23 @@ export class AuthService {
     return;
   }
 
-  async getUserIdByToken(token: string) {
+  async getUserIdByToken(token: string | undefined) {
     if (!token) throw new UnauthorizedException();
     try {
       const user = await this.jwtService.verify(token);
-      return user.id;
+      return user.userId;
     } catch (error) {
       throw new UnauthorizedException();
+    }
+  }
+
+  async getUserIdForGet(token: string | undefined) {
+    if (!token) return 'fffff3ea02afffffc87fffff';
+    try {
+      const user = await this.jwtService.verify(token);
+      return user.userId;
+    } catch (error) {
+      return 'fffff3ea02afffffc87fffff';
     }
   }
 }

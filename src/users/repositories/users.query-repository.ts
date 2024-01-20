@@ -49,8 +49,8 @@ export class UsersQueryRepository {
     return users;
   }
 
-  async getUserById(id: string) {
-    return this.userModel.findOne({ id: new ObjectId(id) }, { _id: 0 });
+  async getUserById(id: ObjectId) {
+    return this.userModel.findOne({ id: id }, { _id: 0 });
   }
 
   async findByLoginOrEmail(loginOrEmail: string) {

@@ -5,10 +5,7 @@ import { Post, PostDocument } from '../domain/posts.entity';
 import { Model } from 'mongoose';
 import { ObjectId } from 'mongodb';
 import { commentsModel } from '../../base/types/comments.model';
-import {
-  Comment,
-  CommentDocument,
-} from '../../comments/domain/comments.entity';
+import { Comment, CommentDocument } from '../../comments/domain/comments.entity';
 
 @Injectable()
 export class PostsRepository {

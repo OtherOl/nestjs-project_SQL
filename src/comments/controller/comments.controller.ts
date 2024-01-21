@@ -5,6 +5,7 @@ import { CommentsRepository } from '../repositories/comments.repository';
 import { SendLikes } from '../../base/types/likes.model';
 import { Request } from 'express';
 import { AuthService } from '../../auth/application/auth.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('comments')
 export class CommentsController {
@@ -15,6 +16,7 @@ export class CommentsController {
     private authService: AuthService,
   ) {}
 
+  @SkipThrottle()
   @Get(':id')
   @HttpCode(200)
   async getCommentById(@Param('id') id: string, @Req() request: Request) {
@@ -25,6 +27,7 @@ export class CommentsController {
     return comment;
   }
 
+  @SkipThrottle()
   @Put(':commentId')
   @HttpCode(204)
   async updateComment(@Param('commentId') commentId: string, @Body() content: string) {
@@ -33,6 +36,7 @@ export class CommentsController {
     return;
   }
 
+  @SkipThrottle()
   @Put(':commentId/like-status')
   @HttpCode(204)
   async doLikeDislike(
@@ -47,6 +51,7 @@ export class CommentsController {
     return await this.commentsService.doLikes(userId, comment, likeStatus.likeStatus);
   }
 
+  @SkipThrottle()
   @Delete(':commentId')
   @HttpCode(204)
   async deleteComment(@Param('commentId') commentId: string) {

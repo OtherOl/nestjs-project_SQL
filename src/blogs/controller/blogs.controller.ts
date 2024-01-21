@@ -20,6 +20,7 @@ import { createBlogPostModel } from '../../base/types/posts.model';
 import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 import { Request } from 'express';
 import { AuthService } from '../../auth/application/auth.service';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('blogs')
 export class BlogsController {
@@ -30,6 +31,7 @@ export class BlogsController {
     private authService: AuthService,
   ) {}
 
+  @SkipThrottle()
   @Get()
   @HttpCode(200)
   async getAllBlogs(
@@ -51,6 +53,7 @@ export class BlogsController {
     );
   }
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
@@ -58,6 +61,7 @@ export class BlogsController {
     return await this.blogsService.createBlog(inputData);
   }
 
+  @SkipThrottle()
   @Get(':blogId/posts')
   @HttpCode(200)
   async getPostsByBlogId(
@@ -86,6 +90,7 @@ export class BlogsController {
     return posts;
   }
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Post(':blogId/posts')
   @HttpCode(201)
@@ -95,6 +100,7 @@ export class BlogsController {
     return newPost;
   }
 
+  @SkipThrottle()
   @Get(':id')
   @HttpCode(200)
   async getBlogById(@Param('id') blogId: string) {
@@ -103,6 +109,7 @@ export class BlogsController {
     return blog;
   }
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
@@ -112,6 +119,7 @@ export class BlogsController {
     return;
   }
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)

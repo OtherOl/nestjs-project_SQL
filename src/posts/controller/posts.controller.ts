@@ -22,6 +22,7 @@ import { Request } from 'express';
 import { AuthService } from '../../auth/application/auth.service';
 import { ObjectId } from 'mongodb';
 import { SendLikes } from '../../base/types/likes.model';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('posts')
 export class PostsController {
@@ -32,6 +33,7 @@ export class PostsController {
     private authService: AuthService,
   ) {}
 
+  @SkipThrottle()
   @Get(':postId/comments')
   @HttpCode(200)
   async getCommentsByPostId(
@@ -59,6 +61,7 @@ export class PostsController {
     return comments;
   }
 
+  @SkipThrottle()
   @Post(':postId/comments')
   @HttpCode(201)
   async createCommentForPost(
@@ -71,6 +74,7 @@ export class PostsController {
     return await this.postsService.createComment(postId, inputData, new ObjectId(userId));
   }
 
+  @SkipThrottle()
   @Get()
   @HttpCode(200)
   async getAllPosts(
@@ -94,6 +98,7 @@ export class PostsController {
     );
   }
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Post()
   @HttpCode(201)
@@ -103,6 +108,7 @@ export class PostsController {
     return newPost;
   }
 
+  @SkipThrottle()
   @Get(':id')
   @HttpCode(200)
   async getPostById(@Param('id') postId: string, @Req() request: Request) {
@@ -111,6 +117,7 @@ export class PostsController {
     return await this.postsQueryRepository.getPostById(postId, userId);
   }
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
@@ -120,6 +127,7 @@ export class PostsController {
     return;
   }
 
+  @SkipThrottle()
   @Put(':postId/like-status')
   @HttpCode(204)
   async doLikeDislike(
@@ -134,6 +142,7 @@ export class PostsController {
     return await this.postsService.doLikes(userId, post, likeStatus.likeStatus);
   }
 
+  @SkipThrottle()
   @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)

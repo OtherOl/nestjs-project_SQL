@@ -26,3 +26,12 @@ export class CommentLikes {
   commentId: ObjectId;
   addedAt: string;
 }
+
+export class PostLikes {
+  id: ObjectId;
+  type: string;
+  userId: ObjectId;
+  postId: ObjectId;
+  addedAt: string;
+  userLogin: string;
+}

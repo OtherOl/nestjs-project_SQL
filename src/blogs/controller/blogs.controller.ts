@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
@@ -17,6 +18,8 @@ import { createBlogModel } from '../../base/types/blogs.model';
 import { PostsQueryRepository } from '../../posts/repositories/posts.query-repository';
 import { createBlogPostModel } from '../../base/types/posts.model';
 import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
+import { Request } from 'express';
+import { AuthService } from '../../auth/application/auth.service';
 
 @Controller('blogs')
 export class BlogsController {
@@ -24,6 +27,7 @@ export class BlogsController {
     private blogsService: BlogsService,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
+    private authService: AuthService,
   ) {}
 
   @Get()
@@ -66,13 +70,17 @@ export class BlogsController {
       pageNumber: number;
       pageSize: number;
     },
+    @Req() request: Request,
   ) {
+    const accessToken = request.headers.authorization;
+    const userId = await this.authService.getUserIdForGet(accessToken?.split(' ')[1]);
     const posts = await this.postsQueryRepository.getPostByBlogId(
       blogId,
       query.sortBy,
       query.sortDirection,
       query.pageNumber ? +query.pageNumber : 1,
       query.pageSize ? +query.pageSize : 10,
+      userId,
     );
     if (!posts) throw new NotFoundException("Blog doesn't exists");
     return posts;

@@ -14,7 +14,7 @@ export class CommentsQueryRepository {
   async getCommentById(id: string, userId?: string) {
     const comment = await this.commentModel.findOne({ id: new ObjectId(id) }, { _id: 0, postId: 0 });
     if (!comment) throw new NotFoundException("Comment doesn't exists");
-    const like = await this.likesQueryRepository.getLikeById(new ObjectId(userId), comment.id);
+    const like = await this.likesQueryRepository.getLikeByCommentId(new ObjectId(userId), comment.id);
     let likeStatus = '';
     if (!like) {
       likeStatus = 'None';

@@ -11,8 +11,14 @@ export class LikesService {
     private likesRepository: LikesRepository,
   ) {}
 
-  async createNewLike(userId: ObjectId, commentId: ObjectId, type: string) {
-    const like = Likes.createLike(userId, commentId, type);
+  async createNewCommentLike(userId: ObjectId, commentId: ObjectId, type: string) {
+    const like = Likes.createCommentLike(userId, commentId, type);
+    await this.likesRepository.createLike(like);
+    return like;
+  }
+
+  async createNewPostLike(userId: ObjectId, postId: ObjectId, type: string, userLogin: string) {
+    const like = Likes.createPostLike(userId, postId, type, userLogin);
     await this.likesRepository.createLike(like);
     return like;
   }

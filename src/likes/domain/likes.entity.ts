@@ -13,24 +13,43 @@ export class Likes {
   type: string;
 
   @Prop({ required: true })
-  userId: ObjectId;
-
-  @Prop({ required: true })
-  commentId: ObjectId;
-
-  @Prop({ required: true })
   addedAt: string;
 
-  static createLike(userId: ObjectId, commentId: ObjectId, type: string) {
-    const like = new Likes();
+  @Prop({ required: true })
+  userId: ObjectId;
 
-    like.id = new ObjectId();
-    like.type = type;
-    like.userId = userId;
-    like.commentId = commentId;
-    like.addedAt = new Date().toISOString();
+  @Prop({ required: false })
+  postId: ObjectId;
 
-    return like;
+  @Prop({ required: false })
+  commentId: ObjectId;
+
+  @Prop({ required: false })
+  login: string;
+
+  static createCommentLike(userId: ObjectId, commentId: ObjectId, type: string) {
+    const commentLike = new Likes();
+
+    commentLike.id = new ObjectId();
+    commentLike.type = type;
+    commentLike.userId = userId;
+    commentLike.commentId = commentId;
+    commentLike.addedAt = new Date().toISOString();
+
+    return commentLike;
+  }
+
+  static createPostLike(userId: ObjectId, postId: ObjectId, type: string, userLogin: string) {
+    const postLike = new Likes();
+
+    postLike.id = new ObjectId();
+    postLike.type = type;
+    postLike.addedAt = new Date().toISOString();
+    postLike.userId = userId;
+    postLike.postId = postId;
+    postLike.login = userLogin;
+
+    return postLike;
   }
 }
 

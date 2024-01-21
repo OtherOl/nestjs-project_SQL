@@ -21,6 +21,7 @@ import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 import { Request } from 'express';
 import { AuthService } from '../../auth/application/auth.service';
 import { ObjectId } from 'mongodb';
+import { SendLikes } from '../../base/types/likes.model';
 
 @Controller('posts')
 export class PostsController {
@@ -80,12 +81,16 @@ export class PostsController {
       pageNumber: number;
       pageSize: number;
     },
+    @Req() request: Request,
   ) {
+    const accessToken = request.headers.authorization;
+    const userId = await this.authService.getUserIdForGet(accessToken?.split(' ')[1]);
     return await this.postsQueryRepository.getAllPosts(
       query.sortBy,
       query.sortDirection,
       query.pageNumber ? +query.pageNumber : 1,
       query.pageSize ? +query.pageSize : 10,
+      userId,
     );
   }
 
@@ -100,10 +105,10 @@ export class PostsController {
 
   @Get(':id')
   @HttpCode(200)
-  async getPostById(@Param('id') postId: string) {
-    const post = await this.postsQueryRepository.getPostById(postId);
-    if (!post) throw new NotFoundException("Post doesn't exists");
-    return post;
+  async getPostById(@Param('id') postId: string, @Req() request: Request) {
+    const accessToken = request.headers.authorization;
+    const userId = await this.authService.getUserIdForGet(accessToken?.split(' ')[1]);
+    return await this.postsQueryRepository.getPostById(postId, userId);
   }
 
   @UseGuards(BasicAuthGuard)
@@ -113,6 +118,20 @@ export class PostsController {
     const updatedPost = await this.postsRepository.updatePost(postId, inputData);
     if (!updatedPost) throw new NotFoundException("Post doesn't exists");
     return;
+  }
+
+  @Put(':postId/like-status')
+  @HttpCode(204)
+  async doLikeDislike(
+    @Param('postId') postId: string,
+    @Body() likeStatus: SendLikes,
+    @Req() request: Request,
+  ) {
+    const accessToken = request.headers.authorization;
+    const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
+    const post = await this.postsQueryRepository.getPostByIdMethod(postId);
+    if (!post) throw new NotFoundException("Post doesn't exists");
+    return await this.postsService.doLikes(userId, post, likeStatus.likeStatus);
   }
 
   @UseGuards(BasicAuthGuard)

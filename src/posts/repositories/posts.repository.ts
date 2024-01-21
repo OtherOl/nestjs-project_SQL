@@ -30,4 +30,20 @@ export class PostsRepository {
     await this.commentModel.create(newComment);
     return newComment;
   }
+
+  async addLike(postId: ObjectId) {
+    return this.postModel.updateOne({ id: postId }, { $inc: { 'extendedLikesInfo.likesCount': +1 } });
+  }
+
+  async decreaseLike(postId: ObjectId) {
+    return this.postModel.updateOne({ id: postId }, { $inc: { 'extendedLikesInfo.likesCount': -1 } });
+  }
+
+  async addDislike(postId: ObjectId) {
+    return this.postModel.updateOne({ id: postId }, { $inc: { 'extendedLikesInfo.dislikesCount': +1 } });
+  }
+
+  async decreaseDislike(postId: ObjectId) {
+    return this.postModel.updateOne({ id: postId }, { $inc: { 'extendedLikesInfo.dislikesCount': -1 } });
+  }
 }

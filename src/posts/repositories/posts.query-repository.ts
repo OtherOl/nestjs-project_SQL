@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../domain/posts.entity';
 import { Model } from 'mongoose';
@@ -44,7 +44,7 @@ export class PostsQueryRepository {
 
     const like = await this.likesQueryRepository.getLikeByUserId(new ObjectId(userId));
     const commentsQuery: any[] = foundedComments.map((comment) => {
-      let likeStatus = '';
+      let likeStatus: string;
       const status = like.find((like) => like.commentId.equals(comment.id));
       if (!status) {
         likeStatus = 'None';
@@ -83,6 +83,7 @@ export class PostsQueryRepository {
     sortDirection: string = 'desc',
     pageNumber: number,
     pageSize: number,
+    userId: string,
   ) {
     const sortQuery: any = {};
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
@@ -95,12 +96,47 @@ export class PostsQueryRepository {
       .limit(pageSize)
       .lean();
 
+    const like = await this.likesQueryRepository.getLikeByUserId(new ObjectId(userId));
+    const likes: any[] = await this.likesQueryRepository.getNewestLikes('Like');
+
+    const postsQuery: any[] = foundedPosts.map((post) => {
+      let likeStatus: string;
+      const status = like.find((l) => l.postId.equals(post.id));
+      if (!status) {
+        likeStatus = 'None';
+      } else {
+        likeStatus = status.type;
+      }
+      const newestLikes = likes
+        .filter((l) => l.postId.equals(post.id))
+        .map((like) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { postId, id, type, ...rest } = like;
+          return rest;
+        });
+
+      return {
+        id: post.id,
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        createdAt: post.createdAt,
+        extendedLikesInfo: {
+          likesCount: post.extendedLikesInfo.likesCount,
+          dislikesCount: post.extendedLikesInfo.dislikesCount,
+          myStatus: likeStatus,
+          newestLikes: newestLikes,
+        },
+      };
+    });
     const posts: paginationModel<postModel> = {
       pagesCount: Math.ceil(countPosts / pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: countPosts,
-      items: foundedPosts,
+      items: postsQuery,
     };
     return posts;
   }
@@ -111,6 +147,7 @@ export class PostsQueryRepository {
     sortDirection: string = 'desc',
     pageNumber: number,
     pageSize: number,
+    userId: string,
   ) {
     const sortQuery: any = {};
     sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
@@ -128,18 +165,79 @@ export class PostsQueryRepository {
       .limit(pageSize)
       .lean();
 
+    const postLike = await this.likesQueryRepository.getLikeByUserId(new ObjectId(userId));
+    const likes: any[] = await this.likesQueryRepository.getNewestLikes('Like');
+
+    const postsQuery: any[] = foundedPosts.map((post) => {
+      let likeStatus: string;
+      const postStatus = postLike.find((l) => l.postId.equals(post.id));
+      if (!postStatus) {
+        likeStatus = 'None';
+      } else {
+        likeStatus = postStatus.type;
+      }
+      const newestPostLikes = likes
+        .filter((l) => l.postId.equals(post.id))
+        .map((like) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { postId, id, type, ...rest } = like;
+          return rest;
+        });
+
+      return {
+        id: post.id,
+        title: post.title,
+        shortDescription: post.shortDescription,
+        content: post.content,
+        blogId: post.blogId,
+        blogName: post.blogName,
+        createdAt: post.createdAt,
+        extendedLikesInfo: {
+          likesCount: post.extendedLikesInfo.likesCount,
+          dislikesCount: post.extendedLikesInfo.dislikesCount,
+          myStatus: likeStatus,
+          newestLikes: newestPostLikes,
+        },
+      };
+    });
+
     const posts: paginationModel<postModel> = {
       pagesCount: Math.ceil(countPosts / pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: countPosts,
-      items: foundedPosts,
+      items: postsQuery,
     };
     return posts;
   }
 
-  async getPostById(postId: string): Promise<postModel | null> {
+  async getPostByIdMethod(postId: string): Promise<postModel | null> {
     return this.postModel.findOne({ id: new ObjectId(postId) }, { _id: 0 });
+  }
+
+  async getPostById(postId: string, userId: string) {
+    let likeStatus: string;
+    const post = await this.postModel.findOne({ id: new ObjectId(postId) }, { _id: 0 });
+    const like = await this.likesQueryRepository.getLikeByPostId(new ObjectId(userId), new ObjectId(postId));
+    if (!post) throw new NotFoundException("Post doesn't exists");
+    like ? (likeStatus = like.type) : (likeStatus = 'None');
+    const likes = await this.likesQueryRepository.getNewestLikeForCurrentPost(new ObjectId(postId), 'Like');
+
+    return {
+      id: post.id,
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+      createdAt: post.createdAt,
+      extendedLikesInfo: {
+        likesCount: post.extendedLikesInfo.likesCount,
+        dislikesCount: post.extendedLikesInfo.dislikesCount,
+        myStatus: likeStatus,
+        newestLikes: likes,
+      },
+    };
   }
 
   async deletePostById(postId: string) {

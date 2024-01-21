@@ -24,10 +24,10 @@ export class CommentsService {
   }
 
   async doLikes(userId: ObjectId, comment: CommentViewModel, likeStatus: string) {
-    const like = await this.likesQueryRepository.getLikeById(new ObjectId(userId), comment.id);
+    const like = await this.likesQueryRepository.getLikeByCommentId(new ObjectId(userId), comment.id);
     if (likeStatus === 'Like') {
       if (!like) {
-        await this.likesService.createNewLike(new ObjectId(userId), comment.id, 'Like');
+        await this.likesService.createNewCommentLike(new ObjectId(userId), comment.id, 'Like');
         await this.commentsRepository.addLike(comment.id);
         return;
       }
@@ -46,7 +46,7 @@ export class CommentsService {
 
     if (likeStatus === 'Dislike') {
       if (!like) {
-        await this.likesService.createNewLike(new ObjectId(userId), comment.id, 'Dislike');
+        await this.likesService.createNewCommentLike(new ObjectId(userId), comment.id, 'Dislike');
         await this.commentsRepository.addDislike(comment.id);
         return;
       }

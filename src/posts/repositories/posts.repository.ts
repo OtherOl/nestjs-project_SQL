@@ -28,7 +28,20 @@ export class PostsRepository {
 
   async createComment(newComment: commentsModel) {
     await this.commentModel.create(newComment);
-    return newComment;
+    return {
+      id: newComment.id,
+      content: newComment.content,
+      commentatorInfo: {
+        userId: newComment.commentatorInfo.userId,
+        userLogin: newComment.commentatorInfo.userLogin,
+      },
+      createdAt: newComment.createdAt,
+      likesInfo: {
+        likesCount: newComment.likesInfo.likesCount,
+        dislikesCount: newComment.likesInfo.dislikesCount,
+        myStatus: newComment.likesInfo.myStatus,
+      },
+    };
   }
 
   async addLike(postId: ObjectId) {

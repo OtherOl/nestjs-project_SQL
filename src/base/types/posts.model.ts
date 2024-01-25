@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { likesInfo } from './likes.model';
-import { IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class createBlogPostModel {
   @IsString()
@@ -17,6 +18,8 @@ export class createBlogPostModel {
 }
 
 export class createPostModel {
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 30)
   title: string;
@@ -25,6 +28,8 @@ export class createPostModel {
   @Length(1, 100)
   shortDescription: string;
 
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 1000)
   content: string;

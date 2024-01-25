@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Put, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CommentsQueryRepository } from '../repositories/comments.query-repository';
 import { CommentsService } from '../application/comments.service';
 import { CommentsRepository } from '../repositories/comments.repository';
@@ -6,6 +17,7 @@ import { SendLikes } from '../../base/types/likes.model';
 import { Request } from 'express';
 import { AuthService } from '../../auth/application/auth.service';
 import { SkipThrottle } from '@nestjs/throttler';
+import { TokenGuard } from '../../auth/guards/token.guard';
 
 @Controller('comments')
 export class CommentsController {
@@ -37,6 +49,7 @@ export class CommentsController {
   }
 
   @SkipThrottle()
+  @UseGuards(TokenGuard)
   @Put(':commentId/like-status')
   @HttpCode(204)
   async doLikeDislike(

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { createPostModel, postModel } from '../../base/types/posts.model';
 import { ObjectId } from 'mongodb';
 import { PostsRepository } from '../repositories/posts.repository';
@@ -26,7 +26,7 @@ export class PostsService {
   ) {}
   async createPost(inputData: createPostModel) {
     const blog: blogModel | null = await this.blogsQueryRepository.getBlogById(inputData.blogId);
-    if (!blog) return null;
+    if (!blog) throw new BadRequestException([{ message: "Blog doesn't exists", field: 'BlogId' }]);
 
     const newPost = Post.createNewPost(
       inputData.title,

@@ -23,6 +23,7 @@ import { AuthService } from '../../auth/application/auth.service';
 import { ObjectId } from 'mongodb';
 import { SendLikes } from '../../base/types/likes.model';
 import { SkipThrottle } from '@nestjs/throttler';
+import { TokenGuard } from '../../auth/guards/token.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -103,9 +104,7 @@ export class PostsController {
   @Post()
   @HttpCode(201)
   async createPostForBlog(@Body() inputData: createPostModel) {
-    const newPost = await this.postsService.createPost(inputData);
-    if (!newPost) throw new NotFoundException("Blog doesn't exists");
-    return newPost;
+    return await this.postsService.createPost(inputData);
   }
 
   @SkipThrottle()
@@ -128,6 +127,7 @@ export class PostsController {
   }
 
   @SkipThrottle()
+  @UseGuards(TokenGuard)
   @Put(':postId/like-status')
   @HttpCode(204)
   async doLikeDislike(

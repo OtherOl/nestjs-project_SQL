@@ -44,6 +44,7 @@ import { LikesService } from './likes/application/likes.service';
 import { LikesQueryRepository } from './likes/repositories/likes.query-repository';
 import { Likes, LikesSchema } from './likes/domain/likes.entity';
 import { LikesRepository } from './likes/repositories/likes.repository';
+import { TokenGuard } from './auth/guards/token.guard';
 
 @Module({
   imports: [
@@ -112,6 +113,7 @@ import { LikesRepository } from './likes/repositories/likes.repository';
     LikesService,
     LikesQueryRepository,
     LikesRepository,
+    TokenGuard,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

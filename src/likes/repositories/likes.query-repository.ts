@@ -24,7 +24,6 @@ export class LikesQueryRepository {
     return this.likesModel
       .find({ type, postId: { $exists: true } }, { _id: 0 })
       .sort({ addedAt: -1 })
-      .limit(3)
       .lean();
   }
 

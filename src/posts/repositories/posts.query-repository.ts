@@ -113,7 +113,8 @@ export class PostsQueryRepository {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { postId, id, type, ...rest } = like;
           return rest;
-        });
+        })
+        .slice(0, 3);
 
       return {
         id: post.id,

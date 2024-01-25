@@ -1,7 +1,10 @@
 import { ObjectId } from 'mongodb';
-import { IsString, IsUrl, Length } from 'class-validator';
+import { IsNotEmpty, IsString, IsUrl, Length } from 'class-validator';
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class createBlogModel {
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 15)
   name: string;

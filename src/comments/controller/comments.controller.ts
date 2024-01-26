@@ -74,9 +74,10 @@ export class CommentsController {
   @UseGuards(TokenGuard)
   @Delete(':commentId')
   @HttpCode(204)
-  async deleteComment(@Param('commentId') commentId: string) {
-    const deletedComment = await this.commentsRepository.deleteComment(commentId);
-    if (!deletedComment) throw new NotFoundException("Comment doesn't exists");
+  async deleteComment(@Param('commentId') commentId: string, @Req() request: Request) {
+    const accessToken = request.headers.authorization;
+    const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
+    await this.commentsRepository.deleteComment(commentId, userId);
     return;
   }
 }

@@ -22,7 +22,7 @@ export class CommentsService {
   async updateComment(commentId: string, content: string, userId: string) {
     const user = await this.usersQueryRepository.getUserById(new ObjectId(userId));
     const comment = await this.commentsQueryRepository.getCommentById(commentId);
-    if (user!.id !== comment.commentatorInfo.userId) throw new ForbiddenException();
+    if (!user!.id.equals(comment.commentatorInfo.userId)) throw new ForbiddenException();
     if (!comment) throw new NotFoundException("Comment doesn't exists");
     await this.commentsRepository.updateComment(commentId, content);
     return;

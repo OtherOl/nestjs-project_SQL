@@ -60,10 +60,14 @@ export class postModel {
 }
 
 export class updatePostModel {
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 30)
   title: string;
 
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 100)
   shortDescription: string;
@@ -72,6 +76,7 @@ export class updatePostModel {
   @Length(1, 1000)
   content: string;
 
+  @Validate(CustomBlogIdValidation)
   @IsString()
   blogId: string;
 }

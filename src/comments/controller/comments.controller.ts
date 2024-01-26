@@ -18,6 +18,7 @@ import { Request } from 'express';
 import { AuthService } from '../../auth/application/auth.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { TokenGuard } from '../../auth/guards/token.guard';
+import { createCommentModel } from '../../base/types/comments.model';
 
 @Controller('comments')
 export class CommentsController {
@@ -40,12 +41,17 @@ export class CommentsController {
   }
 
   @SkipThrottle()
+  @UseGuards(TokenGuard)
   @Put(':commentId')
   @HttpCode(204)
-  async updateComment(@Param('commentId') commentId: string, @Body() content: string) {
-    const comment = await this.commentsService.updateComment(commentId, content);
-    if (!comment) throw new NotFoundException("Comment doesn't exists");
-    return;
+  async updateComment(
+    @Param('commentId') commentId: string,
+    @Body() content: createCommentModel,
+    @Req() request: Request,
+  ) {
+    const accessToken = request.headers.authorization;
+    const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
+    return await this.commentsService.updateComment(commentId, content.content, userId);
   }
 
   @SkipThrottle()
@@ -65,6 +71,7 @@ export class CommentsController {
   }
 
   @SkipThrottle()
+  @UseGuards(TokenGuard)
   @Delete(':commentId')
   @HttpCode(204)
   async deleteComment(@Param('commentId') commentId: string) {

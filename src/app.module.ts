@@ -45,6 +45,7 @@ import { LikesQueryRepository } from './likes/repositories/likes.query-repositor
 import { Likes, LikesSchema } from './likes/domain/likes.entity';
 import { LikesRepository } from './likes/repositories/likes.repository';
 import { TokenGuard } from './auth/guards/token.guard';
+import { CustomBlogIdValidation } from './base/middlewares/blogId.middleware';
 
 @Module({
   imports: [
@@ -114,6 +115,7 @@ import { TokenGuard } from './auth/guards/token.guard';
     LikesQueryRepository,
     LikesRepository,
     TokenGuard,
+    CustomBlogIdValidation,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

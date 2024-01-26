@@ -1,7 +1,10 @@
 import { ObjectId } from 'mongodb';
-import { IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { Transform, TransformFnParams } from 'class-transformer';
 
 export class createCommentModel {
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(20, 300)
   content: string;

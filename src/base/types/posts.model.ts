@@ -1,17 +1,24 @@
 import { ObjectId } from 'mongodb';
 import { likesInfo } from './likes.model';
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsString, Length, Validate } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
+import { CustomBlogIdValidation } from '../middlewares/blogId.middleware';
 
 export class createBlogPostModel {
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 30)
   title: string;
 
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 100)
   shortDescription: string;
 
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 1000)
   content: string;
@@ -24,6 +31,8 @@ export class createPostModel {
   @Length(1, 30)
   title: string;
 
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 100)
   shortDescription: string;
@@ -35,6 +44,7 @@ export class createPostModel {
   content: string;
 
   @IsString()
+  @Validate(CustomBlogIdValidation)
   blogId: string;
 }
 

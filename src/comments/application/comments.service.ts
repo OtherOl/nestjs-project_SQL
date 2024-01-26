@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CommentsQueryRepository } from '../repositories/comments.query-repository';
 import { CommentsRepository } from '../repositories/comments.repository';
 import { ObjectId } from 'mongodb';
@@ -6,6 +6,7 @@ import { CommentViewModel } from '../../base/types/comments.model';
 import { LikesQueryRepository } from '../../likes/repositories/likes.query-repository';
 import { LikesService } from '../../likes/application/likes.service';
 import { LikesRepository } from '../../likes/repositories/likes.repository';
+import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
 
 @Injectable()
 export class CommentsService {
@@ -15,12 +16,16 @@ export class CommentsService {
     private likesQueryRepository: LikesQueryRepository,
     private likesService: LikesService,
     private likesRepository: LikesRepository,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  async updateComment(commentId: string, content: string) {
-    const comment = await this.commentsRepository.updateComment(commentId, content);
+  async updateComment(commentId: string, content: string, userId: string) {
+    const user = await this.usersQueryRepository.getUserById(new ObjectId(userId));
+    const comment = await this.commentsQueryRepository.getCommentById(commentId);
+    if (user!.id !== comment.commentatorInfo.userId) throw new ForbiddenException();
     if (!comment) throw new NotFoundException("Comment doesn't exists");
-    return comment;
+    await this.commentsRepository.updateComment(commentId, content);
+    return;
   }
 
   async doLikes(userId: ObjectId, comment: CommentViewModel, likeStatus: string) {

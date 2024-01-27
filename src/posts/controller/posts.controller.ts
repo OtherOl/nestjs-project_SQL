@@ -63,6 +63,7 @@ export class PostsController {
   }
 
   @SkipThrottle()
+  @UseGuards(TokenGuard)
   @Post(':postId/comments')
   @HttpCode(201)
   async createCommentForPost(
@@ -117,7 +118,7 @@ export class PostsController {
   }
 
   @SkipThrottle()
-  @UseGuards(TokenGuard)
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
   async updatePost(@Param('id') postId: string, @Body() inputData: updatePostModel) {
@@ -143,7 +144,7 @@ export class PostsController {
   }
 
   @SkipThrottle()
-  @UseGuards(TokenGuard)
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deletePost(@Param('id') postId: string) {

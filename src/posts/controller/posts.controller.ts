@@ -117,7 +117,7 @@ export class PostsController {
   }
 
   @SkipThrottle()
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(TokenGuard)
   @Put(':id')
   @HttpCode(204)
   async updatePost(@Param('id') postId: string, @Body() inputData: updatePostModel) {
@@ -143,7 +143,7 @@ export class PostsController {
   }
 
   @SkipThrottle()
-  @UseGuards(BasicAuthGuard)
+  @UseGuards(TokenGuard)
   @Delete(':id')
   @HttpCode(204)
   async deletePost(@Param('id') postId: string) {

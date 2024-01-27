@@ -72,6 +72,8 @@ export class updatePostModel {
   @Length(1, 100)
   shortDescription: string;
 
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
   @Length(1, 1000)
   content: string;

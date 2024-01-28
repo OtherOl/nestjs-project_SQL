@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { LikesQueryRepository } from '../repositories/likes.query-repository';
 import { ObjectId } from 'mongodb';
 import { Likes } from '../domain/likes.entity';
 import { LikesRepository } from '../repositories/likes.repository';
 
 @Injectable()
 export class LikesService {
-  constructor(
-    private likesQueryRepository: LikesQueryRepository,
-    private likesRepository: LikesRepository,
-  ) {}
+  constructor(private likesRepository: LikesRepository) {}
 
   async createNewCommentLike(userId: ObjectId, commentId: ObjectId, type: string) {
     const like = Likes.createCommentLike(userId, commentId, type);

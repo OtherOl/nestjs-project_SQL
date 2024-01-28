@@ -12,7 +12,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsService } from '../application/blogs.service';
 import { BlogsQueryRepository } from '../repositories/blogs.query-repository';
 import { createBlogModel } from '../../base/types/blogs.model';
 import { PostsQueryRepository } from '../../posts/repositories/posts.query-repository';
@@ -21,14 +20,19 @@ import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 import { Request } from 'express';
 import { AuthService } from '../../auth/application/auth.service';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CreateBlogUseCase } from '../use-cases/createBlog.use-case';
+import { CreatePostForBlogUseCase } from '../use-cases/createPostForBlog.use-case';
+import { UpdateBlogUseCase } from '../use-cases/updateBlog.use-case';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private blogsService: BlogsService,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
     private authService: AuthService,
+    private createBlogUseCase: CreateBlogUseCase,
+    private createPostForBlogUseCase: CreatePostForBlogUseCase,
+    private updateBlogUseCase: UpdateBlogUseCase,
   ) {}
 
   @SkipThrottle()
@@ -58,7 +62,7 @@ export class BlogsController {
   @Post()
   @HttpCode(201)
   async createBlog(@Body() inputData: createBlogModel) {
-    return await this.blogsService.createBlog(inputData);
+    return await this.createBlogUseCase.createBlog(inputData);
   }
 
   @SkipThrottle()
@@ -95,7 +99,7 @@ export class BlogsController {
   @Post(':blogId/posts')
   @HttpCode(201)
   async createPostForBlog(@Param('blogId') blogId: string, @Body() inputData: createBlogPostModel) {
-    const newPost = await this.blogsService.createPostForBlog(blogId, inputData);
+    const newPost = await this.createPostForBlogUseCase.createPostForBlog(blogId, inputData);
     if (!newPost) throw new NotFoundException("Blog doesn't exists");
     return newPost;
   }
@@ -114,7 +118,7 @@ export class BlogsController {
   @Put(':id')
   @HttpCode(204)
   async updateBlog(@Param('id') blogId: string, @Body() inputData: createBlogModel) {
-    const updatedBlog = await this.blogsService.updateBlog(blogId, inputData);
+    const updatedBlog = await this.updateBlogUseCase.updateBlog(blogId, inputData);
     if (!updatedBlog) throw new NotFoundException("Blog doesn't exists");
     return;
   }

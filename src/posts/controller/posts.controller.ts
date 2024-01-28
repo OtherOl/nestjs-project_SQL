@@ -13,7 +13,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { createPostModel, updatePostModel } from '../../base/types/posts.model';
-import { PostsService } from '../application/posts.service';
 import { PostsQueryRepository } from '../repositories/posts.query-repository';
 import { PostsRepository } from '../repositories/posts.repository';
 import { createCommentModel } from '../../base/types/comments.model';
@@ -24,14 +23,19 @@ import { ObjectId } from 'mongodb';
 import { SendLikes } from '../../base/types/likes.model';
 import { SkipThrottle } from '@nestjs/throttler';
 import { TokenGuard } from '../../auth/guards/token.guard';
+import { CreatePostUseCase } from '../use-cases/createPost.use-case';
+import { CreateCommentUseCase } from '../use-cases/createComment.use-case';
+import { DoPostLikesUseCase } from '../use-cases/doPostLikes.use-case';
 
 @Controller('posts')
 export class PostsController {
   constructor(
-    private postsService: PostsService,
     private postsQueryRepository: PostsQueryRepository,
     private postsRepository: PostsRepository,
     private authService: AuthService,
+    private createPostUseCase: CreatePostUseCase,
+    private createCommentUseCase: CreateCommentUseCase,
+    private doPostLikesUseCase: DoPostLikesUseCase,
   ) {}
 
   @SkipThrottle()
@@ -73,7 +77,7 @@ export class PostsController {
   ) {
     const accessToken = request.headers.authorization;
     const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
-    return await this.postsService.createComment(postId, inputData, new ObjectId(userId));
+    return await this.createCommentUseCase.createComment(postId, inputData, new ObjectId(userId));
   }
 
   @SkipThrottle()
@@ -105,7 +109,7 @@ export class PostsController {
   @Post()
   @HttpCode(201)
   async createPostForBlog(@Body() inputData: createPostModel) {
-    return await this.postsService.createPost(inputData);
+    return await this.createPostUseCase.createPost(inputData);
   }
 
   @SkipThrottle()
@@ -140,7 +144,7 @@ export class PostsController {
     const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
     const post = await this.postsQueryRepository.getPostByIdMethod(postId);
     if (!post) throw new NotFoundException("Post doesn't exists");
-    return await this.postsService.doLikes(userId, post, likeStatus.likeStatus);
+    return await this.doPostLikesUseCase.doLikes(userId, post, likeStatus.likeStatus);
   }
 
   @SkipThrottle()

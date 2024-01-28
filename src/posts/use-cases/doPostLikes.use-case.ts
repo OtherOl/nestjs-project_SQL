@@ -1,52 +1,21 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { createPostModel, postModel } from '../../base/types/posts.model';
-import { ObjectId } from 'mongodb';
-import { PostsRepository } from '../repositories/posts.repository';
-import { PostsQueryRepository } from '../repositories/posts.query-repository';
-import { BlogsQueryRepository } from '../../blogs/repositories/blogs.query-repository';
-import { blogModel } from '../../base/types/blogs.model';
-import { commentsModel, createCommentModel } from '../../base/types/comments.model';
-import { Post } from '../domain/posts.entity';
-import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
-import { Comment } from '../../comments/domain/comments.entity';
+import { Injectable } from '@nestjs/common';
 import { LikesQueryRepository } from '../../likes/repositories/likes.query-repository';
-import { LikesService } from '../../likes/application/likes.service';
 import { LikesRepository } from '../../likes/repositories/likes.repository';
+import { LikesService } from '../../likes/application/likes.service';
+import { PostsRepository } from '../repositories/posts.repository';
+import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
+import { ObjectId } from 'mongodb';
+import { postModel } from '../../base/types/posts.model';
 
 @Injectable()
-export class PostsService {
+export class DoPostLikesUseCase {
   constructor(
-    private postsRepository: PostsRepository,
-    private postsQueryRepository: PostsQueryRepository,
-    private blogsQueryRepository: BlogsQueryRepository,
-    private usersQueryRepository: UsersQueryRepository,
     private likesQueryRepository: LikesQueryRepository,
-    private likesService: LikesService,
     private likesRepository: LikesRepository,
+    private likesService: LikesService,
+    private postsRepository: PostsRepository,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
-  async createPost(inputData: createPostModel) {
-    const blog: blogModel | null = await this.blogsQueryRepository.getBlogById(inputData.blogId);
-    if (!blog) throw new BadRequestException([{ message: "Blog doesn't exists", field: 'BlogId' }]);
-
-    const newPost = Post.createNewPost(
-      inputData.title,
-      inputData.shortDescription,
-      inputData.content,
-      blog.id,
-      blog.name,
-    );
-
-    return this.postsRepository.createPost(newPost);
-  }
-
-  async createComment(postId: string, content: createCommentModel, userId: ObjectId) {
-    const post = await this.postsQueryRepository.getPostByIdMethod(postId);
-    const user = await this.usersQueryRepository.getUserById(userId);
-    if (!post) throw new NotFoundException("Post doesn't exists");
-    if (!user) throw new UnauthorizedException();
-    const comment: commentsModel = Comment.createNewComment(postId, content, user.id, user.login);
-    return await this.postsRepository.createComment(comment);
-  }
 
   async doLikes(userId: ObjectId, post: postModel, likeStatus: string) {
     const like = await this.likesQueryRepository.getLikeByPostId(new ObjectId(userId), post.id);

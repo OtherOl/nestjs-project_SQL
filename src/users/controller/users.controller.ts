@@ -12,16 +12,18 @@ import {
 } from '@nestjs/common';
 import { UsersQueryRepository } from '../repositories/users.query-repository';
 import { createUserModel } from '../../base/types/users.model';
-import { UsersService } from '../application/users.service';
 import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ObjectId } from 'mongodb';
+import { CreateUserUseCase } from '../use-cases/createUser.use-case';
+import { DeleteUserUseCase } from '../use-cases/deleteUser.use-case';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,
-    private usersService: UsersService,
+    private createUserUseCase: CreateUserUseCase,
+    private deleteUserUseCase: DeleteUserUseCase,
   ) {}
 
   @SkipThrottle()
@@ -54,7 +56,7 @@ export class UsersController {
   @Post()
   @HttpCode(201)
   async createUser(@Body() inputData: createUserModel) {
-    return await this.usersService.createUser(inputData);
+    return await this.createUserUseCase.createUser(inputData);
   }
 
   @SkipThrottle()
@@ -62,7 +64,7 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(204)
   async deleteUser(@Param('id') id: string) {
-    const user = await this.usersService.deleteUser(new ObjectId(id));
+    const user = await this.deleteUserUseCase.deleteUser(new ObjectId(id));
     if (!user) throw new NotFoundException("User doesn't exists");
     return user;
   }

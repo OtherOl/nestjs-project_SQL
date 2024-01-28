@@ -1,32 +1,19 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CommentsQueryRepository } from '../repositories/comments.query-repository';
-import { CommentsRepository } from '../repositories/comments.repository';
-import { ObjectId } from 'mongodb';
-import { CommentViewModel } from '../../base/types/comments.model';
+import { Injectable } from '@nestjs/common';
 import { LikesQueryRepository } from '../../likes/repositories/likes.query-repository';
 import { LikesService } from '../../likes/application/likes.service';
+import { CommentsRepository } from '../repositories/comments.repository';
 import { LikesRepository } from '../../likes/repositories/likes.repository';
-import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
+import { ObjectId } from 'mongodb';
+import { CommentViewModel } from '../../base/types/comments.model';
 
 @Injectable()
-export class CommentsService {
+export class DoLikesUseCase {
   constructor(
-    private commentsQueryRepository: CommentsQueryRepository,
-    private commentsRepository: CommentsRepository,
     private likesQueryRepository: LikesQueryRepository,
-    private likesService: LikesService,
     private likesRepository: LikesRepository,
-    private usersQueryRepository: UsersQueryRepository,
+    private likesService: LikesService,
+    private commentsRepository: CommentsRepository,
   ) {}
-
-  async updateComment(commentId: string, content: string, userId: string) {
-    const user = await this.usersQueryRepository.getUserById(new ObjectId(userId));
-    const comment = await this.commentsQueryRepository.getCommentById(commentId);
-    if (!user!.id.equals(comment.commentatorInfo.userId)) throw new ForbiddenException();
-    if (!comment) throw new NotFoundException("Comment doesn't exists");
-    await this.commentsRepository.updateComment(commentId, content);
-    return;
-  }
 
   async doLikes(userId: ObjectId, comment: CommentViewModel, likeStatus: string) {
     const like = await this.likesQueryRepository.getLikeByCommentId(new ObjectId(userId), comment.id);

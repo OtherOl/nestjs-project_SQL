@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { BlogsController } from './blogs/controller/blogs.controller';
-import { BlogsService } from './blogs/application/blogs.service';
 import { BlogsQueryRepository } from './blogs/repositories/blogs.query-repository';
 import { BlogsRepository } from './blogs/repositories/blogs.repository';
-import { PostsService } from './posts/application/posts.service';
 import { PostsRepository } from './posts/repositories/posts.repository';
 import { PostsController } from './posts/controller/posts.controller';
 import { PostsQueryRepository } from './posts/repositories/posts.query-repository';
@@ -11,7 +9,6 @@ import { CommentsController } from './comments/controller/comments.controller';
 import { CommentsQueryRepository } from './comments/repositories/comments.query-repository';
 import { UsersController } from './users/controller/users.controller';
 import { UsersQueryRepository } from './users/repositories/users.query-repository';
-import { UsersService } from './users/application/users.service';
 import { UsersRepository } from './users/repositories/users.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './blogs/domain/blogs.entity';
@@ -22,7 +19,6 @@ import { Comment, CommentSchema } from './comments/domain/comments.entity';
 import { User, UserSchema } from './users/domain/users.entity';
 import { TestingController } from './testing/controller/testing.controller';
 import { TestingRepository } from './testing/repositories/testing.repository';
-import { CommentsService } from './comments/application/comments.service';
 import { CommentsRepository } from './comments/repositories/comments.repository';
 import { BasicStrategy } from './auth/strategies/basic.strategy';
 import { PassportModule } from '@nestjs/passport';
@@ -46,6 +42,42 @@ import { Likes, LikesSchema } from './likes/domain/likes.entity';
 import { LikesRepository } from './likes/repositories/likes.repository';
 import { TokenGuard } from './auth/guards/token.guard';
 import { CustomBlogIdValidation } from './base/middlewares/blogId.middleware';
+import { CheckCredentialsUseCase } from './auth/use-cases/checkCredentials.use-case';
+import { ConfirmEmailUseCase } from './auth/use-cases/confirmEmail.use-case';
+import { PasswordRecoveryCodeUseCase } from './auth/use-cases/passwordRecoveryCode.use-case';
+import { ResendConfirmationUseCase } from './auth/use-cases/resendConfirmation.use-case';
+import { CreateBlogUseCase } from './blogs/use-cases/createBlog.use-case';
+import { CreatePostForBlogUseCase } from './blogs/use-cases/createPostForBlog.use-case';
+import { UpdateBlogUseCase } from './blogs/use-cases/updateBlog.use-case';
+import { DoLikesUseCase } from './comments/use-cases/doLikes.use-case';
+import { UpdateCommentUseCase } from './comments/use-cases/updateComment.use-case';
+import { CreateCommentUseCase } from './posts/use-cases/createComment.use-case';
+import { CreatePostUseCase } from './posts/use-cases/createPost.use-case';
+import { DoPostLikesUseCase } from './posts/use-cases/doPostLikes.use-case';
+import { CreateNewPasswordUseCase } from './users/use-cases/createNewPassword.use-case';
+import { CreateUserUseCase } from './users/use-cases/createUser.use-case';
+import { CreateUserForRegistrationUseCase } from './users/use-cases/createUserForRegistration.use-case';
+import { DeleteUserUseCase } from './users/use-cases/deleteUser.use-case';
+
+const authUseCases = [
+  CheckCredentialsUseCase,
+  ConfirmEmailUseCase,
+  PasswordRecoveryCodeUseCase,
+  ResendConfirmationUseCase,
+];
+
+const blogsUseCases = [CreateBlogUseCase, CreatePostForBlogUseCase, UpdateBlogUseCase];
+
+const commentsUseCases = [DoLikesUseCase, UpdateCommentUseCase];
+
+const postsUseCases = [CreateCommentUseCase, CreatePostUseCase, DoPostLikesUseCase];
+
+const usersUseCases = [
+  CreateNewPasswordUseCase,
+  CreateUserUseCase,
+  CreateUserForRegistrationUseCase,
+  DeleteUserUseCase,
+];
 
 @Module({
   imports: [
@@ -91,17 +123,13 @@ import { CustomBlogIdValidation } from './base/middlewares/blogId.middleware';
     SecurityController,
   ],
   providers: [
-    BlogsService,
     BlogsQueryRepository,
     BlogsRepository,
-    PostsService,
     PostsRepository,
     PostsQueryRepository,
-    CommentsService,
     CommentsRepository,
     CommentsQueryRepository,
     UsersQueryRepository,
-    UsersService,
     UsersRepository,
     TestingRepository,
     BasicStrategy,
@@ -116,6 +144,11 @@ import { CustomBlogIdValidation } from './base/middlewares/blogId.middleware';
     LikesRepository,
     TokenGuard,
     CustomBlogIdValidation,
+    ...authUseCases,
+    ...blogsUseCases,
+    ...commentsUseCases,
+    ...postsUseCases,
+    ...usersUseCases,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

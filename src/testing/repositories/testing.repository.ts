@@ -3,10 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from '../../posts/domain/posts.entity';
 import { Model } from 'mongoose';
 import { Blog } from '../../blogs/domain/blogs.entity';
-import {
-  Comment,
-  CommentDocument,
-} from '../../comments/domain/comments.entity';
+import { Comment, CommentDocument } from '../../comments/domain/comments.entity';
 import { User, UserDocument } from '../../users/domain/users.entity';
 
 @Injectable()

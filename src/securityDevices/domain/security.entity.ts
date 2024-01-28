@@ -23,6 +23,19 @@ export class Security {
 
   @Prop({ required: true })
   userId: string;
+
+  static createSession(ip: string, title: string = 'Chrome 105', verifiedToken: any) {
+    const session = new Security();
+
+    session.id = new ObjectId();
+    session.ip = ip;
+    session.title = title;
+    session.lastActivateDate = new Date(verifiedToken.iat * 1000).toISOString();
+    session.deviceId = verifiedToken.deviceId;
+    session.userId = verifiedToken.userId;
+
+    return session;
+  }
 }
 
 export const SecuritySchema = SchemaFactory.createForClass(Security);

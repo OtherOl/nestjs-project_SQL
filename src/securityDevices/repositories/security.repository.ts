@@ -8,8 +8,8 @@ import { securityViewModel } from '../../base/types/security.model';
 export class SecurityRepository {
   constructor(@InjectModel(Security.name) private securityModel: Model<SecurityDocument>) {}
 
-  async deleteAllSessions(): Promise<any> {
-    return this.securityModel.deleteMany({});
+  async deleteAllSessions(deviceId: string): Promise<any> {
+    return this.securityModel.deleteMany({ deviceId: { $ne: deviceId } });
   }
 
   async createSession(newSession: securityViewModel) {
@@ -22,5 +22,10 @@ export class SecurityRepository {
       { $set: { lastActivateDate: new Date().toISOString() } },
     );
     return updatedSession.modifiedCount === 1;
+  }
+
+  async deleteSpecifiedSession(deviceId: string) {
+    const deletedSession = await this.securityModel.deleteOne({ deviceId });
+    return deletedSession.deletedCount === 1;
   }
 }

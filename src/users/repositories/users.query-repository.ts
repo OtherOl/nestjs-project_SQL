@@ -49,7 +49,7 @@ export class UsersQueryRepository {
     return users;
   }
 
-  async getUserById(id: ObjectId) {
+  async getUserById(id: ObjectId): Promise<userModel | null> {
     return this.userModel.findOne({ id: id }, { _id: 0 });
   }
 

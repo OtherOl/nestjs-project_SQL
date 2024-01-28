@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, Post, Req, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ConfirmationCode,
   createNewPassword,
@@ -18,6 +28,11 @@ import { CheckCredentialsUseCase } from '../use-cases/checkCredentials.use-case'
 import { ConfirmEmailUseCase } from '../use-cases/confirmEmail.use-case';
 import { ResendConfirmationUseCase } from '../use-cases/resendConfirmation.use-case';
 import { PasswordRecoveryCodeUseCase } from '../use-cases/passwordRecoveryCode.use-case';
+import { SkipThrottle } from '@nestjs/throttler';
+import { AccessTokenGuard } from '../guards/accessToken.guard';
+import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
+import { ObjectId } from 'mongodb';
+import { GetDeviceIdUseCase } from '../use-cases/getDeviceId.use-case';
 
 @Controller('auth')
 export class AuthController {
@@ -26,12 +41,14 @@ export class AuthController {
     private securityRepository: SecurityRepository,
     private authService: AuthService,
     private authRepository: AuthRepository,
+    private usersQueryRepository: UsersQueryRepository,
     private createUserForRegistrationUseCase: CreateUserForRegistrationUseCase,
     private createNewPasswordUseCase: CreateNewPasswordUseCase,
     private checkCredentialsUseCase: CheckCredentialsUseCase,
     private confirmEmailUseCase: ConfirmEmailUseCase,
     private resendConfirmationUseCase: ResendConfirmationUseCase,
     private passwordRecoveryCodeUseCase: PasswordRecoveryCodeUseCase,
+    private getDeviceIdUseCase: GetDeviceIdUseCase,
   ) {}
 
   @HttpCode(204)
@@ -65,17 +82,18 @@ export class AuthController {
   @Post('refresh-token')
   async refreshToken(@Req() request: Request, @Res() response: Response) {
     const refreshToken = request.cookies.refreshToken();
-    const verify = await this.authService.verifyToken(refreshToken);
+    // const verify = await this.authService.verifyToken(refreshToken);
     const userId = await this.authService.getUserIdByToken(refreshToken);
     await this.authRepository.blackList(refreshToken);
 
     const accessToken = await this.authService.createAccessToken(userId);
     const newRefreshToken = await this.authService.createRefreshToken(userId);
+    const verifiedToken = await this.authService.verifyToken(newRefreshToken);
 
     const isInvalid = await this.authRepository.findInvalidToken(newRefreshToken);
     if (isInvalid) throw new UnauthorizedException();
 
-    await this.securityRepository.updateSession(verify.deviceId);
+    await this.securityRepository.updateSession(verifiedToken.deviceId);
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
@@ -105,16 +123,26 @@ export class AuthController {
 
   @HttpCode(204)
   @Post('logout')
-  async logout() {}
+  async logout(@Req() request: Request, @Res() response: Response) {
+    const refreshToken = request.cookies.refreshToken();
+    const deviceId = await this.getDeviceIdUseCase.getDeviceId(refreshToken);
+    await this.authRepository.blackList(refreshToken);
+    await this.securityRepository.deleteSpecifiedSession(deviceId);
+    return response.clearCookie('refreshToken');
+  }
 
+  @SkipThrottle()
+  @UseGuards(AccessTokenGuard)
   @HttpCode(200)
   @Get('me')
-  async getProfile() {
-    // const user: userModel | undefined = req.user;
-    // return {
-    //   email: user!.email,
-    //   login: user!.login,
-    //   userId: user!.id,
-    // };
+  async getProfile(@Req() request: Request) {
+    const accessToken = request.headers.authorization;
+    const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
+    const user = await this.usersQueryRepository.getUserById(new ObjectId(userId));
+    return {
+      email: user!.email,
+      login: user!.login,
+      userId: user!.id,
+    };
   }
 }

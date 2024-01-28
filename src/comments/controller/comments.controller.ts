@@ -16,7 +16,7 @@ import { SendLikes } from '../../base/types/likes.model';
 import { Request } from 'express';
 import { AuthService } from '../../auth/application/auth.service';
 import { SkipThrottle } from '@nestjs/throttler';
-import { TokenGuard } from '../../auth/guards/token.guard';
+import { AccessTokenGuard } from '../../auth/guards/accessToken.guard';
 import { createCommentModel } from '../../base/types/comments.model';
 import { UpdateCommentUseCase } from '../use-cases/updateComment.use-case';
 import { DoLikesUseCase } from '../use-cases/doLikes.use-case';
@@ -43,7 +43,7 @@ export class CommentsController {
   }
 
   @SkipThrottle()
-  @UseGuards(TokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Put(':commentId')
   @HttpCode(204)
   async updateComment(
@@ -57,7 +57,7 @@ export class CommentsController {
   }
 
   @SkipThrottle()
-  @UseGuards(TokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Put(':commentId/like-status')
   @HttpCode(204)
   async doLikeDislike(
@@ -73,7 +73,7 @@ export class CommentsController {
   }
 
   @SkipThrottle()
-  @UseGuards(TokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Delete(':commentId')
   @HttpCode(204)
   async deleteComment(@Param('commentId') commentId: string, @Req() request: Request) {

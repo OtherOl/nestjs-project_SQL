@@ -40,7 +40,7 @@ import { LikesService } from './likes/application/likes.service';
 import { LikesQueryRepository } from './likes/repositories/likes.query-repository';
 import { Likes, LikesSchema } from './likes/domain/likes.entity';
 import { LikesRepository } from './likes/repositories/likes.repository';
-import { TokenGuard } from './auth/guards/token.guard';
+import { AccessTokenGuard } from './auth/guards/accessToken.guard';
 import { CustomBlogIdValidation } from './base/middlewares/blogId.middleware';
 import { CheckCredentialsUseCase } from './auth/use-cases/checkCredentials.use-case';
 import { ConfirmEmailUseCase } from './auth/use-cases/confirmEmail.use-case';
@@ -58,12 +58,15 @@ import { CreateNewPasswordUseCase } from './users/use-cases/createNewPassword.us
 import { CreateUserUseCase } from './users/use-cases/createUser.use-case';
 import { CreateUserForRegistrationUseCase } from './users/use-cases/createUserForRegistration.use-case';
 import { DeleteUserUseCase } from './users/use-cases/deleteUser.use-case';
+import { RefreshTokenGuard } from './auth/guards/refreshToken.guard';
+import { GetDeviceIdUseCase } from './auth/use-cases/getDeviceId.use-case';
 
 const authUseCases = [
   CheckCredentialsUseCase,
   ConfirmEmailUseCase,
   PasswordRecoveryCodeUseCase,
   ResendConfirmationUseCase,
+  GetDeviceIdUseCase,
 ];
 
 const blogsUseCases = [CreateBlogUseCase, CreatePostForBlogUseCase, UpdateBlogUseCase];
@@ -109,7 +112,7 @@ const usersUseCases = [
     JwtModule.register({
       global: true,
       secret: process.env.SECRET || '123',
-      signOptions: { expiresIn: '10m' },
+      signOptions: { expiresIn: '10s' },
     }),
     ThrottlerModule.forRoot([{ ttl: 10000, limit: 5 }]),
   ],
@@ -142,7 +145,8 @@ const usersUseCases = [
     LikesService,
     LikesQueryRepository,
     LikesRepository,
-    TokenGuard,
+    AccessTokenGuard,
+    RefreshTokenGuard,
     CustomBlogIdValidation,
     ...authUseCases,
     ...blogsUseCases,

@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { Blog } from '../../blogs/domain/blogs.entity';
 import { Comment, CommentDocument } from '../../comments/domain/comments.entity';
 import { User, UserDocument } from '../../users/domain/users.entity';
+import { Security, SecurityDocument } from '../../securityDevices/domain/security.entity';
 
 @Injectable()
 export class TestingRepository {
@@ -13,6 +14,7 @@ export class TestingRepository {
     @InjectModel(Blog.name) private blogModel: Model<Blog>,
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Security.name) private securityModel: Model<SecurityDocument>,
   ) {}
 
   async clearDB() {
@@ -20,6 +22,7 @@ export class TestingRepository {
     await this.blogModel.deleteMany({});
     await this.commentModel.deleteMany({});
     await this.userModel.deleteMany({});
+    await this.securityModel.deleteMany({});
     return;
   }
 }

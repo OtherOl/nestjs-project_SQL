@@ -22,7 +22,7 @@ import { AuthService } from '../../auth/application/auth.service';
 import { ObjectId } from 'mongodb';
 import { SendLikes } from '../../base/types/likes.model';
 import { SkipThrottle } from '@nestjs/throttler';
-import { TokenGuard } from '../../auth/guards/token.guard';
+import { AccessTokenGuard } from '../../auth/guards/accessToken.guard';
 import { CreatePostUseCase } from '../use-cases/createPost.use-case';
 import { CreateCommentUseCase } from '../use-cases/createComment.use-case';
 import { DoPostLikesUseCase } from '../use-cases/doPostLikes.use-case';
@@ -67,7 +67,7 @@ export class PostsController {
   }
 
   @SkipThrottle()
-  @UseGuards(TokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Post(':postId/comments')
   @HttpCode(201)
   async createCommentForPost(
@@ -132,7 +132,7 @@ export class PostsController {
   }
 
   @SkipThrottle()
-  @UseGuards(TokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Put(':postId/like-status')
   @HttpCode(204)
   async doLikeDislike(

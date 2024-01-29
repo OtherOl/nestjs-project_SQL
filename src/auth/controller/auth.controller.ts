@@ -85,6 +85,8 @@ export class AuthController {
   @Post('refresh-token')
   async refreshToken(@Req() request: Request, @Res() response: Response) {
     const refreshToken = request.cookies.refreshToken;
+    const isInvalid = await this.authRepository.findInvalidToken(refreshToken);
+    if (isInvalid !== null) throw new UnauthorizedException();
     const verify = await this.authService.verifyToken(refreshToken);
     const userId = await this.authService.getUserIdByToken(refreshToken);
     await this.authRepository.blackList(refreshToken);
@@ -94,9 +96,6 @@ export class AuthController {
       new ObjectId(userId),
       verify.deviceId,
     );
-
-    const isInvalid = await this.authRepository.findInvalidToken(newRefreshToken);
-    if (isInvalid !== null) throw new UnauthorizedException();
 
     await this.securityRepository.updateSession(verify.deviceId);
     response.cookie('refreshToken', newRefreshToken, {
@@ -131,6 +130,9 @@ export class AuthController {
   @Post('logout')
   async logout(@Req() request: Request, @Res() response: Response) {
     const refreshToken = request.cookies.refreshToken;
+    const isInvalid = await this.authRepository.findInvalidToken(refreshToken);
+    if (isInvalid !== null) throw new UnauthorizedException();
+
     const deviceId = await this.getDeviceIdUseCase.getDeviceId(refreshToken);
     await this.authRepository.blackList(refreshToken);
     await this.securityRepository.deleteSpecifiedSession(deviceId);

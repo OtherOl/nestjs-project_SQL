@@ -20,6 +20,10 @@ export class AuthService {
     return this.jwtService.sign({ userId: userId, deviceId: uuidv4() });
   }
 
+  async createNewRefreshToken(userId: ObjectId, deviceId: string) {
+    return this.jwtService.sign({ userId, deviceId });
+  }
+
   async verifyToken(token: string) {
     return this.jwtService.verify(token);
   }

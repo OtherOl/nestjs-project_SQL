@@ -8,7 +8,7 @@ export class AuthRepository {
   constructor(@InjectModel(Auth.name) private authModel: Model<AuthDocument>) {}
 
   async blackList(token: string) {
-    await this.authModel.create(token);
+    return await this.authModel.create({ token });
   }
 
   async findInvalidToken(token: string) {

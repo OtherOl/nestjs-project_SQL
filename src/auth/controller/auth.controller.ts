@@ -33,6 +33,7 @@ import { AccessTokenGuard } from '../guards/accessToken.guard';
 import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
 import { ObjectId } from 'mongodb';
 import { GetDeviceIdUseCase } from '../use-cases/getDeviceId.use-case';
+import { RefreshTokenGuard } from '../guards/refreshToken.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -79,22 +80,25 @@ export class AuthController {
   }
 
   @HttpCode(200)
+  @UseGuards(RefreshTokenGuard)
   @Post('refresh-token')
   async refreshToken(@Req() request: Request, @Res() response: Response) {
-    const refreshToken = request.cookies.refreshToken();
-    // const verify = await this.authService.verifyToken(refreshToken);
+    const refreshToken = request.cookies.refreshToken;
+    const verify = await this.authService.verifyToken(refreshToken);
     const userId = await this.authService.getUserIdByToken(refreshToken);
     await this.authRepository.blackList(refreshToken);
 
     const accessToken = await this.authService.createAccessToken(userId);
-    const newRefreshToken = await this.authService.createRefreshToken(userId);
-    const verifiedToken = await this.authService.verifyToken(newRefreshToken);
+    const newRefreshToken = await this.authService.createNewRefreshToken(
+      new ObjectId(userId),
+      verify.deviceId,
+    );
 
     const isInvalid = await this.authRepository.findInvalidToken(newRefreshToken);
     if (isInvalid) throw new UnauthorizedException();
 
-    await this.securityRepository.updateSession(verifiedToken.deviceId);
-    response.cookie('refreshToken', refreshToken, {
+    await this.securityRepository.updateSession(verify.deviceId);
+    response.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: true,
       expires: add(new Date(), { seconds: 20 }),
@@ -122,13 +126,14 @@ export class AuthController {
   }
 
   @HttpCode(204)
+  @UseGuards(RefreshTokenGuard)
   @Post('logout')
   async logout(@Req() request: Request, @Res() response: Response) {
-    const refreshToken = request.cookies.refreshToken();
+    const refreshToken = request.cookies.refreshToken;
     const deviceId = await this.getDeviceIdUseCase.getDeviceId(refreshToken);
     await this.authRepository.blackList(refreshToken);
     await this.securityRepository.deleteSpecifiedSession(deviceId);
-    return response.clearCookie('refreshToken');
+    return response.clearCookie('refreshToken').sendStatus(204);
   }
 
   @SkipThrottle()

@@ -79,6 +79,7 @@ export class AuthController {
     return response.send({ accessToken: token });
   }
 
+  @SkipThrottle()
   @HttpCode(200)
   @UseGuards(RefreshTokenGuard)
   @Post('refresh-token')
@@ -88,14 +89,14 @@ export class AuthController {
     const userId = await this.authService.getUserIdByToken(refreshToken);
     await this.authRepository.blackList(refreshToken);
 
-    const accessToken = await this.authService.createAccessToken(userId);
+    const accessToken = await this.authService.createAccessToken(new ObjectId(userId));
     const newRefreshToken = await this.authService.createNewRefreshToken(
       new ObjectId(userId),
       verify.deviceId,
     );
 
     const isInvalid = await this.authRepository.findInvalidToken(newRefreshToken);
-    if (isInvalid) throw new UnauthorizedException();
+    if (isInvalid !== null) throw new UnauthorizedException();
 
     await this.securityRepository.updateSession(verify.deviceId);
     response.cookie('refreshToken', newRefreshToken, {

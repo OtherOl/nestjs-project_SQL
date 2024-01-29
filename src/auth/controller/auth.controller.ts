@@ -81,7 +81,7 @@ export class AuthController {
 
   @SkipThrottle()
   @HttpCode(200)
-  // @UseGuards(RefreshTokenGuard)
+  @UseGuards(RefreshTokenGuard)
   @Post('refresh-token')
   async refreshToken(@Req() request: Request, @Res() response: Response) {
     const refreshToken = request.cookies.refreshToken;
@@ -96,7 +96,6 @@ export class AuthController {
     );
 
     const isInvalid = await this.authRepository.findInvalidToken(newRefreshToken);
-    console.log(isInvalid);
     if (isInvalid !== null) throw new UnauthorizedException();
 
     await this.securityRepository.updateSession(verify.deviceId);

@@ -21,7 +21,7 @@ export class AuthService {
   }
 
   async createNewRefreshToken(userId: ObjectId, deviceId: string) {
-    return this.jwtService.sign({ userId, deviceId });
+    return this.jwtService.sign({ userId: userId, deviceId: deviceId });
   }
 
   async verifyToken(token: string) {

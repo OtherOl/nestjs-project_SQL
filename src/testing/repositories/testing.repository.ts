@@ -6,6 +6,7 @@ import { Blog } from '../../blogs/domain/blogs.entity';
 import { Comment, CommentDocument } from '../../comments/domain/comments.entity';
 import { User, UserDocument } from '../../users/domain/users.entity';
 import { Security, SecurityDocument } from '../../securityDevices/domain/security.entity';
+import { Auth, AuthDocument } from '../../auth/domain/auth.entity';
 
 @Injectable()
 export class TestingRepository {
@@ -15,6 +16,7 @@ export class TestingRepository {
     @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Security.name) private securityModel: Model<SecurityDocument>,
+    @InjectModel(Auth.name) private authModel: Model<AuthDocument>,
   ) {}
 
   async clearDB() {
@@ -23,6 +25,7 @@ export class TestingRepository {
     await this.commentModel.deleteMany({});
     await this.userModel.deleteMany({});
     await this.securityModel.deleteMany({});
+    await this.authModel.deleteMany({});
     return;
   }
 }

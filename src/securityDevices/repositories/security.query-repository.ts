@@ -13,6 +13,7 @@ export class SecurityQueryRepository {
   }
 
   async getSessionById(deviceId: string) {
+    console.log(deviceId);
     const session = await this.securityModel.findOne({ deviceId });
     if (!session) {
       throw new NotFoundException("Session doesn't exists");

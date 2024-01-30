@@ -33,7 +33,8 @@ export class SecurityController {
   async deleteAllExceptOne(@Req() request: Request) {
     const refreshToken = request.cookies.refreshToken;
     const deviceId = await this.getDeviceIdUseCase.getDeviceId(refreshToken);
-    return await this.securityRepository.deleteAllSessions(deviceId);
+    await this.securityRepository.deleteAllSessions(deviceId);
+    return;
   }
 
   @SkipThrottle()
@@ -45,6 +46,7 @@ export class SecurityController {
     const inputUserId = await this.authService.getUserIdByToken(refreshToken);
     const session = await this.securityQueryRepository.getSessionById(deviceId);
     if (inputUserId !== session.userId) throw new ForbiddenException();
-    return await this.securityRepository.deleteSpecifiedSession(deviceId);
+    await this.securityRepository.deleteSpecifiedSession(deviceId);
+    return;
   }
 }

@@ -13,15 +13,15 @@ export class AuthService {
   }
 
   async createAccessToken(userId: ObjectId) {
-    return this.jwtService.sign({ userId: userId });
+    return this.jwtService.sign({ userId: userId }, { expiresIn: '10s' });
   }
 
   async createRefreshToken(userId: ObjectId) {
-    return this.jwtService.sign({ userId: userId, deviceId: uuidv4() });
+    return this.jwtService.sign({ userId: userId, deviceId: uuidv4() }, { expiresIn: '20s' });
   }
 
   async createNewRefreshToken(userId: ObjectId, deviceId: string) {
-    return this.jwtService.sign({ userId: userId, deviceId: deviceId });
+    return this.jwtService.sign({ userId: userId, deviceId: deviceId }, { expiresIn: '20s' });
   }
 
   async verifyToken(token: string) {

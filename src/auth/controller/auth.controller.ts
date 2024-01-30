@@ -8,7 +8,6 @@ import {
 } from '../../base/types/users.model';
 import { AuthService } from '../application/auth.service';
 import { Request, Response } from 'express';
-import { add } from 'date-fns/add';
 import { SecurityService } from '../../securityDevices/application/security.service';
 import { AuthRepository } from '../repositories/auth.repository';
 import { SecurityRepository } from '../../securityDevices/repositories/security.repository';
@@ -64,7 +63,6 @@ export class AuthController {
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
-      expires: add(new Date(), { seconds: 20 }),
     });
     return response.send({ accessToken: token });
   }
@@ -89,7 +87,6 @@ export class AuthController {
     response.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: true,
-      expires: add(new Date(), { seconds: 20 }),
     });
     return response.send({ accessToken: accessToken });
   }

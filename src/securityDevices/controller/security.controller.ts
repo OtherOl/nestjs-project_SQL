@@ -43,6 +43,7 @@ export class SecurityController {
   @HttpCode(204)
   async deleteSessionById(@Req() request: Request, @Param('deviceId') deviceId: string) {
     const refreshToken = request.cookies.refreshToken;
+    console.log(refreshToken);
     const inputUserId = await this.authService.getUserIdByToken(refreshToken);
     const session = await this.securityQueryRepository.getSessionById(deviceId);
     if (inputUserId !== session.userId) throw new ForbiddenException();

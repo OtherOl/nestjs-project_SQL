@@ -112,7 +112,6 @@ const usersUseCases = [
     JwtModule.register({
       global: true,
       secret: process.env.SECRET || '123',
-      signOptions: { expiresIn: '10s' },
     }),
     ThrottlerModule.forRoot([{ ttl: 10000, limit: 5 }]),
   ],

@@ -19,7 +19,7 @@ export class SecurityRepository {
   async updateSession(deviceId: string) {
     const updatedSession = await this.securityModel.updateOne(
       { deviceId: deviceId },
-      { $set: { lastActivateDate: new Date().toISOString() } },
+      { $set: { lastActiveDate: new Date().toISOString() } },
     );
     return updatedSession.modifiedCount === 1;
   }

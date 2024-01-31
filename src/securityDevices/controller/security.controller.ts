@@ -50,7 +50,6 @@ export class SecurityController {
     const session = await this.securityQueryRepository.getSessionById(deviceId);
     if (inputUserId !== session.userId) throw new ForbiddenException();
     await this.securityRepository.deleteSpecifiedSession(deviceId);
-    await this.authRepository.blackList(refreshToken);
     return;
   }
 }

@@ -48,4 +48,10 @@ export class AuthService {
       return 'fffff3ea02afffffc87fffff';
     }
   }
+
+  async decodeRefreshToken(token: string | undefined) {
+    if (!token) throw new UnauthorizedException();
+    const decodedToken = await this.jwtService.decode(token);
+    return decodedToken.deviceId;
+  }
 }

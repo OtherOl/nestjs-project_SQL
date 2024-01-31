@@ -1124,9 +1124,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/testing@npm:^10.0.0":
-  version: 10.2.10
-  resolution: "@nestjs/testing@npm:10.2.10"
+"@nestjs/testing@npm:^10.3.1":
+  version: 10.3.1
+  resolution: "@nestjs/testing@npm:10.3.1"
   dependencies:
     tslib: "npm:2.6.2"
   peerDependencies:
@@ -1139,7 +1139,7 @@ __metadata:
       optional: true
     "@nestjs/platform-express":
       optional: true
-  checksum: 2221310546cbd0a17f0c6d51797a0c82ceea5252b98e3411daae00a569d333950169c99605303aa48e5a132c339c47455755c2e0c17cb37f627e085e9c985826
+  checksum: 04ce037e6f0db99408463d6353560ed8d46f6871a3b5931b3b3cbedc29fff083a4d5889c7906ff5270e45653308f9ee78c233ebe772ccebb33b026abd10b5678
   languageName: node
   linkType: hard
 
@@ -5786,7 +5786,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest@npm:^29.5.0":
+"jest@npm:^29.7.0":
   version: 29.7.0
   resolution: "jest@npm:29.7.0"
   dependencies:
@@ -7226,7 +7226,7 @@ __metadata:
     "@nestjs/passport": "npm:^10.0.3"
     "@nestjs/platform-express": "npm:^10.0.0"
     "@nestjs/schematics": "npm:^10.0.0"
-    "@nestjs/testing": "npm:^10.0.0"
+    "@nestjs/testing": "npm:^10.3.1"
     "@nestjs/throttler": "npm:^5.1.1"
     "@types/bcrypt": "npm:^5.0.2"
     "@types/cookie-parser": "npm:^1.4.6"
@@ -7250,7 +7250,7 @@ __metadata:
     eslint-config-prettier: "npm:^9.0.0"
     eslint-plugin-prettier: "npm:^5.0.0"
     handlebars: "npm:^4.7.8"
-    jest: "npm:^29.5.0"
+    jest: "npm:^29.7.0"
     mongodb: "npm:^6.3.0"
     mongoose: "npm:^8.0.3"
     nodemailer: "npm:^6.9.8"
@@ -7260,7 +7260,7 @@ __metadata:
     reflect-metadata: "npm:^0.1.13"
     rxjs: "npm:^7.8.1"
     source-map-support: "npm:^0.5.21"
-    supertest: "npm:^6.3.3"
+    supertest: "npm:^6.3.4"
     ts-jest: "npm:^29.1.0"
     ts-loader: "npm:^9.4.3"
     ts-node: "npm:^10.9.1"
@@ -8911,7 +8911,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"superagent@npm:^8.0.5":
+"superagent@npm:^8.1.2":
   version: 8.1.2
   resolution: "superagent@npm:8.1.2"
   dependencies:
@@ -8929,13 +8929,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supertest@npm:^6.3.3":
-  version: 6.3.3
-  resolution: "supertest@npm:6.3.3"
+"supertest@npm:^6.3.4":
+  version: 6.3.4
+  resolution: "supertest@npm:6.3.4"
   dependencies:
     methods: "npm:^1.1.2"
-    superagent: "npm:^8.0.5"
-  checksum: 178ca0d2f3919ec01e1e22240df237793d80eb36f249f57c9bba34ce6ad002b4918db6a4fdf31ba8d15746451c9164305c60a490f4fcb43b5761a8f582def183
+    superagent: "npm:^8.1.2"
+  checksum: f8c0b6c73b5e87da31feee6ccb36e7af766a438513cad89d6907f22c97edd83b1e765b4c8de955d5f7af4bca5fd0aaf9149ff48e21567dd290b326a8633af2a7
   languageName: node
   linkType: hard
 

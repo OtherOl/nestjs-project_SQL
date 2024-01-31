@@ -16,7 +16,7 @@ export class Security {
   title: string;
 
   @Prop({ required: true })
-  lastActivateDate: string;
+  lastActiveDate: string;
 
   @Prop({ required: true })
   deviceId: string;
@@ -30,7 +30,7 @@ export class Security {
     session.id = new ObjectId();
     session.ip = ip;
     session.title = title;
-    session.lastActivateDate = new Date(verifiedToken.iat * 1000).toISOString();
+    session.lastActiveDate = new Date(verifiedToken.iat * 1000).toISOString();
     session.deviceId = verifiedToken.deviceId;
     session.userId = verifiedToken.userId;
 

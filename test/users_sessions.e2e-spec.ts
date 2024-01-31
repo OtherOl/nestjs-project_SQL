@@ -60,7 +60,7 @@ describe('Sessions', () => {
       {
         ip: expect.any(String),
         title: expect.any(String),
-        lastActivateDate: expect.any(String),
+        lastActiveDate: expect.any(String),
         deviceId: expect.any(String),
       },
     ]);
@@ -129,25 +129,25 @@ describe('Sessions', () => {
   //     {
   //       ip: expect.any(String),
   //       title: expect.any(String),
-  //       lastActivateDate: expect.any(String),
+  //       lastActiveDate: expect.any(String),
   //       deviceId: expect.any(String),
   //     },
   //     {
   //       ip: expect.any(String),
   //       title: expect.any(String),
-  //       lastActivateDate: expect.any(String),
+  //       lastActiveDate: expect.any(String),
   //       deviceId: expect.any(String),
   //     },
   //     {
   //       ip: expect.any(String),
   //       title: expect.any(String),
-  //       lastActivateDate: expect.any(String),
+  //       lastActiveDate: expect.any(String),
   //       deviceId: expect.any(String),
   //     },
   //     {
   //       ip: expect.any(String),
   //       title: expect.any(String),
-  //       lastActivateDate: expect.any(String),
+  //       lastActiveDate: expect.any(String),
   //       deviceId: expect.any(String),
   //     },
   //   ]);

@@ -6,6 +6,7 @@ import { AuthService } from '../../auth/application/auth.service';
 import { SkipThrottle } from '@nestjs/throttler';
 import { RefreshTokenGuard } from '../../auth/guards/refreshToken.guard';
 import { GetDeviceIdUseCase } from '../../auth/use-cases/getDeviceId.use-case';
+import { AuthRepository } from '../../auth/repositories/auth.repository';
 
 @Controller('security/devices')
 export class SecurityController {
@@ -13,6 +14,7 @@ export class SecurityController {
     private securityQueryRepository: SecurityQueryRepository,
     private securityRepository: SecurityRepository,
     private authService: AuthService,
+    private authRepository: AuthRepository,
     private getDeviceIdUseCase: GetDeviceIdUseCase,
   ) {}
 
@@ -26,9 +28,10 @@ export class SecurityController {
     return await this.securityQueryRepository.getAllSessions(userId);
   }
 
+  //удалить все кроме текущего refresh
   @SkipThrottle()
-  @Delete()
   @UseGuards(RefreshTokenGuard)
+  @Delete()
   @HttpCode(204)
   async deleteAllExceptOne(@Req() request: Request) {
     const refreshToken = request.cookies.refreshToken;
@@ -47,6 +50,7 @@ export class SecurityController {
     const session = await this.securityQueryRepository.getSessionById(deviceId);
     if (inputUserId !== session.userId) throw new ForbiddenException();
     await this.securityRepository.deleteSpecifiedSession(deviceId);
+    await this.authRepository.blackList(refreshToken);
     return;
   }
 }

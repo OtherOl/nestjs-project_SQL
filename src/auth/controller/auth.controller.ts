@@ -9,7 +9,7 @@ import {
 import { AuthService } from '../application/auth.service';
 import { Request, Response } from 'express';
 import { SecurityService } from '../../securityDevices/application/security.service';
-import { AuthRepository } from '../repositories/auth.repository';
+import { AuthBlackListRepository } from '../repositories/auth-black-list-repository.service';
 import { SecurityRepository } from '../../securityDevices/repositories/security.repository';
 import { CreateUserForRegistrationUseCase } from '../../users/use-cases/createUserForRegistration.use-case';
 import { CreateNewPasswordUseCase } from '../../users/use-cases/createNewPassword.use-case';
@@ -23,6 +23,7 @@ import { UsersQueryRepository } from '../../users/repositories/users.query-repos
 import { ObjectId } from 'mongodb';
 import { GetDeviceIdUseCase } from '../use-cases/getDeviceId.use-case';
 import { RefreshTokenGuard } from '../guards/refreshToken.guard';
+import { AuthWhiteListRepository } from '../repositories/auth-white_list.repository';
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +31,8 @@ export class AuthController {
     private securityService: SecurityService,
     private securityRepository: SecurityRepository,
     private authService: AuthService,
-    private authRepository: AuthRepository,
+    private authBlackListRepository: AuthBlackListRepository,
+    private authWhiteListRepository: AuthWhiteListRepository,
     private usersQueryRepository: UsersQueryRepository,
     private createUserForRegistrationUseCase: CreateUserForRegistrationUseCase,
     private createNewPasswordUseCase: CreateNewPasswordUseCase,
@@ -75,7 +77,7 @@ export class AuthController {
     const refreshToken = request.cookies.refreshToken;
     const verify = await this.authService.verifyToken(refreshToken);
     const userId = await this.authService.getUserIdByToken(refreshToken);
-    await this.authRepository.blackList(refreshToken);
+    await this.authBlackListRepository.blackList(refreshToken);
 
     const accessToken = await this.authService.createAccessToken(new ObjectId(userId));
     const newRefreshToken = await this.authService.createNewRefreshToken(
@@ -116,7 +118,8 @@ export class AuthController {
   async logout(@Req() request: Request, @Res() response: Response) {
     const refreshToken = request.cookies.refreshToken;
     const deviceId = await this.getDeviceIdUseCase.getDeviceId(refreshToken);
-    await this.authRepository.blackList(refreshToken);
+    await this.authBlackListRepository.blackList(refreshToken);
+    await this.authWhiteListRepository.deleteToken(refreshToken);
     await this.securityRepository.deleteSpecifiedSession(deviceId);
     return response.clearCookie('refreshToken').sendStatus(204);
   }

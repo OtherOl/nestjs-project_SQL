@@ -1,13 +1,13 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { AuthRepository } from '../repositories/auth.repository';
+import { AuthBlackListRepository } from '../repositories/auth-black-list-repository.service';
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
-    private authRepository: AuthRepository,
+    private authRepository: AuthBlackListRepository,
   ) {}
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const req: Request = context.switchToHttp().getRequest();

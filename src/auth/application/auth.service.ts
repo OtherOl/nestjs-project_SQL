@@ -3,10 +3,14 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
+import { AuthWhiteListRepository } from '../repositories/auth-white_list.repository';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private authWhiteListRepository: AuthWhiteListRepository,
+  ) {}
 
   async createPasswordHash(password: string) {
     return await bcrypt.hash(password, 10);
@@ -17,7 +21,10 @@ export class AuthService {
   }
 
   async createRefreshToken(userId: ObjectId) {
-    return this.jwtService.sign({ userId: userId, deviceId: uuidv4() }, { expiresIn: '20s' });
+    const deviceId = uuidv4();
+    const refreshToken = this.jwtService.sign({ userId, deviceId }, { expiresIn: '20s' });
+    await this.authWhiteListRepository.createNewToken(refreshToken, userId, deviceId);
+    return refreshToken;
   }
 
   async createNewRefreshToken(userId: ObjectId, deviceId: string) {

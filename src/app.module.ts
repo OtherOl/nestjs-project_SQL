@@ -34,8 +34,8 @@ import { SecurityController } from './securityDevices/controller/security.contro
 import { SecurityService } from './securityDevices/application/security.service';
 import { SecurityRepository } from './securityDevices/repositories/security.repository';
 import { SecurityQueryRepository } from './securityDevices/repositories/security.query-repository';
-import { Auth, AuthSchema } from './auth/domain/auth.entity';
-import { AuthRepository } from './auth/repositories/auth.repository';
+import { AuthBlackList, AuthBlackListSchema } from './auth/domain/auth-black_list.entity';
+import { AuthBlackListRepository } from './auth/repositories/auth-black-list-repository.service';
 import { LikesService } from './likes/application/likes.service';
 import { LikesQueryRepository } from './likes/repositories/likes.query-repository';
 import { Likes, LikesSchema } from './likes/domain/likes.entity';
@@ -60,6 +60,8 @@ import { CreateUserForRegistrationUseCase } from './users/use-cases/createUserFo
 import { DeleteUserUseCase } from './users/use-cases/deleteUser.use-case';
 import { RefreshTokenGuard } from './auth/guards/refreshToken.guard';
 import { GetDeviceIdUseCase } from './auth/use-cases/getDeviceId.use-case';
+import { AuthWhitelist, AuthWhiteListSchema } from './auth/domain/auth-white_list.entity';
+import { AuthWhiteListRepository } from './auth/repositories/auth-white_list.repository';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -95,7 +97,8 @@ const usersUseCases = [
       { name: Comment.name, schema: CommentSchema },
       { name: User.name, schema: UserSchema },
       { name: Security.name, schema: SecuritySchema },
-      { name: Auth.name, schema: AuthSchema },
+      { name: AuthWhitelist.name, schema: AuthWhiteListSchema },
+      { name: AuthBlackList.name, schema: AuthBlackListSchema },
       { name: Likes.name, schema: LikesSchema },
     ]),
     MailerModule.forRoot({
@@ -136,7 +139,8 @@ const usersUseCases = [
     TestingRepository,
     BasicStrategy,
     AuthService,
-    AuthRepository,
+    AuthWhiteListRepository,
+    AuthBlackListRepository,
     EmailManager,
     SecurityService,
     SecurityRepository,

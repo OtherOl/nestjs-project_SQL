@@ -36,6 +36,10 @@ export class AuthWhiteListRepository {
     return deletedTokens.deletedCount === 1;
   }
 
+  async findTokens(userId: ObjectId, deviceId: string): Promise<any | null> {
+    return this.authWhiteListModel.find({ userId: userId, deviceId: { $ne: deviceId } });
+  }
+
   async findInvalidToken(token: string) {
     return this.authWhiteListModel.findOne({ token });
   }

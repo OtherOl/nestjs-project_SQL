@@ -22,8 +22,8 @@ export class AuthWhiteListRepository {
   }
 
   async deleteTokenByDeviceId(deviceId: string) {
-    // const refreshToken = await this.authWhiteListModel.findOne({ deviceId });
-    // await this.authBlackListRepository.blackList(refreshToken!.token);
+    const refreshToken = await this.authWhiteListModel.findOne({ deviceId });
+    await this.authBlackListRepository.blackList(refreshToken!.token);
     const deletedToken = await this.authWhiteListModel.deleteOne({ deviceId });
     return deletedToken.deletedCount === 1;
   }
@@ -38,9 +38,5 @@ export class AuthWhiteListRepository {
 
   async findTokens(userId: ObjectId, deviceId: string): Promise<any | null> {
     return this.authWhiteListModel.find({ userId: userId, deviceId: { $ne: deviceId } });
-  }
-
-  async findInvalidToken(token: string) {
-    return this.authWhiteListModel.findOne({ token });
   }
 }

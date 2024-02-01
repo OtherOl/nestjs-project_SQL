@@ -28,7 +28,9 @@ export class AuthService {
   }
 
   async createNewRefreshToken(userId: ObjectId, deviceId: string) {
-    return this.jwtService.sign({ userId: userId, deviceId: deviceId }, { expiresIn: '20s' });
+    const refreshToken = this.jwtService.sign({ userId: userId, deviceId: deviceId }, { expiresIn: '20s' });
+    await this.authWhiteListRepository.createNewToken(refreshToken, userId, deviceId);
+    return refreshToken;
   }
 
   async verifyToken(token: string) {

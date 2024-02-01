@@ -78,7 +78,7 @@ export class AuthController {
     const verify = await this.authService.verifyToken(refreshToken);
     const userId = await this.authService.getUserIdByToken(refreshToken);
     await this.authWhiteListRepository.deleteToken(refreshToken);
-    // await this.authBlackListRepository.blackList(refreshToken);
+    await this.authBlackListRepository.blackList(refreshToken);
 
     const accessToken = await this.authService.createAccessToken(new ObjectId(userId));
     const newRefreshToken = await this.authService.createNewRefreshToken(
@@ -119,7 +119,7 @@ export class AuthController {
   async logout(@Req() request: Request, @Res() response: Response) {
     const refreshToken = request.cookies.refreshToken;
     const deviceId = await this.getDeviceIdUseCase.getDeviceId(refreshToken);
-    // await this.authBlackListRepository.blackList(refreshToken);
+    await this.authBlackListRepository.blackList(refreshToken);
     await this.authWhiteListRepository.deleteToken(refreshToken);
     await this.securityRepository.deleteSpecifiedSession(deviceId);
     return response.clearCookie('refreshToken').sendStatus(204);

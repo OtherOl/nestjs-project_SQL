@@ -8,7 +8,6 @@ import {
 } from '../../base/types/users.model';
 import { AuthService } from '../application/auth.service';
 import { Request, Response } from 'express';
-import { SecurityService } from '../../securityDevices/application/security.service';
 import { AuthBlackListRepository } from '../repositories/auth-black-list-repository.service';
 import { SecurityRepository } from '../../securityDevices/repositories/security.repository';
 import { CreateUserForRegistrationUseCase } from '../../users/use-cases/createUserForRegistration.use-case';
@@ -24,11 +23,13 @@ import { ObjectId } from 'mongodb';
 import { GetDeviceIdUseCase } from '../use-cases/getDeviceId.use-case';
 import { RefreshTokenGuard } from '../guards/refreshToken.guard';
 import { AuthWhiteListRepository } from '../repositories/auth-white_list.repository';
+import { CreateRefreshTokenUseCase } from '../use-cases/createRefreshToken.use-case';
+import { CreateNewRefreshTokenUseCase } from '../use-cases/createNewRefreshToken.use-case';
+import { CreateSessionUseCase } from '../../securityDevices/use-cases/createSession.use-case';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private securityService: SecurityService,
     private securityRepository: SecurityRepository,
     private authService: AuthService,
     private authBlackListRepository: AuthBlackListRepository,
@@ -41,6 +42,9 @@ export class AuthController {
     private resendConfirmationUseCase: ResendConfirmationUseCase,
     private passwordRecoveryCodeUseCase: PasswordRecoveryCodeUseCase,
     private getDeviceIdUseCase: GetDeviceIdUseCase,
+    private createRefreshTokenUseCase: CreateRefreshTokenUseCase,
+    private createNewRefreshTokenUseCase: CreateNewRefreshTokenUseCase,
+    private createSessionUseCase: CreateSessionUseCase,
   ) {}
 
   @HttpCode(204)
@@ -60,8 +64,8 @@ export class AuthController {
   async login(@Body() inputData: UserLogin, @Res() response: Response, @Req() req: Request) {
     const user = await this.checkCredentialsUseCase.checkCredentials(inputData);
     const token = await this.authService.createAccessToken(user.id);
-    const refreshToken = await this.authService.createRefreshToken(user.id);
-    await this.securityService.createSession(req.ip!, req.headers['user-agent'], refreshToken);
+    const refreshToken = await this.createRefreshTokenUseCase.createRefreshToken(user.id);
+    await this.createSessionUseCase.createSession(req.ip!, req.headers['user-agent'], refreshToken);
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
@@ -81,7 +85,7 @@ export class AuthController {
     await this.authBlackListRepository.blackList(refreshToken);
 
     const accessToken = await this.authService.createAccessToken(new ObjectId(userId));
-    const newRefreshToken = await this.authService.createNewRefreshToken(
+    const newRefreshToken = await this.createNewRefreshTokenUseCase.createNewRefreshToken(
       new ObjectId(userId),
       verify.deviceId,
     );

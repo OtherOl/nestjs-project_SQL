@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from '../../auth/application/auth.service';
-import { securityViewModel } from '../../base/types/security.model';
 import { SecurityRepository } from '../repositories/security.repository';
+import { securityViewModel } from '../../base/types/security.model';
 import { Security } from '../domain/security.entity';
 
 @Injectable()
-export class SecurityService {
+export class CreateSessionUseCase {
   constructor(
     private authService: AuthService,
     private securityRepository: SecurityRepository,

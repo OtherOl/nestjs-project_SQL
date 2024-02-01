@@ -7,6 +7,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { RefreshTokenGuard } from '../../auth/guards/refreshToken.guard';
 import { GetDeviceIdUseCase } from '../../auth/use-cases/getDeviceId.use-case';
 import { AuthWhiteListRepository } from '../../auth/repositories/auth-white_list.repository';
+import { DeleteTokensExceptOneUseCase } from '../use-cases/deleteTokensExceptOne.use-case';
 
 @Controller('security/devices')
 export class SecurityController {
@@ -16,6 +17,7 @@ export class SecurityController {
     private authService: AuthService,
     private authWhiteListRepository: AuthWhiteListRepository,
     private getDeviceIdUseCase: GetDeviceIdUseCase,
+    private deleteTokensExceptOneUseCase: DeleteTokensExceptOneUseCase,
   ) {}
 
   @SkipThrottle()
@@ -28,7 +30,6 @@ export class SecurityController {
     return await this.securityQueryRepository.getAllSessions(userId);
   }
 
-  //удалить все кроме текущего refresh
   @SkipThrottle()
   @UseGuards(RefreshTokenGuard)
   @Delete()
@@ -37,10 +38,10 @@ export class SecurityController {
     const refreshToken = request.cookies.refreshToken;
     const deviceId = await this.getDeviceIdUseCase.getDeviceId(refreshToken);
     await this.securityRepository.deleteAllSessions(deviceId);
+    await this.deleteTokensExceptOneUseCase.deleteAllTokens(refreshToken);
     return;
   }
 
-  //В теории создать новое entity для токенов в белом листе и потом искать там нужный по deviceId и удалять его
   @SkipThrottle()
   @Delete(':deviceId')
   @UseGuards(RefreshTokenGuard)

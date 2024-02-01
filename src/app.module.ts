@@ -62,6 +62,7 @@ import { RefreshTokenGuard } from './auth/guards/refreshToken.guard';
 import { GetDeviceIdUseCase } from './auth/use-cases/getDeviceId.use-case';
 import { AuthWhitelist, AuthWhiteListSchema } from './auth/domain/auth-white_list.entity';
 import { AuthWhiteListRepository } from './auth/repositories/auth-white_list.repository';
+import { DeleteTokensExceptOneUseCase } from './securityDevices/use-cases/deleteTokensExceptOne.use-case';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -83,6 +84,8 @@ const usersUseCases = [
   CreateUserForRegistrationUseCase,
   DeleteUserUseCase,
 ];
+
+const securityUseCases = [DeleteTokensExceptOneUseCase];
 
 @Module({
   imports: [
@@ -156,6 +159,7 @@ const usersUseCases = [
     ...commentsUseCases,
     ...postsUseCases,
     ...usersUseCases,
+    ...securityUseCases,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

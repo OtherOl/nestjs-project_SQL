@@ -58,7 +58,6 @@ export class AuthService {
 
   async decodeRefreshToken(token: string | undefined) {
     if (!token) throw new UnauthorizedException();
-    const decodedToken = await this.jwtService.decode(token);
-    return decodedToken.deviceId;
+    return await this.jwtService.decode(token);
   }
 }

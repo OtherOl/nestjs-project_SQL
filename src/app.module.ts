@@ -31,7 +31,6 @@ import { AuthService } from './auth/application/auth.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailManager } from './email/emailManager';
 import { SecurityController } from './securityDevices/controller/security.controller';
-import { SecurityService } from './securityDevices/application/security.service';
 import { SecurityRepository } from './securityDevices/repositories/security.repository';
 import { SecurityQueryRepository } from './securityDevices/repositories/security.query-repository';
 import { AuthBlackList, AuthBlackListSchema } from './auth/domain/auth-black_list.entity';
@@ -63,10 +62,17 @@ import { GetDeviceIdUseCase } from './auth/use-cases/getDeviceId.use-case';
 import { AuthWhitelist, AuthWhiteListSchema } from './auth/domain/auth-white_list.entity';
 import { AuthWhiteListRepository } from './auth/repositories/auth-white_list.repository';
 import { DeleteTokensExceptOneUseCase } from './securityDevices/use-cases/deleteTokensExceptOne.use-case';
+import { CreateNewRefreshTokenUseCase } from './auth/use-cases/createNewRefreshToken.use-case';
+import { CreateRefreshTokenUseCase } from './auth/use-cases/createRefreshToken.use-case';
+import { DecodeRefreshTokenUseCase } from './auth/use-cases/decodeRefreshToken.use-case';
+import { CreateSessionUseCase } from './securityDevices/use-cases/createSession.use-case';
 
 const authUseCases = [
   CheckCredentialsUseCase,
   ConfirmEmailUseCase,
+  CreateNewRefreshTokenUseCase,
+  CreateRefreshTokenUseCase,
+  DecodeRefreshTokenUseCase,
   PasswordRecoveryCodeUseCase,
   ResendConfirmationUseCase,
   GetDeviceIdUseCase,
@@ -85,7 +91,7 @@ const usersUseCases = [
   DeleteUserUseCase,
 ];
 
-const securityUseCases = [DeleteTokensExceptOneUseCase];
+const securityUseCases = [CreateSessionUseCase, DeleteTokensExceptOneUseCase];
 
 @Module({
   imports: [
@@ -145,7 +151,6 @@ const securityUseCases = [DeleteTokensExceptOneUseCase];
     AuthWhiteListRepository,
     AuthBlackListRepository,
     EmailManager,
-    SecurityService,
     SecurityRepository,
     SecurityQueryRepository,
     LikesService,

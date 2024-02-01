@@ -43,8 +43,8 @@ export class SecurityController {
   }
 
   @SkipThrottle()
-  @Delete(':deviceId')
   @UseGuards(RefreshTokenGuard)
+  @Delete(':deviceId')
   @HttpCode(204)
   async deleteSessionById(@Req() request: Request, @Param('deviceId') deviceId: string) {
     const refreshToken = request.cookies.refreshToken;

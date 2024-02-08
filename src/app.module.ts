@@ -116,13 +116,13 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: PGHOST,
-      port: 5432,
-      ssl: true,
+      port: 3000,
       username: PGUSER,
       password: PGPASSWORD,
       database: PGDATABASE,
       autoLoadEntities: false,
       synchronize: true,
+      ssl: true,
     }),
     MailerModule.forRoot({
       transport: {

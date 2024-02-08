@@ -94,6 +94,8 @@ const usersUseCases = [
 
 const securityUseCases = [CreateSessionUseCase, DeleteTokensExceptOneUseCase];
 
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -113,11 +115,12 @@ const securityUseCases = [CreateSessionUseCase, DeleteTokensExceptOneUseCase];
     ]),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 3000,
-      username: 'BasicUser',
-      password: 'qwerty',
-      database: 'NestjsDb',
+      host: PGHOST,
+      port: 5432,
+      ssl: true,
+      username: PGUSER,
+      password: PGPASSWORD,
+      database: PGDATABASE,
       autoLoadEntities: false,
       synchronize: true,
     }),

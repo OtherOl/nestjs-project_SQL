@@ -19,7 +19,6 @@ import { PasswordRecoveryCodeUseCase } from '../use-cases/passwordRecoveryCode.u
 import { SkipThrottle } from '@nestjs/throttler';
 import { AccessTokenGuard } from '../guards/accessToken.guard';
 import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
-import { ObjectId } from 'mongodb';
 import { GetDeviceIdUseCase } from '../use-cases/getDeviceId.use-case';
 import { RefreshTokenGuard } from '../guards/refreshToken.guard';
 import { AuthWhiteListRepository } from '../repositories/auth-white_list.repository';
@@ -84,9 +83,9 @@ export class AuthController {
     await this.authWhiteListRepository.deleteToken(refreshToken);
     await this.authBlackListRepository.blackList(refreshToken);
 
-    const accessToken = await this.authService.createAccessToken(new ObjectId(userId));
+    const accessToken = await this.authService.createAccessToken(userId);
     const newRefreshToken = await this.createNewRefreshTokenUseCase.createNewRefreshToken(
-      new ObjectId(userId),
+      userId,
       verify.deviceId,
     );
 
@@ -136,7 +135,7 @@ export class AuthController {
   async getProfile(@Req() request: Request) {
     const accessToken = request.headers.authorization;
     const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
-    const user = await this.usersQueryRepository.getUserById(new ObjectId(userId));
+    const user = await this.usersQueryRepository.getUserByIdSQL(userId);
     return {
       email: user!.email,
       login: user!.login,

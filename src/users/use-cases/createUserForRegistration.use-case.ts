@@ -28,7 +28,7 @@ export class CreateUserForRegistrationUseCase {
     const newUser: userModel = User.createNewUser(inputData.login, inputData.email, passwordHash, false);
 
     await this.emailManager.sendEmailConfirmationCode(newUser);
-    await this.usersRepository.createUser(newUser);
+    await this.usersRepository.createUserSQL(newUser);
     return;
   }
 }

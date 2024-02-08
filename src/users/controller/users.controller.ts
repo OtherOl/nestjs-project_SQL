@@ -1,20 +1,8 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  NotFoundException,
-  Param,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { UsersQueryRepository } from '../repositories/users.query-repository';
 import { createUserModel } from '../../base/types/users.model';
 import { BasicAuthGuard } from '../../auth/guards/basic-auth.guard';
 import { SkipThrottle } from '@nestjs/throttler';
-import { ObjectId } from 'mongodb';
 import { CreateUserUseCase } from '../use-cases/createUser.use-case';
 import { DeleteUserUseCase } from '../use-cases/deleteUser.use-case';
 
@@ -64,8 +52,6 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(204)
   async deleteUser(@Param('id') id: string) {
-    const user = await this.deleteUserUseCase.deleteUser(new ObjectId(id));
-    if (!user) throw new NotFoundException("User doesn't exists");
-    return user;
+    return await this.deleteUserUseCase.deleteUser(id);
   }
 }

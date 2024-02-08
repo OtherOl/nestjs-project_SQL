@@ -17,10 +17,10 @@ export class CreateNewPasswordUseCase {
     if (!user) throw new BadRequestException([{ message: 'User not found', field: 'login' }]);
     if (user.recoveryConfirmation.recoveryCode !== inputData.recoveryCode)
       throw new BadRequestException([{ message: 'RecoveryCode is false', field: 'recoveryCode' }]);
-    if (user.recoveryConfirmation.expirationDate < new Date())
+    if (user.recoveryConfirmation.expirationDate < new Date().toISOString())
       throw new BadRequestException([{ message: 'Date has expired', field: 'expirationDate' }]);
 
-    const newPassword = await this.authService.createPasswordHash(inputData.password);
+    const newPassword = await this.authService.createPasswordHash(inputData.newPassword);
     await this.usersRepository.updatePassword(user.id, newPassword);
     return;
   }

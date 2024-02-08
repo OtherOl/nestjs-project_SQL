@@ -17,7 +17,7 @@ export class ConfirmEmailUseCase {
       throw new BadRequestException([{ message: 'User already confirmed', field: 'code' }]);
     if (user.emailConfirmation.confirmationCode !== code.code)
       throw new BadRequestException([{ message: 'Invalid confirmationCode', field: 'code' }]);
-    if (user.emailConfirmation.expirationDate < new Date())
+    if (user.emailConfirmation.expirationDate < new Date().toISOString())
       throw new BadRequestException([{ message: 'expirationDate expired', field: 'code' }]);
 
     return await this.usersRepository.updateConfirmation(user.id);

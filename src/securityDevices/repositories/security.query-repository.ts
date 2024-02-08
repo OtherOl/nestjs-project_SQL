@@ -1,23 +1,42 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Security, SecurityDocument } from '../domain/security.entity';
-import { Model } from 'mongoose';
 import { securityViewModel } from '../../base/types/security.model';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class SecurityQueryRepository {
-  constructor(@InjectModel(Security.name) private securityModel: Model<SecurityDocument>) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async getAllSessions(userId: string): Promise<securityViewModel[]> {
-    return this.securityModel.find({ userId }, { _id: 0, id: 0, userId: 0 });
+    return await this.dataSource.query(
+      `
+        SELECT ip, title, "lastActiveDate", "deviceId"
+            FROM public."Sessions"
+            WHERE "userId" = $1
+    `,
+      [userId],
+    );
   }
 
   async getSessionById(deviceId: string) {
-    const session = await this.securityModel.findOne({ deviceId });
-    if (!session) {
+    const session = await this.dataSource.query(
+      `
+         SELECT *
+         FROM public."Sessions"
+         WHERE "deviceId" = $1
+    `,
+      [deviceId],
+    );
+    if (!session[0]) {
       throw new NotFoundException("Session doesn't exists");
     } else {
-      return session;
+      return session[0];
     }
+    // const session = await this.securityModel.findOne({ deviceId });
+    // if (!session) {
+    //   throw new NotFoundException("Session doesn't exists");
+    // } else {
+    //   return session;
+    // }
   }
 }

@@ -27,7 +27,6 @@ export class Security {
   static createSession(ip: string, title: string = 'Chrome 105', verifiedToken: any) {
     const session = new Security();
 
-    session.id = new ObjectId();
     session.ip = ip;
     session.title = title;
     session.lastActiveDate = new Date(verifiedToken.iat * 1000).toISOString();

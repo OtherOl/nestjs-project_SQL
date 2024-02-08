@@ -66,6 +66,7 @@ import { CreateNewRefreshTokenUseCase } from './auth/use-cases/createNewRefreshT
 import { CreateRefreshTokenUseCase } from './auth/use-cases/createRefreshToken.use-case';
 import { DecodeRefreshTokenUseCase } from './auth/use-cases/decodeRefreshToken.use-case';
 import { CreateSessionUseCase } from './securityDevices/use-cases/createSession.use-case';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -110,6 +111,16 @@ const securityUseCases = [CreateSessionUseCase, DeleteTokensExceptOneUseCase];
       { name: AuthBlackList.name, schema: AuthBlackListSchema },
       { name: Likes.name, schema: LikesSchema },
     ]),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 3000,
+      username: 'BasicUser',
+      password: 'qwerty',
+      database: 'NestjsDb',
+      autoLoadEntities: false,
+      synchronize: true,
+    }),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',

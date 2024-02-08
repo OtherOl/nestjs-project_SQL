@@ -2,47 +2,49 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../domain/users.entity';
 import { Model } from 'mongoose';
-import { ConfirmationCode, userModel } from '../../base/types/users.model';
+import { ConfirmationCode, userModel, userModelSQL } from '../../base/types/users.model';
 import { paginationModel } from '../../base/types/pagination.model';
 import { ObjectId } from 'mongodb';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class UsersQueryRepository {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectDataSource() private dataSource: DataSource,
+  ) {}
   async getAllUsers(
     sortBy: string = 'createdAt',
-    sortDirection: string = 'desc',
+    sortDirection: string = 'DESC',
     pageNumber: number,
     pageSize: number,
-    searchLoginTerm: string,
-    searchEmailTerm: string,
+    searchLoginTerm: string = '',
+    searchEmailTerm: string = '',
   ) {
-    const sortQuery: any = {};
-    sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
+    const countUsers: number = await this.dataSource.query(
+      `SELECT COUNT(*)
+            FROM public."Users"
+            WHERE login LIKE $1
+            OR login LIKE $2`,
+      [`%${searchLoginTerm}%`, `%${searchEmailTerm}%`],
+    );
 
-    const filter = {
-      $or: [{ login: RegExp(searchLoginTerm, 'i') }, { email: RegExp(searchEmailTerm, 'i') }],
-    };
-
-    const countUsers: number = await this.userModel.countDocuments(filter);
-    const foundUsers: userModel[] = await this.userModel
-      .find(filter, {
-        _id: 0,
-        passwordHash: 0,
-        emailConfirmation: 0,
-        recoveryConfirmation: 0,
-        isConfirmed: 0,
-      })
-      .sort(sortQuery)
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
-      .lean();
+    const foundUsers: userModel[] = await this.dataSource.query(
+      `SELECT id, login, email, "createdAt", "isConfirmed", "emailConfirmation", "recoveryConfirmation", "passwordHash"
+            FROM public."Users"
+            WHERE login LIKE $1
+            OR email LIKE $2
+            ORDER BY "${sortBy}" ASC
+            LIMIT $3 OFFSET $4`,
+      [`%${searchLoginTerm}%`, `%${searchEmailTerm}%`, pageSize, (pageNumber - 1) * pageSize],
+    );
 
     const users: paginationModel<userModel> = {
-      pagesCount: Math.ceil(countUsers / pageSize),
+      pagesCount: Math.ceil(Number(countUsers[0].count) / pageSize),
       page: pageNumber,
       pageSize: pageSize,
-      totalCount: countUsers,
+      totalCount: Number(countUsers[0].count),
       items: foundUsers,
     };
 
@@ -53,21 +55,48 @@ export class UsersQueryRepository {
     return this.userModel.findOne({ id: id }, { _id: 0 });
   }
 
-  async findByLoginOrEmail(loginOrEmail: string) {
-    const foundedUser: userModel | null = await this.userModel.findOne(
-      {
-        $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
-      },
-      { _id: 0 },
+  async getUserByIdSQL(id: string) {
+    const result = await this.dataSource.query(
+      `SELECT id, login, email, "createdAt"
+            FROM public."Users"
+                WHERE "id" = $1`,
+      [`${id}`],
     );
-    return foundedUser;
+    return result[0];
   }
 
-  async findUserByConfirmationCode(code: ConfirmationCode): Promise<userModel | null> {
-    return this.userModel.findOne({ 'emailConfirmation.confirmationCode': code.code });
+  async findByLoginOrEmail(loginOrEmail: string) {
+    const foundedUser = await this.dataSource.query(
+      `SELECT id, login, email, "createdAt", "isConfirmed", "passwordHash", "recoveryConfirmation"
+            FROM public."Users"
+            WHERE login = $1
+            OR email = $1`,
+      [loginOrEmail],
+    );
+    return foundedUser[0];
+  }
+
+  async findUserByConfirmationCode(code: ConfirmationCode): Promise<userModelSQL | null> {
+    const user = await this.dataSource.query(
+      `
+           SELECT *
+            FROM public."Users"
+            WHERE "emailConfirmation" ->> 'confirmationCode' = $1
+    `,
+      [code.code],
+    );
+    return user[0];
   }
 
   async findUserByRecoveryCode(recoveryCode: string): Promise<userModel | null> {
-    return this.userModel.findOne({ 'recoveryConfirmation.recoveryCode': recoveryCode });
+    const user = await this.dataSource.query(
+      `
+           SELECT *
+            FROM public."Users"
+            WHERE "recoveryConfirmation" ->> 'recoveryCode' = $1
+    `,
+      [recoveryCode],
+    );
+    return user[0];
   }
 }

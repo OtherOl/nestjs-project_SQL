@@ -1,31 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Security, SecurityDocument } from '../domain/security.entity';
-import { Model } from 'mongoose';
-import { securityViewModel } from '../../base/types/security.model';
+import { securityViewModelSQL } from '../../base/types/security.model';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class SecurityRepository {
-  constructor(@InjectModel(Security.name) private securityModel: Model<SecurityDocument>) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async deleteAllSessions(deviceId: string): Promise<any> {
-    return this.securityModel.deleteMany({ deviceId: { $ne: deviceId } });
+    return await this.dataSource.query(
+      `
+        DELETE FROM public."Sessions"
+        WHERE "deviceId" != $1
+    `,
+      [deviceId],
+    );
   }
 
-  async createSession(newSession: securityViewModel) {
-    return await this.securityModel.create(newSession);
+  async createSession(newSession: securityViewModelSQL, sessionId: string) {
+    return await this.dataSource.query(
+      `
+        INSERT INTO public."Sessions"(
+            id, ip, title, "lastActiveDate", "deviceId", "userId")
+            VALUES ($1, $2, $3, $4, $5, $6);
+    `,
+      [
+        sessionId,
+        newSession.ip,
+        newSession.title,
+        newSession.lastActiveDate,
+        newSession.deviceId,
+        newSession.userId,
+      ],
+    );
   }
 
   async updateSession(deviceId: string) {
-    const updatedSession = await this.securityModel.updateOne(
-      { deviceId: deviceId },
-      { $set: { lastActiveDate: new Date().toISOString() } },
+    return await this.dataSource.query(
+      `
+        UPDATE public."Sessions"
+            SET "lastActiveDate"= $1
+            WHERE "deviceId" = $2;
+    `,
+      [new Date().toISOString(), deviceId],
     );
-    return updatedSession.modifiedCount === 1;
   }
 
   async deleteSpecifiedSession(deviceId: string) {
-    const deletedSession = await this.securityModel.deleteOne({ deviceId });
-    return deletedSession.deletedCount === 1;
+    return await this.dataSource.query(
+      `
+          DELETE FROM public."Sessions"
+          WHERE "deviceId" = $1
+    `,
+      [deviceId],
+    );
   }
 }

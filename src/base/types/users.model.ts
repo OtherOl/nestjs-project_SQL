@@ -4,7 +4,7 @@ import { IsEmail, IsString, Length, Matches } from 'class-validator';
 export class createNewPassword {
   @IsString()
   @Length(6, 20)
-  password: string;
+  newPassword: string;
 
   @IsString()
   recoveryCode: string;
@@ -43,6 +43,23 @@ export class createUserModel {
 
 export class userModel {
   id: ObjectId;
+  login: string;
+  email: string;
+  passwordHash: string;
+  createdAt: string;
+  emailConfirmation: {
+    confirmationCode: string;
+    expirationDate: any;
+  };
+  recoveryConfirmation: {
+    recoveryCode: string;
+    expirationDate: any;
+  };
+  isConfirmed: boolean;
+}
+
+export class userModelSQL {
+  id: string;
   login: string;
   email: string;
   passwordHash: string;

@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersQueryRepository } from '../repositories/users.query-repository';
 import { UsersRepository } from '../repositories/users.repository';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class DeleteUserUseCase {
@@ -10,9 +9,9 @@ export class DeleteUserUseCase {
     private usersRepository: UsersRepository,
   ) {}
 
-  async deleteUser(id: ObjectId) {
-    const user = await this.usersQueryRepository.getUserById(id);
-    if (!user) return false;
+  async deleteUser(id: string) {
+    const user = await this.usersQueryRepository.getUserByIdSQL(id);
+    if (!user) throw new NotFoundException("User doesn't exists");
     return await this.usersRepository.deleteUser(id);
   }
 }

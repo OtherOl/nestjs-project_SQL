@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class AuthService {
@@ -11,8 +10,8 @@ export class AuthService {
     return await bcrypt.hash(password, 10);
   }
 
-  async createAccessToken(userId: ObjectId) {
-    return this.jwtService.sign({ userId: userId }, { expiresIn: '10s' });
+  async createAccessToken(userId: string) {
+    return this.jwtService.sign({ userId: userId }, { expiresIn: '10m' });
   }
 
   async verifyToken(token: string) {

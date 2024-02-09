@@ -34,8 +34,8 @@ export class UsersController {
       query.sortDirection,
       query.pageNumber ? +query.pageNumber : 1,
       query.pageSize ? +query.pageSize : 10,
-      query.searchLoginTerm,
-      query.searchEmailTerm,
+      query.searchLoginTerm || '',
+      query.searchEmailTerm || '',
     );
   }
 

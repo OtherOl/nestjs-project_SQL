@@ -19,22 +19,22 @@ export class UsersQueryRepository {
     sortDirection: string = 'DESC',
     pageNumber: number,
     pageSize: number,
-    searchLoginTerm: string = '',
-    searchEmailTerm: string = '',
+    searchLoginTerm: string,
+    searchEmailTerm: string,
   ) {
     const countUsers: number = await this.dataSource.query(
       `SELECT COUNT(*)
             FROM public."Users"
-            WHERE login LIKE $1
-            OR login LIKE $2`,
+            WHERE "login" LIKE $1
+            OR "email" LIKE $2`,
       [`%${searchLoginTerm}%`, `%${searchEmailTerm}%`],
     );
 
     const foundUsers: userModel[] = await this.dataSource.query(
       `SELECT id, login, email, "createdAt"
             FROM public."Users"
-            WHERE login LIKE $1
-            OR email LIKE $2
+            WHERE "login" LIKE $1
+            OR "email" LIKE $2
             ORDER BY "${sortBy}" ${sortDirection}
             LIMIT $3 OFFSET $4`,
       [`%${searchLoginTerm}%`, `%${searchEmailTerm}%`, pageSize, (pageNumber - 1) * pageSize],

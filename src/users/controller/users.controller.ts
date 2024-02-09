@@ -6,7 +6,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { CreateUserUseCase } from '../use-cases/createUser.use-case';
 import { DeleteUserUseCase } from '../use-cases/deleteUser.use-case';
 
-@Controller('users')
+@Controller('sa/users')
 export class UsersController {
   constructor(
     private usersQueryRepository: UsersQueryRepository,

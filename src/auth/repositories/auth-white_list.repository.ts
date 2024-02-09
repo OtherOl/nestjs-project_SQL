@@ -53,10 +53,6 @@ export class AuthWhiteListRepository {
     `,
       [deviceId],
     );
-    //const refreshToken = await this.authWhiteListModel.findOne({ deviceId });
-    // await this.authBlackListRepository.blackList(refreshToken!.token);
-    // const deletedToken = await this.authWhiteListModel.deleteOne({ deviceId });
-    // return deletedToken.deletedCount === 1;
   }
 
   async deleteAllExceptOne(userId: ObjectId, deviceId: string) {

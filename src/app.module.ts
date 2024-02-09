@@ -116,7 +116,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: PGHOST,
-      port: 3000,
+      port: 5432,
       username: PGUSER,
       password: PGPASSWORD,
       database: PGDATABASE,
@@ -124,6 +124,16 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
       synchronize: true,
       ssl: true,
     }),
+    // TypeOrmModule.forRoot({
+    //   type: 'postgres',
+    //   host: 'localhost',
+    //   port: 3000,
+    //   username: 'BasicUser',
+    //   password: 'qwerty',
+    //   database: 'NestjsDb',
+    //   autoLoadEntities: false,
+    //   synchronize: true,
+    // }),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',

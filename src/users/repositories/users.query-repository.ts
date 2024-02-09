@@ -31,7 +31,7 @@ export class UsersQueryRepository {
     );
 
     const foundUsers: userModel[] = await this.dataSource.query(
-      `SELECT id, login, email, "createdAt", "isConfirmed", "emailConfirmation", "recoveryConfirmation", "passwordHash"
+      `SELECT id, login, email, "createdAt"
             FROM public."Users"
             WHERE login LIKE $1
             OR email LIKE $2

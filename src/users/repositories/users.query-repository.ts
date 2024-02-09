@@ -35,7 +35,7 @@ export class UsersQueryRepository {
             FROM public."Users"
             WHERE login LIKE $1
             OR email LIKE $2
-            ORDER BY "${sortBy}" ASC
+            ORDER BY "${sortBy}" ${sortDirection}
             LIMIT $3 OFFSET $4`,
       [`%${searchLoginTerm}%`, `%${searchEmailTerm}%`, pageSize, (pageNumber - 1) * pageSize],
     );

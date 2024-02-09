@@ -26,14 +26,14 @@ export class UsersQueryRepository {
       `SELECT COUNT(*)
             FROM public."Users"
             WHERE login ILIKE $1
-            AND email ILIKE $2`,
+            OR email ILIKE $2`,
       [`%${searchLoginTerm}%`, `%${searchEmailTerm}%`],
     );
     const foundUsers: userModel[] = await this.dataSource.query(
       `SELECT id, login, email, "createdAt"
             FROM public."Users"
             WHERE "login" ILIKE $1
-            AND "email" ILIKE $2
+            OR "email" ILIKE $2
             ORDER BY "${sortBy}" ${sortDirection}
             LIMIT $3 OFFSET $4`,
       [`%${searchLoginTerm}%`, `%${searchEmailTerm}%`, pageSize, (pageNumber - 1) * pageSize],

@@ -1,6 +1,7 @@
 import { Controller, Get, HttpCode, NotFoundException, Param, Query } from '@nestjs/common';
 import { BlogsQueryRepository } from '../repositories/blogs.query-repository';
 import { PostsQueryRepository } from '../../posts/repositories/posts.query-repository';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('blogs')
 export class BlogsController {
@@ -9,6 +10,7 @@ export class BlogsController {
     private postsQueryRepository: PostsQueryRepository,
   ) {}
 
+  @SkipThrottle()
   @Get()
   @HttpCode(200)
   async getAllBlogs(
@@ -30,6 +32,7 @@ export class BlogsController {
     );
   }
 
+  @SkipThrottle()
   @Get(':blogId/posts')
   @HttpCode(200)
   async getPostsByBlogId(
@@ -52,6 +55,7 @@ export class BlogsController {
     );
   }
 
+  @SkipThrottle()
   @Get(':id')
   @HttpCode(200)
   async getBlogById(@Param('id') id: string) {

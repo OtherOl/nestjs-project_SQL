@@ -80,7 +80,7 @@ describe('Testing Blogs', () => {
       description: newBlog.description,
       websiteUrl: newBlog.websiteUrl,
       createdAt: expect.any(String),
-      isMembership: true,
+      isMembership: false,
     });
   });
 
@@ -108,7 +108,7 @@ describe('Testing Blogs', () => {
       description: newBlog.body.description,
       websiteUrl: newBlog.body.websiteUrl,
       createdAt: expect.any(String),
-      isMembership: true,
+      isMembership: false,
     });
   });
 
@@ -136,7 +136,7 @@ describe('Testing Blogs', () => {
       description: expect.any(String),
       websiteUrl: expect.any(String),
       createdAt: expect.any(String),
-      isMembership: true,
+      isMembership: false,
     });
   });
 
@@ -200,7 +200,12 @@ describe('Testing Blogs', () => {
       blogId: post.body.blogId,
       blogName: post.body.blogName,
       createdAt: expect.any(String),
-      extendedLikesInfo: [],
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
     });
   });
 });

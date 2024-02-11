@@ -17,7 +17,7 @@ export class Blog {
     blog.description = inputData.description;
     blog.websiteUrl = inputData.websiteUrl;
     blog.createdAt = new Date().toISOString();
-    blog.isMembership = true;
+    blog.isMembership = false;
 
     return blog;
   }

@@ -72,7 +72,12 @@ describe('Testing Posts', () => {
       blogId: newPost.body.blogId,
       blogName: newPost.body.blogName,
       createdAt: newPost.body.createdAt,
-      extendedLikesInfo: [],
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
     });
 
     const foundedPost = await request(app.getHttpServer()).get(`/posts/${newPost.body.id}`);

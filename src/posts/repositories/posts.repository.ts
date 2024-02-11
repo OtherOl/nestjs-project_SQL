@@ -51,7 +51,12 @@ export class PostsRepository {
       blogId: newPost.blogId,
       blogName: newPost.blogName,
       createdAt: newPost.createdAt,
-      extendedLikesInfo: [],
+      extendedLikesInfo: {
+        likesCount: newPost.extendedLikesInfo.likesCount,
+        dislikesCount: newPost.extendedLikesInfo.dislikesCount,
+        myStatus: newPost.extendedLikesInfo.myStatus,
+        newestLikes: newPost.extendedLikesInfo.newestLikes,
+      },
     };
   }
 
@@ -67,7 +72,7 @@ export class PostsRepository {
     return await this.dataSource.query(
       `
         UPDATE public."Posts"
-        SET title = $1, shortDescription = $2, content = $3
+        SET title = $1, "shortDescription" = $2, content = $3
         WHERE id = $4
     `,
       [inputData.title, inputData.shortDescription, inputData.content, postId],

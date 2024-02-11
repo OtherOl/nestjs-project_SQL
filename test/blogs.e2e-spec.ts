@@ -19,11 +19,13 @@ describe('Testing Blogs', () => {
   });
 
   afterAll(async () => {
+    const db = await request(app.getHttpServer()).delete('/testing/all-data').send();
+    expect(db.status).toBe(204);
     await app.close();
   });
 
   it('should return empty array => 200 status', async () => {
-    const blogs = await request(app.getHttpServer()).get('/blogs');
+    const blogs = await request(app.getHttpServer()).get('/sa/blogs').auth('admin', 'qwerty');
 
     expect(blogs.status).toBe(200);
     expect(blogs.body).toEqual({ items: [], page: 1, pageSize: 10, pagesCount: 0, totalCount: 0 });
@@ -37,7 +39,7 @@ describe('Testing Blogs', () => {
     };
 
     const createdBlog = await request(app.getHttpServer())
-      .post('/blogs')
+      .post('/sa/blogs')
       .send(newBlog)
       .auth('Hacker', 'qwerty');
 
@@ -52,7 +54,7 @@ describe('Testing Blogs', () => {
     };
 
     const createdBlog = await request(app.getHttpServer())
-      .post('/blogs')
+      .post('/sa/blogs')
       .send(newBlog)
       .auth('admin', 'qwerty');
 
@@ -67,7 +69,7 @@ describe('Testing Blogs', () => {
     };
 
     const createdBlog = await request(app.getHttpServer())
-      .post('/blogs')
+      .post('/sa/blogs')
       .send(newBlog)
       .auth('admin', 'qwerty');
 
@@ -78,19 +80,21 @@ describe('Testing Blogs', () => {
       description: newBlog.description,
       websiteUrl: newBlog.websiteUrl,
       createdAt: expect.any(String),
-      isMembership: false,
+      isMembership: true,
     });
   });
 
   it("shouldn't return blog by id => 404 status", async () => {
-    const blog = await request(app.getHttpServer()).get('/blogs/fffff3ea02afffffc87fffff').send();
+    const blog = await request(app.getHttpServer())
+      .get('/sa/blogs/2e4f5446-6045-4db3-b2e3-887d12f6aaca')
+      .send();
 
     expect(blog.status).toBe(404);
   });
 
   it('should return blog by id => 200 status', async () => {
     const newBlog = await request(app.getHttpServer())
-      .post('/blogs')
+      .post('/sa/blogs')
       .send({ name: 'Hello YouTube', description: 'About your life', websiteUrl: 'google.com' })
       .auth('admin', 'qwerty');
 
@@ -104,7 +108,99 @@ describe('Testing Blogs', () => {
       description: newBlog.body.description,
       websiteUrl: newBlog.body.websiteUrl,
       createdAt: expect.any(String),
-      isMembership: false,
+      isMembership: true,
+    });
+  });
+
+  it('should update blog => 204 status', async () => {
+    const newBlog = await request(app.getHttpServer())
+      .post('/sa/blogs')
+      .send({ name: 'Hello YouTube', description: 'About your life', websiteUrl: 'google.com' })
+      .auth('admin', 'qwerty');
+
+    expect(newBlog.status).toBe(201);
+
+    const updatedBlog = await request(app.getHttpServer())
+      .put(`/sa/blogs/${newBlog.body.id}`)
+      .send({ name: 'Updated blog', description: 'Valid text', websiteUrl: 'OKKEEEY.com' })
+      .auth('admin', 'qwerty');
+
+    expect(updatedBlog.status).toBe(204);
+
+    const blog = await request(app.getHttpServer()).get(`/blogs/${newBlog.body.id}`);
+
+    expect(blog.status).toBe(200);
+    expect(blog.body).toEqual({
+      id: newBlog.body.id,
+      name: 'Updated blog',
+      description: expect.any(String),
+      websiteUrl: expect.any(String),
+      createdAt: expect.any(String),
+      isMembership: true,
+    });
+  });
+
+  it("shouldn't delete blog by id => 404 status", async () => {
+    const newBlog = await request(app.getHttpServer())
+      .post('/sa/blogs')
+      .send({ name: 'Hello YouTube', description: 'About your life', websiteUrl: 'google.com' })
+      .auth('admin', 'qwerty');
+
+    expect(newBlog.status).toBe(201);
+
+    const deletedBlog = await request(app.getHttpServer())
+      .delete(`/sa/2e4f5446-6045-4db3-b2e3-887d12f6aaca`)
+      .auth('admin', 'qwerty');
+
+    expect(deletedBlog.status).toBe(404);
+  });
+
+  it('should delete blog by id => 204 status', async () => {
+    const newBlog = await request(app.getHttpServer())
+      .post('/sa/blogs')
+      .send({ name: 'Hello YouTube', description: 'About my life', websiteUrl: 'google.com' })
+      .auth('admin', 'qwerty');
+
+    expect(newBlog.status).toBe(201);
+
+    const deletedBlog = await request(app.getHttpServer())
+      .delete(`/sa/blogs/${newBlog.body.id}`)
+      .auth('admin', 'qwerty');
+
+    expect(deletedBlog.status).toBe(204);
+
+    const isExists = await request(app.getHttpServer()).get(`/sa/blogs/${newBlog.body.id}`).send();
+
+    expect(isExists.status).toBe(404);
+  });
+
+  it('should create Post by blogId => 201 status', async () => {
+    const newBlog = await request(app.getHttpServer())
+      .post('/sa/blogs')
+      .send({ name: 'Hello YouTube', description: 'About my life', websiteUrl: 'google.com' })
+      .auth('admin', 'qwerty');
+
+    expect(newBlog.status).toBe(201);
+
+    const post = await request(app.getHttpServer())
+      .post(`/sa/blogs/${newBlog.body.id}/posts`)
+      .send({
+        title: 'Post created by static method',
+        shortDescription: 'We are doing likes and dislikes for posts',
+        content: 'yesyesyesyesyesyesye',
+      })
+      .auth('admin', 'qwerty');
+
+    expect(post.status).toBe(201);
+    expect(post.body).toEqual({
+      id: expect.any(String),
+      title: post.body.title,
+      shortDescription: post.body.shortDescription,
+      content: post.body.content,
+      blogId: post.body.blogId,
+      blogName: post.body.blogName,
+      createdAt: expect.any(String),
+      extendedLikesInfo: [],
     });
   });
 });

@@ -1,8 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
 import { ObjectId } from 'mongodb';
-
-export type SecurityDocument = HydratedDocument<Security>;
 
 @Schema({ versionKey: false })
 export class Security {

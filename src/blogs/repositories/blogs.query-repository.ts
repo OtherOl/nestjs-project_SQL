@@ -1,51 +1,67 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from '../domain/blogs.entity';
-import { Model } from 'mongoose';
-import { blogModel } from '../../base/types/blogs.model';
+import { blogViewModelSQL } from '../../base/types/blogs.model';
 import { paginationModel } from '../../base/types/pagination.model';
-import { ObjectId } from 'mongodb';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class BlogsQueryRepository {
-  constructor(@InjectModel(Blog.name) private blogModel: Model<BlogDocument>) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async getAllBlogs(
     searchNameTerm: string,
     sortBy: string = 'createdAt',
-    sortDirection: string = 'desc',
+    sortDirection: string = 'DESC',
     pageNumber: number,
     pageSize: number,
   ) {
-    const sortQuery: any = {};
-    sortQuery[sortBy] = sortDirection === 'asc' ? 1 : -1;
+    const countBlogs = await this.dataSource.query(
+      `
+      SELECT COUNT(*)
+      FROM public."Blogs"
+      WHERE name ILIKE $1
+    `,
+      [`%${searchNameTerm}%`],
+    );
 
-    const filter = { name: RegExp(searchNameTerm, 'i') };
-    const countBlogs: number = await this.blogModel.countDocuments(filter);
-    const foundedBlogs: blogModel[] = await this.blogModel
-      .find(filter, { _id: 0 })
-      .sort(sortQuery)
-      .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize);
-
-    const blogs: paginationModel<blogModel> = {
-      pagesCount: Math.ceil(countBlogs / pageSize),
+    const foundedBlogs = await this.dataSource.query(
+      `
+        SELECT *
+        FROM public."Blogs"
+        WHERE name ILIKE $1
+        ORDER BY "${sortBy}" ${sortDirection}
+        LIMIT $2 OFFSET $3
+    `,
+      [`%${searchNameTerm}%`, pageSize, (pageNumber - 1) * pageSize],
+    );
+    const blogs: paginationModel<blogViewModelSQL> = {
+      pagesCount: Math.ceil(Number(countBlogs[0].count) / pageSize),
       page: pageNumber,
       pageSize: pageSize,
-      totalCount: countBlogs,
+      totalCount: Number(countBlogs[0].count),
       items: foundedBlogs,
     };
     return blogs;
   }
 
-  async getBlogById(blogId: string): Promise<blogModel | null> {
-    return this.blogModel.findOne({ id: new ObjectId(blogId) }, { _id: 0 });
+  async getBlogByIdSQL(id: string): Promise<blogViewModelSQL | []> {
+    return await this.dataSource.query(
+      `
+        SELECT *
+        FROM public."Blogs"
+        WHERE id = $1
+    `,
+      [id],
+    );
   }
 
   async deleteBlogById(blogId: string) {
-    const deletedBlog = await this.blogModel.deleteOne({
-      id: new ObjectId(blogId),
-    });
-    return deletedBlog.deletedCount === 1;
+    return await this.dataSource.query(
+      `
+        DELETE FROM public."Blogs"
+        WHERE id = $1
+    `,
+      [blogId],
+    );
   }
 }

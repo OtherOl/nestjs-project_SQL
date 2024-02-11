@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   NotFoundException,
@@ -12,7 +11,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { createPostModel, updatePostModel } from '../../base/types/posts.model';
+import { updatePostModel } from '../../base/types/posts.model';
 import { PostsQueryRepository } from '../repositories/posts.query-repository';
 import { PostsRepository } from '../repositories/posts.repository';
 import { createCommentModel } from '../../base/types/comments.model';
@@ -91,34 +90,30 @@ export class PostsController {
       pageNumber: number;
       pageSize: number;
     },
-    @Req() request: Request,
   ) {
-    const accessToken = request.headers.authorization;
-    const userId = await this.authService.getUserIdForGet(accessToken?.split(' ')[1]);
     return await this.postsQueryRepository.getAllPosts(
       query.sortBy,
       query.sortDirection,
       query.pageNumber ? +query.pageNumber : 1,
       query.pageSize ? +query.pageSize : 10,
-      userId,
     );
   }
 
-  @SkipThrottle()
-  @UseGuards(BasicAuthGuard)
-  @Post()
-  @HttpCode(201)
-  async createPostForBlog(@Body() inputData: createPostModel) {
-    return await this.createPostUseCase.createPost(inputData);
-  }
+  // @SkipThrottle()
+  // @UseGuards(BasicAuthGuard)
+  // @Post()
+  // @HttpCode(201)
+  // async createPostForBlog(@Body() inputData: createPostModel) {
+  //   return await this.createPostUseCase.createPost(inputData);
+  // }
 
   @SkipThrottle()
   @Get(':id')
   @HttpCode(200)
-  async getPostById(@Param('id') postId: string, @Req() request: Request) {
-    const accessToken = request.headers.authorization;
-    const userId = await this.authService.getUserIdForGet(accessToken?.split(' ')[1]);
-    return await this.postsQueryRepository.getPostById(postId, userId);
+  async getPostById(@Param('id') postId: string) {
+    const post = await this.postsQueryRepository.getPostByIdSQL(postId);
+    if (!post[0]) throw new NotFoundException("Post doesn't exists");
+    return post[0];
   }
 
   @SkipThrottle()
@@ -147,13 +142,13 @@ export class PostsController {
     return await this.doPostLikesUseCase.doLikes(userId, post, likeStatus.likeStatus);
   }
 
-  @SkipThrottle()
-  @UseGuards(BasicAuthGuard)
-  @Delete(':id')
-  @HttpCode(204)
-  async deletePost(@Param('id') postId: string) {
-    const deletedPost = await this.postsQueryRepository.deletePostById(postId);
-    if (!deletedPost) throw new NotFoundException("Post doesn't exists");
-    return;
-  }
+  // @SkipThrottle()
+  // @UseGuards(BasicAuthGuard)
+  // @Delete(':id')
+  // @HttpCode(204)
+  // async deletePost(@Param('id') postId: string) {
+  //   const deletedPost = await this.postsRepository.deletePostById(postId);
+  //   if (!deletedPost) throw new NotFoundException("Post doesn't exists");
+  //   return;
+  // }
 }

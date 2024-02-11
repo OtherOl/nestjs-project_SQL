@@ -36,7 +36,7 @@ export class Post {
   content: string;
 
   @Prop({ required: true })
-  blogId: ObjectId;
+  blogId: string;
 
   @Prop({ required: true })
   blogName: string;
@@ -51,7 +51,7 @@ export class Post {
     title: string,
     shortDescription: string,
     content: string,
-    blogId: ObjectId,
+    blogId: string,
     blogName: string,
   ) {
     const post = new Post();

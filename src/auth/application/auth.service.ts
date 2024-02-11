@@ -11,7 +11,7 @@ export class AuthService {
   }
 
   async createAccessToken(userId: string) {
-    return this.jwtService.sign({ userId: userId }, { expiresIn: '10s' });
+    return this.jwtService.sign({ userId: userId }, { expiresIn: '10m' });
   }
 
   async verifyToken(token: string) {

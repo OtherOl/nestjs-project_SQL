@@ -1,11 +1,17 @@
-import { ObjectId } from 'mongodb';
 import { IsNotEmpty, IsString, IsUrl, Length } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
+import { applyDecorators } from '@nestjs/common';
+
+const Trim = () => Transform(({ value }: TransformFnParams) => value?.trim());
+
+function IsNotEmptyCustom() {
+  return applyDecorators(IsString(), Trim(), IsNotEmpty());
+}
 
 export class createBlogModel {
   @IsNotEmpty()
-  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsString()
+  @IsNotEmptyCustom()
   @Length(1, 15)
   name: string;
 
@@ -18,8 +24,8 @@ export class createBlogModel {
   websiteUrl: string;
 }
 
-export class blogModel {
-  id: ObjectId;
+export class blogViewModelSQL {
+  id: string;
   name: string;
   description: string;
   websiteUrl: string;

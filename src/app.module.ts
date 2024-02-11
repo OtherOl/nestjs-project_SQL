@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { BlogsController } from './blogs/controller/blogs.controller';
+import { SuperAdminBlogsController } from './blogs/controller/super-admin.blogs.controller';
 import { BlogsQueryRepository } from './blogs/repositories/blogs.query-repository';
 import { BlogsRepository } from './blogs/repositories/blogs.repository';
 import { PostsRepository } from './posts/repositories/posts.repository';
@@ -11,7 +11,6 @@ import { UsersController } from './users/controller/users.controller';
 import { UsersQueryRepository } from './users/repositories/users.query-repository';
 import { UsersRepository } from './users/repositories/users.repository';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from './blogs/domain/blogs.entity';
 import { ConfigModule } from '@nestjs/config';
 import * as process from 'process';
 import { Post, PostSchema } from './posts/domain/posts.entity';
@@ -67,6 +66,10 @@ import { CreateRefreshTokenUseCase } from './auth/use-cases/createRefreshToken.u
 import { DecodeRefreshTokenUseCase } from './auth/use-cases/decodeRefreshToken.use-case';
 import { CreateSessionUseCase } from './securityDevices/use-cases/createSession.use-case';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DeleteBlogUseCase } from './blogs/use-cases/deleteBlog.use-case';
+import { DeletePostByBlogIdUseCase } from './blogs/use-cases/deletePostByBlogIdUseCase';
+import { UpdatePostByBlogIdUseCase } from './blogs/use-cases/updatePostByBlogId.use-case';
+import { BlogsController } from './blogs/controller/blogs.controller';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -79,7 +82,14 @@ const authUseCases = [
   GetDeviceIdUseCase,
 ];
 
-const blogsUseCases = [CreateBlogUseCase, CreatePostForBlogUseCase, UpdateBlogUseCase];
+const blogsUseCases = [
+  CreateBlogUseCase,
+  CreatePostForBlogUseCase,
+  UpdateBlogUseCase,
+  DeleteBlogUseCase,
+  DeletePostByBlogIdUseCase,
+  UpdatePostByBlogIdUseCase,
+];
 
 const commentsUseCases = [DoLikesUseCase, UpdateCommentUseCase];
 
@@ -104,7 +114,6 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     }),
     MongooseModule.forRoot(process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'),
     MongooseModule.forFeature([
-      { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: User.name, schema: UserSchema },
@@ -152,6 +161,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     ThrottlerModule.forRoot([{ ttl: 10000, limit: 5 }]),
   ],
   controllers: [
+    SuperAdminBlogsController,
     BlogsController,
     PostsController,
     CommentsController,

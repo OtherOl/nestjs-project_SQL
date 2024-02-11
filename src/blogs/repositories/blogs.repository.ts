@@ -1,29 +1,31 @@
 import { Injectable } from '@nestjs/common';
-import { blogModel, createBlogModel } from '../../base/types/blogs.model';
-import { InjectModel } from '@nestjs/mongoose';
-import { Blog } from '../domain/blogs.entity';
-import { Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { blogViewModelSQL, createBlogModel } from '../../base/types/blogs.model';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class BlogsRepository {
-  constructor(@InjectModel(Blog.name) private blogModel: Model<Blog>) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createBlog(blog: blogModel): Promise<blogModel> {
-    await this.blogModel.create(blog);
+  async createBlog(blog: blogViewModelSQL) {
+    await this.dataSource.query(
+      `
+        INSERT INTO public."Blogs"
+        (id, name, description, "websiteUrl", "createdAt", "isMembership")
+        VALUES($1, $2, $3, $4, $5, $6)
+    `,
+      [blog.id, blog.name, blog.description, blog.websiteUrl, blog.createdAt, blog.isMembership],
+    );
     return blog;
   }
   async updateBlog(blogId: string, inputData: createBlogModel) {
-    const updatedBlog = await this.blogModel.updateOne(
-      { id: new ObjectId(blogId) },
-      {
-        $set: {
-          name: inputData.name,
-          description: inputData.description,
-          websiteUrl: inputData.websiteUrl,
-        },
-      },
+    return await this.dataSource.query(
+      `
+        UPDATE public."Blogs"
+        SET name = $1, description = $2, "websiteUrl" = $3
+        WHERE id = $4
+    `,
+      [inputData.name, inputData.description, inputData.websiteUrl, blogId],
     );
-    return updatedBlog.modifiedCount === 1;
   }
 }

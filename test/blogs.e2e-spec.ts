@@ -28,7 +28,13 @@ describe('Testing Blogs', () => {
     const blogs = await request(app.getHttpServer()).get('/sa/blogs').auth('admin', 'qwerty');
 
     expect(blogs.status).toBe(200);
-    expect(blogs.body).toEqual({ items: [], page: 1, pageSize: 10, pagesCount: 0, totalCount: 0 });
+    expect(blogs.body).toEqual({
+      pagesCount: 0,
+      page: 1,
+      pageSize: 10,
+      totalCount: 0,
+      items: [],
+    });
   });
 
   it("shouldn't create newBlog => 401 status", async () => {

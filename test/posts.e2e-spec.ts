@@ -99,4 +99,38 @@ describe('Testing Posts', () => {
       },
     });
   });
+
+  it('Should update post (Get: getAllPosts, Put: updatePostByBlogId) => status 204', async () => {
+    const posts = await request(app.getHttpServer()).get('/posts');
+    expect(posts.status).toBe(200);
+
+    const updatedPost = await request(app.getHttpServer())
+      .put(`/sa/blogs/${posts.body.items[0].blogId}/posts/${posts.body.items[0].id}`)
+      .send({
+        content: 'Update post in tests',
+        shortDescription: 'shortDescription after update',
+        title: 'title updated',
+      })
+      .auth('admin', 'qwerty');
+
+    expect(updatedPost.status).toBe(204);
+
+    const post = await request(app.getHttpServer()).get(`/posts/${posts.body.items[0].id}`);
+    expect(post.status).toBe(200);
+    expect(post.body).toEqual({
+      id: posts.body.items[0].id,
+      title: 'title updated',
+      shortDescription: 'shortDescription after update',
+      content: 'Update post in tests',
+      blogId: posts.body.items[0].blogId,
+      blogName: expect.any(String),
+      createdAt: expect.any(String),
+      extendedLikesInfo: {
+        dislikesCount: 0,
+        likesCount: 0,
+        myStatus: 'None',
+        newestLikes: [],
+      },
+    });
+  });
 });

@@ -1,19 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../domain/users.entity';
-import { Model } from 'mongoose';
 import { ConfirmationCode, userModel, userModelSQL } from '../../base/types/users.model';
 import { paginationModel } from '../../base/types/pagination.model';
-import { ObjectId } from 'mongodb';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 @Injectable()
 export class UsersQueryRepository {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-    @InjectDataSource() private dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
   async getAllUsers(
     sortBy: string = 'createdAt',
     sortDirection: string = 'DESC',
@@ -48,10 +41,6 @@ export class UsersQueryRepository {
     };
 
     return users;
-  }
-
-  async getUserById(id: ObjectId): Promise<userModel | null> {
-    return this.userModel.findOne({ id: id }, { _id: 0 });
   }
 
   async getUserByIdSQL(id: string) {

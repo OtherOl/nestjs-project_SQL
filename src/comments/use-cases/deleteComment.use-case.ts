@@ -1,21 +1,21 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { CommentsQueryRepository } from '../repositories/comments.query-repository';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
+import { CommentsQueryRepository } from '../repositories/comments.query-repository';
 import { CommentsRepository } from '../repositories/comments.repository';
 
 @Injectable()
-export class UpdateCommentUseCase {
+export class DeleteCommentUseCase {
   constructor(
+    private usersQueryRepository: UsersQueryRepository,
     private commentsQueryRepository: CommentsQueryRepository,
     private commentsRepository: CommentsRepository,
-    private usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  async updateComment(commentId: string, content: string, userId: string) {
+  async deleteComment(commentId: string, userId: string) {
     const user = await this.usersQueryRepository.getUserByIdSQL(userId);
     const comment = await this.commentsQueryRepository.getCommentById(commentId);
+    if (!comment) throw new NotFoundException("Comment doesn't exists");
     if (user!.id !== comment.commentatorInfo.userId) throw new ForbiddenException();
-    await this.commentsRepository.updateComment(commentId, content);
-    return;
+    return await this.commentsRepository.deleteComment(comment.id);
   }
 }

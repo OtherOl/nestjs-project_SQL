@@ -1,8 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectId } from 'mongodb';
-import { HydratedDocument } from 'mongoose';
-
-export type PostDocument = HydratedDocument<Post>;
 
 @Schema({ versionKey: false, _id: false })
 export class LikesInfo {

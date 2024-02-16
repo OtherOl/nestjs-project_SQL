@@ -4,7 +4,6 @@ import { LikesRepository } from '../../likes/repositories/likes.repository';
 import { LikesService } from '../../likes/application/likes.service';
 import { PostsRepository } from '../repositories/posts.repository';
 import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
-import { ObjectId } from 'mongodb';
 import { postModel } from '../../base/types/posts.model';
 
 @Injectable()
@@ -17,12 +16,12 @@ export class DoPostLikesUseCase {
     private usersQueryRepository: UsersQueryRepository,
   ) {}
 
-  async doLikes(userId: ObjectId, post: postModel, likeStatus: string) {
-    const like = await this.likesQueryRepository.getLikeByPostId(new ObjectId(userId), post.id);
-    const user = await this.usersQueryRepository.getUserById(new ObjectId(userId));
+  async doLikes(userId: string, post: postModel, likeStatus: string) {
+    const like = await this.likesQueryRepository.getLikeByPostId(userId, post.id);
+    const user = await this.usersQueryRepository.getUserByIdSQL(userId);
     if (likeStatus === 'Like') {
       if (!like) {
-        await this.likesService.createNewPostLike(new ObjectId(userId), post.id, 'Like', user!.login);
+        await this.likesService.createNewPostLike(userId, post.id, 'Like', user!.login);
         await this.postsRepository.addLike(post.id);
         return;
       }
@@ -40,7 +39,7 @@ export class DoPostLikesUseCase {
     }
     if (likeStatus === 'Dislike') {
       if (!like) {
-        await this.likesService.createNewPostLike(new ObjectId(userId), post.id, 'Dislike', user!.login);
+        await this.likesService.createNewPostLike(userId, post.id, 'Dislike', user!.login);
         await this.postsRepository.addDislike(post.id);
         return;
       }

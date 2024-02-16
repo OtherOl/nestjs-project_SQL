@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
 
@@ -11,11 +10,11 @@ export class createCommentModel {
 }
 
 export class commentsModel {
-  postId: ObjectId;
-  id: ObjectId;
+  postId: string;
+  id: string;
   content: string;
   commentatorInfo: {
-    userId: ObjectId;
+    userId: string;
     userLogin: string;
   };
   createdAt: string;
@@ -27,10 +26,10 @@ export class commentsModel {
 }
 
 export class CommentViewModel {
-  id: ObjectId;
+  id: string;
   content: string;
   commentatorInfo: {
-    userId: ObjectId;
+    userId: string;
     userLogin: string;
   };
   createdAt: string;

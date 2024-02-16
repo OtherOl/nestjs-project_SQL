@@ -1,5 +1,4 @@
 import { IsEnum } from 'class-validator';
-import { ObjectId } from 'mongodb';
 
 export type likesInfo = {
   likesCount: number;
@@ -20,18 +19,18 @@ export class SendLikes {
 }
 
 export class CommentLikes {
-  id: ObjectId;
+  id: string;
   type: string;
-  userId: ObjectId;
-  commentId: ObjectId;
+  userId: string;
+  commentId: string;
   addedAt: string;
 }
 
 export class PostLikes {
-  id: ObjectId;
+  id: string;
   type: string;
-  userId: ObjectId;
-  postId: ObjectId;
+  userId: string;
+  postId: string;
   addedAt: string;
-  userLogin: string;
+  login: string;
 }

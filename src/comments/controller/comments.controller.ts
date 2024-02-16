@@ -1,17 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  NotFoundException,
-  Param,
-  Put,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Put, Req, UseGuards } from '@nestjs/common';
 import { CommentsQueryRepository } from '../repositories/comments.query-repository';
-import { CommentsRepository } from '../repositories/comments.repository';
 import { SendLikes } from '../../base/types/likes.model';
 import { Request } from 'express';
 import { AuthService } from '../../auth/application/auth.service';
@@ -20,15 +8,16 @@ import { AccessTokenGuard } from '../../auth/guards/accessToken.guard';
 import { createCommentModel } from '../../base/types/comments.model';
 import { UpdateCommentUseCase } from '../use-cases/updateComment.use-case';
 import { DoLikesUseCase } from '../use-cases/doLikes.use-case';
+import { DeleteCommentUseCase } from '../use-cases/deleteComment.use-case';
 
 @Controller('comments')
 export class CommentsController {
   constructor(
     private commentsQueryRepository: CommentsQueryRepository,
-    private commentsRepository: CommentsRepository,
     private authService: AuthService,
     private updateCommentUseCase: UpdateCommentUseCase,
     private doLikesUseCase: DoLikesUseCase,
+    private deleteCommentUseCase: DeleteCommentUseCase,
   ) {}
 
   @SkipThrottle()
@@ -37,9 +26,7 @@ export class CommentsController {
   async getCommentById(@Param('id') id: string, @Req() request: Request) {
     const accessToken = request.headers.authorization;
     const userId = await this.authService.getUserIdForGet(accessToken?.split(' ')[1]);
-    const comment = await this.commentsQueryRepository.getCommentById(id, userId);
-    if (!comment) throw new NotFoundException("Comment doesn't exists");
-    return comment;
+    return await this.commentsQueryRepository.getCommentByIdService(id, userId);
   }
 
   @SkipThrottle()
@@ -67,8 +54,7 @@ export class CommentsController {
   ) {
     const accessToken = request.headers.authorization;
     const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
-    const comment = await this.commentsQueryRepository.getCommentById(commentId);
-    if (!comment) throw new NotFoundException("Comment doesn't exists");
+    const comment = await this.commentsQueryRepository.getCommentById(commentId); //был userId
     return await this.doLikesUseCase.doLikes(userId, comment, likeStatus.likeStatus);
   }
 
@@ -79,7 +65,6 @@ export class CommentsController {
   async deleteComment(@Param('commentId') commentId: string, @Req() request: Request) {
     const accessToken = request.headers.authorization;
     const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
-    await this.commentsRepository.deleteComment(commentId, userId);
-    return;
+    return await this.deleteCommentUseCase.deleteComment(commentId, userId);
   }
 }

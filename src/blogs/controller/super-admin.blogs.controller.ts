@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { BlogsQueryRepository } from '../repositories/blogs.query-repository';
 import { createBlogModel } from '../../base/types/blogs.model';
 import { PostsQueryRepository } from '../../posts/repositories/posts.query-repository';
@@ -11,12 +23,15 @@ import { UpdateBlogUseCase } from '../use-cases/updateBlog.use-case';
 import { DeleteBlogUseCase } from '../use-cases/deleteBlog.use-case';
 import { UpdatePostByBlogIdUseCase } from '../use-cases/updatePostByBlogId.use-case';
 import { DeletePostByBlogIdUseCase } from '../use-cases/deletePostByBlogIdUseCase';
+import { Request } from 'express';
+import { AuthService } from '../../auth/application/auth.service';
 
 @Controller('sa/blogs')
 export class SuperAdminBlogsController {
   constructor(
     private blogsQueryRepository: BlogsQueryRepository,
     private postsQueryRepository: PostsQueryRepository,
+    private authService: AuthService,
     private createBlogUseCase: CreateBlogUseCase,
     private createPostForBlogUseCase: CreatePostForBlogUseCase,
     private updateBlogUseCase: UpdateBlogUseCase,
@@ -86,13 +101,17 @@ export class SuperAdminBlogsController {
       pageNumber: number;
       pageSize: number;
     },
+    @Req() request: Request,
   ) {
+    const accessToken = request.headers.authorization;
+    const userId = await this.authService.getUserIdForGet(accessToken?.split(' ')[1]);
     return await this.postsQueryRepository.getAllPostsByBlogId(
       blogId,
       query.sortBy,
       query.sortDirection,
       query.pageNumber ? +query.pageNumber : 1,
       query.pageSize ? +query.pageSize : 10,
+      userId,
     );
   }
 

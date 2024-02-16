@@ -1,22 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { createBlogPostModel, postModelSQL, updatePostModel } from '../../base/types/posts.model';
-import { InjectModel } from '@nestjs/mongoose';
-import { Post, PostDocument } from '../domain/posts.entity';
-import { Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { createBlogPostModel, postModelSQL } from '../../base/types/posts.model';
 import { commentsModel } from '../../base/types/comments.model';
-import { Comment, CommentDocument } from '../../comments/domain/comments.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class PostsRepository {
-  constructor(
-    @InjectModel(Post.name) private postModel: Model<PostDocument>,
-    @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
-    @InjectDataSource() private dataSource: DataSource,
-  ) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async createPostSQL(newPost: postModelSQL) {
     const id = uuidv4();
@@ -60,14 +51,6 @@ export class PostsRepository {
     };
   }
 
-  async updatePost(postId: string, inputData: updatePostModel) {
-    const updatedPost = await this.postModel.updateOne(
-      { id: new ObjectId(postId) },
-      { $set: { ...inputData } },
-    );
-    return updatedPost.modifiedCount === 1;
-  }
-
   async updatePostSQL(postId: string, inputData: createBlogPostModel) {
     return await this.dataSource.query(
       `
@@ -80,7 +63,25 @@ export class PostsRepository {
   }
 
   async createComment(newComment: commentsModel) {
-    await this.commentModel.create(newComment);
+    await this.dataSource.query(
+      `
+        INSERT INTO public."Comments"(
+            id, "postId", content, "commentatorInfo", "createdAt", "likesInfo")
+            VALUES ($1, $2, $3, $4, $5, $6);
+    `,
+      [
+        newComment.id,
+        newComment.postId,
+        newComment.content,
+        { userId: newComment.commentatorInfo.userId, userLogin: newComment.commentatorInfo.userLogin },
+        newComment.createdAt,
+        {
+          likesCount: newComment.likesInfo.likesCount,
+          dislikesCount: newComment.likesInfo.dislikesCount,
+          myStatus: newComment.likesInfo.myStatus,
+        },
+      ],
+    );
     return {
       id: newComment.id,
       content: newComment.content,
@@ -107,19 +108,51 @@ export class PostsRepository {
     );
   }
 
-  async addLike(postId: ObjectId) {
-    return this.postModel.updateOne({ id: postId }, { $inc: { 'extendedLikesInfo.likesCount': +1 } });
+  async addLike(postId: string) {
+    return await this.dataSource.query(
+      `
+        UPDATE public."Posts"
+        SET "extendedLikesInfo" = jsonb_set("extendedLikesInfo", '{likesCount}',
+        (COALESCE("extendedLikesInfo"->>'likesCount','0')::int + 1)::text::jsonb)
+        WHERE id = $1
+    `,
+      [postId],
+    );
   }
 
-  async decreaseLike(postId: ObjectId) {
-    return this.postModel.updateOne({ id: postId }, { $inc: { 'extendedLikesInfo.likesCount': -1 } });
+  async decreaseLike(postId: string) {
+    return await this.dataSource.query(
+      `
+        UPDATE public."Posts"
+        SET "extendedLikesInfo" = jsonb_set("extendedLikesInfo", '{likesCount}',
+        (COALESCE("extendedLikesInfo"->>'likesCount','0')::int - 1)::text::jsonb)
+        WHERE id = $1
+    `,
+      [postId],
+    );
   }
 
-  async addDislike(postId: ObjectId) {
-    return this.postModel.updateOne({ id: postId }, { $inc: { 'extendedLikesInfo.dislikesCount': +1 } });
+  async addDislike(postId: string) {
+    return await this.dataSource.query(
+      `
+        UPDATE public."Posts"
+        SET "extendedLikesInfo" = jsonb_set("extendedLikesInfo", '{dislikesCount}',
+        (COALESCE("extendedLikesInfo"->>'dislikesCount','0')::int + 1)::text::jsonb)
+        WHERE id = $1
+    `,
+      [postId],
+    );
   }
 
-  async decreaseDislike(postId: ObjectId) {
-    return this.postModel.updateOne({ id: postId }, { $inc: { 'extendedLikesInfo.dislikesCount': -1 } });
+  async decreaseDislike(postId: string) {
+    return await this.dataSource.query(
+      `
+        UPDATE public."Posts"
+        SET "extendedLikesInfo" = jsonb_set("extendedLikesInfo", '{dislikesCount}',
+        (COALESCE("extendedLikesInfo"->>'dislikesCount','0')::int - 1)::text::jsonb)
+        WHERE id = $1
+    `,
+      [postId],
+    );
   }
 }

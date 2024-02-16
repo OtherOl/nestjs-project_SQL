@@ -1,13 +1,10 @@
-import { ObjectId } from 'mongodb';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
-
-export type LikesDocument = HydratedDocument<Likes>;
+import { v4 as uuidv4 } from 'uuid';
 
 @Schema({ versionKey: false })
 export class Likes {
   @Prop({ required: true })
-  id: ObjectId;
+  id: string;
 
   @Prop({ required: true })
   type: string;
@@ -16,21 +13,21 @@ export class Likes {
   addedAt: string;
 
   @Prop({ required: true })
-  userId: ObjectId;
+  userId: string;
 
   @Prop({ required: false })
-  postId: ObjectId;
+  postId: string;
 
   @Prop({ required: false })
-  commentId: ObjectId;
+  commentId: string;
 
   @Prop({ required: false })
   login: string;
 
-  static createCommentLike(userId: ObjectId, commentId: ObjectId, type: string) {
+  static createCommentLike(userId: string, commentId: string, type: string) {
     const commentLike = new Likes();
 
-    commentLike.id = new ObjectId();
+    commentLike.id = uuidv4();
     commentLike.type = type;
     commentLike.userId = userId;
     commentLike.commentId = commentId;
@@ -39,10 +36,10 @@ export class Likes {
     return commentLike;
   }
 
-  static createPostLike(userId: ObjectId, postId: ObjectId, type: string, userLogin: string) {
+  static createPostLike(userId: string, postId: string, type: string, userLogin: string) {
     const postLike = new Likes();
 
-    postLike.id = new ObjectId();
+    postLike.id = uuidv4();
     postLike.type = type;
     postLike.addedAt = new Date().toISOString();
     postLike.userId = userId;

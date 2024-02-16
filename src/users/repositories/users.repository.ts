@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
 import { userModel } from '../../base/types/users.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -80,7 +79,7 @@ export class UsersRepository {
     );
   }
 
-  async updatePassword(userId: ObjectId, passwordHash: string) {
+  async updatePassword(userId: string, passwordHash: string) {
     return await this.dataSource.query(
       `
            UPDATE public."Users"

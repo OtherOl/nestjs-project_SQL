@@ -56,11 +56,11 @@ export class createPostModel {
 }
 
 export class postModel {
-  id: ObjectId;
+  id: string;
   title: string;
   shortDescription: string;
   content: string;
-  blogId: ObjectId;
+  blogId: string;
   blogName: string;
   createdAt: string;
   extendedLikesInfo: likesInfo;

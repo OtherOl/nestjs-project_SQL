@@ -1,37 +1,71 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Likes, LikesDocument } from '../domain/likes.entity';
-import { Model } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class LikesQueryRepository {
-  constructor(@InjectModel(Likes.name) private likesModel: Model<LikesDocument>) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async getLikeByCommentId(userId: ObjectId, commentId: ObjectId) {
-    return this.likesModel.findOne({ userId, commentId });
+  async getLikeByCommentId(userId: string, commentId: string) {
+    return await this.dataSource.query(
+      `
+        SELECT *
+        FROM public."Likes"
+        WHERE "commentId" = $1
+        AND "userId" = $2
+    `,
+      [commentId, userId],
+    );
   }
 
-  async getLikeByUserId(userId: ObjectId) {
-    return this.likesModel.find({ userId });
+  async getLikeByUserId(userId: string) {
+    return await this.dataSource.query(
+      `
+        SELECT *
+        FROM public."Likes"
+        WHERE "userId" = $1
+    `,
+      [userId],
+    );
   }
 
-  async getLikeByPostId(userId: ObjectId, postId: ObjectId) {
-    return this.likesModel.findOne({ userId, postId });
+  async getLikeByPostId(userId: string, postId: string) {
+    const like = await this.dataSource.query(
+      `
+        SELECT *
+        FROM public."Likes"
+        WHERE "userId" = $1 
+        AND "postId" = $2
+    `,
+      [userId, postId],
+    );
+    return like[0];
   }
 
   async getNewestLikes(type: string) {
-    return this.likesModel
-      .find({ type, postId: { $exists: true } }, { _id: 0 })
-      .sort({ addedAt: -1 })
-      .lean();
+    return await this.dataSource.query(
+      `
+        SELECT *
+        FROM public."Likes"
+        WHERE "postId" IS NOT NULL
+        AND type = $1
+        ORDER BY "addedAt" DESC
+    `,
+      [type],
+    );
   }
 
-  async getNewestLikeForCurrentPost(postId: ObjectId, type: string) {
-    return this.likesModel
-      .find({ postId, type }, { _id: 0, id: 0, type: 0, postId: 0 })
-      .sort({ addedAt: -1 })
-      .limit(3)
-      .lean();
+  async getNewestLikeForCurrentPost(postId: string, type: string) {
+    return await this.dataSource.query(
+      `
+        SELECT "addedAt", "userId", login
+        FROM public."Likes"
+        WHERE "postId" = $1
+        AND type = $2
+        ORDER BY "addedAt" DESC
+        LIMIT 3
+    `,
+      [postId, type],
+    );
   }
 }

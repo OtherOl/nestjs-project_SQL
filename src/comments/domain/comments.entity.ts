@@ -1,15 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ObjectId } from 'mongodb';
-import { HydratedDocument } from 'mongoose';
 import { createCommentModel } from '../../base/types/comments.model';
 import { LikesEnum } from '../../base/types/likes.model';
-
-export type CommentDocument = HydratedDocument<Comment>;
+import { v4 as uuidv4 } from 'uuid';
 
 @Schema({ versionKey: false, _id: false })
 export class CommentatorInfo {
   @Prop({ required: true })
-  userId: ObjectId;
+  userId: string;
 
   @Prop({ required: true })
   userLogin: string;
@@ -34,10 +31,10 @@ export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
 @Schema({ versionKey: false })
 export class Comment {
   @Prop({ required: true })
-  postId: ObjectId;
+  id: string;
 
   @Prop({ required: true })
-  id: ObjectId;
+  postId: string;
 
   @Prop({ required: true })
   content: string;
@@ -51,11 +48,11 @@ export class Comment {
   @Prop({ required: true, type: LikesInfoSchema })
   likesInfo: LikesInfo;
 
-  static createNewComment(postId: string, content: createCommentModel, userId: ObjectId, userLogin: string) {
+  static createNewComment(postId: string, content: createCommentModel, userId: string, userLogin: string) {
     const comment = new Comment();
 
-    comment.postId = new ObjectId(postId);
-    comment.id = new ObjectId();
+    comment.id = uuidv4();
+    comment.postId = postId;
     comment.content = content.content;
     comment.commentatorInfo = { userId, userLogin };
     comment.createdAt = new Date().toISOString();

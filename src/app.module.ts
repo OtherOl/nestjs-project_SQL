@@ -15,7 +15,6 @@ import { ConfigModule } from '@nestjs/config';
 import * as process from 'process';
 import { Post, PostSchema } from './posts/domain/posts.entity';
 import { Comment, CommentSchema } from './comments/domain/comments.entity';
-import { User, UserSchema } from './users/domain/users.entity';
 import { TestingController } from './testing/controller/testing.controller';
 import { TestingRepository } from './testing/repositories/testing.repository';
 import { CommentsRepository } from './comments/repositories/comments.repository';
@@ -50,7 +49,6 @@ import { UpdateBlogUseCase } from './blogs/use-cases/updateBlog.use-case';
 import { DoLikesUseCase } from './comments/use-cases/doLikes.use-case';
 import { UpdateCommentUseCase } from './comments/use-cases/updateComment.use-case';
 import { CreateCommentUseCase } from './posts/use-cases/createComment.use-case';
-import { CreatePostUseCase } from './posts/use-cases/createPost.use-case';
 import { DoPostLikesUseCase } from './posts/use-cases/doPostLikes.use-case';
 import { CreateNewPasswordUseCase } from './users/use-cases/createNewPassword.use-case';
 import { CreateUserUseCase } from './users/use-cases/createUser.use-case';
@@ -70,6 +68,7 @@ import { DeleteBlogUseCase } from './blogs/use-cases/deleteBlog.use-case';
 import { DeletePostByBlogIdUseCase } from './blogs/use-cases/deletePostByBlogIdUseCase';
 import { UpdatePostByBlogIdUseCase } from './blogs/use-cases/updatePostByBlogId.use-case';
 import { BlogsController } from './blogs/controller/blogs.controller';
+import { DeleteCommentUseCase } from './comments/use-cases/deleteComment.use-case';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -91,9 +90,9 @@ const blogsUseCases = [
   UpdatePostByBlogIdUseCase,
 ];
 
-const commentsUseCases = [DoLikesUseCase, UpdateCommentUseCase];
+const commentsUseCases = [DoLikesUseCase, UpdateCommentUseCase, DeleteCommentUseCase];
 
-const postsUseCases = [CreateCommentUseCase, CreatePostUseCase, DoPostLikesUseCase];
+const postsUseCases = [CreateCommentUseCase, DoPostLikesUseCase];
 
 const usersUseCases = [
   CreateNewPasswordUseCase,
@@ -116,7 +115,6 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     MongooseModule.forFeature([
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
-      { name: User.name, schema: UserSchema },
       { name: Security.name, schema: SecuritySchema },
       { name: AuthWhitelist.name, schema: AuthWhiteListSchema },
       { name: AuthBlackList.name, schema: AuthBlackListSchema },

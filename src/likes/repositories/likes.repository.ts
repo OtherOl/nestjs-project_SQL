@@ -1,19 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Likes, LikesDocument } from '../domain/likes.entity';
-import { Model } from 'mongoose';
 import { CommentLikes, PostLikes } from '../../base/types/likes.model';
-import { ObjectId } from 'mongodb';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class LikesRepository {
-  constructor(@InjectModel(Likes.name) private likesModel: Model<LikesDocument>) {}
+  constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createLike(like: CommentLikes | PostLikes) {
-    return await this.likesModel.create(like);
+  async createCommentLike(like: CommentLikes) {
+    return await this.dataSource.query(
+      `
+        INSERT INTO public."Likes"(
+            id, type, "addedAt", "userId", "commentId")
+            VALUES ($1, $2, $3, $4, $5);
+    `,
+      [like.id, like.type, like.addedAt, like.userId, like.commentId],
+    );
   }
 
-  async updateLike(likeId: ObjectId, type: string) {
-    return this.likesModel.updateOne({ id: likeId }, { $set: { type: type } });
+  async createPostLike(like: PostLikes) {
+    return await this.dataSource.query(
+      `
+        INSERT INTO public."Likes"(
+            id, type, "addedAt", "userId", "postId", login)
+            VALUES ($1, $2, $3, $4, $5, $6);
+    `,
+      [like.id, like.type, like.addedAt, like.userId, like.postId, like.login],
+    );
+  }
+
+  async updateLike(likeId: string, type: string) {
+    return await this.dataSource.query(
+      `
+        UPDATE public."Likes"
+        SET type = $1
+        WHERE id = $2
+    `,
+      [type, likeId],
+    );
   }
 }

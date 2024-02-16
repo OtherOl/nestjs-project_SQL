@@ -42,7 +42,7 @@ export class createUserModel {
 }
 
 export class userModel {
-  id: ObjectId;
+  id: string;
   login: string;
   email: string;
   passwordHash: string;

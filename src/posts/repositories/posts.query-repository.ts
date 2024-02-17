@@ -115,7 +115,7 @@ export class PostsQueryRepository {
         .filter((l) => l.postId === post.id)
         .map((like) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { postId, id, type, ...rest } = like;
+          const { postId, id, type, commentId, ...rest } = like;
           return rest;
         })
         .slice(0, 3);
@@ -188,7 +188,7 @@ export class PostsQueryRepository {
         likeStatus = postStatus.type;
       }
       const newestPostLikes = likes
-        .filter((l) => l.postId.equals(post.id))
+        .filter((l) => l.postId === post.id)
         .map((like) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { postId, id, type, ...rest } = like;

@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { IsEmail, IsString, Length, Matches } from 'class-validator';
 
 export class createNewPassword {

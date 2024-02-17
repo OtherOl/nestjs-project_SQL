@@ -1,16 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { createBlogPostModel, postModelSQL } from '../../base/types/posts.model';
+import { createBlogPostModel, postModel } from '../../base/types/posts.model';
 import { commentsModel } from '../../base/types/comments.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class PostsRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createPostSQL(newPost: postModelSQL) {
-    const id = uuidv4();
+  async createPostSQL(newPost: postModel) {
     await this.dataSource.query(
       `
         INSERT INTO public."Posts"(
@@ -18,7 +16,7 @@ export class PostsRepository {
         VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     `,
       [
-        id,
+        newPost.id,
         newPost.title,
         newPost.shortDescription,
         newPost.content,
@@ -35,7 +33,7 @@ export class PostsRepository {
     );
 
     return {
-      id: id,
+      id: newPost.id,
       title: newPost.title,
       shortDescription: newPost.shortDescription,
       content: newPost.content,

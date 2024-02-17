@@ -1,47 +1,30 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ObjectId } from 'mongodb';
+import { v4 as uuidv4 } from 'uuid';
 
-@Schema({ versionKey: false, _id: false })
 export class LikesInfo {
-  @Prop({ required: true })
   likesCount: number;
 
-  @Prop({ required: true })
   dislikesCount: number;
 
-  @Prop({ required: true })
   myStatus: string;
 
-  @Prop({ required: true })
   newestLikes: [];
 }
 
-export const LikesInfoSchema = SchemaFactory.createForClass(LikesInfo);
-
-@Schema({ versionKey: false })
 export class Post {
-  @Prop({ required: true })
-  id: ObjectId;
+  id: string;
 
-  @Prop({ required: true })
   title: string;
 
-  @Prop({ required: true })
   shortDescription: string;
 
-  @Prop({ required: true })
   content: string;
 
-  @Prop({ required: true })
   blogId: string;
 
-  @Prop({ required: true })
   blogName: string;
 
-  @Prop({ required: true })
   createdAt: string;
 
-  @Prop({ required: true, type: LikesInfoSchema })
   extendedLikesInfo: LikesInfo;
 
   static createNewPost(
@@ -53,7 +36,7 @@ export class Post {
   ) {
     const post = new Post();
 
-    post.id = new ObjectId();
+    post.id = uuidv4();
     post.title = title;
     post.shortDescription = shortDescription;
     post.content = content;
@@ -65,4 +48,3 @@ export class Post {
     return post;
   }
 }
-export const PostSchema = SchemaFactory.createForClass(Post);

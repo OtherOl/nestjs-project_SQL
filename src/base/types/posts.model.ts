@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { likesInfo } from './likes.model';
 import { IsNotEmpty, IsString, Length, Validate } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
@@ -57,17 +56,6 @@ export class createPostModel {
 
 export class postModel {
   id: string;
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-  blogName: string;
-  createdAt: string;
-  extendedLikesInfo: likesInfo;
-}
-
-export class postModelSQL {
-  id: ObjectId;
   title: string;
   shortDescription: string;
   content: string;

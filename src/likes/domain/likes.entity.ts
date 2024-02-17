@@ -1,27 +1,18 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { v4 as uuidv4 } from 'uuid';
 
-@Schema({ versionKey: false })
 export class Likes {
-  @Prop({ required: true })
   id: string;
 
-  @Prop({ required: true })
   type: string;
 
-  @Prop({ required: true })
   addedAt: string;
 
-  @Prop({ required: true })
   userId: string;
 
-  @Prop({ required: false })
   postId: string;
 
-  @Prop({ required: false })
   commentId: string;
 
-  @Prop({ required: false })
   login: string;
 
   static createCommentLike(userId: string, commentId: string, type: string) {
@@ -49,5 +40,3 @@ export class Likes {
     return postLike;
   }
 }
-
-export const LikesSchema = SchemaFactory.createForClass(Likes);

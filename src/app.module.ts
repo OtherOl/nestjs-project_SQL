@@ -13,8 +13,6 @@ import { UsersRepository } from './users/repositories/users.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import * as process from 'process';
-import { Post, PostSchema } from './posts/domain/posts.entity';
-import { Comment, CommentSchema } from './comments/domain/comments.entity';
 import { TestingController } from './testing/controller/testing.controller';
 import { TestingRepository } from './testing/repositories/testing.repository';
 import { CommentsRepository } from './comments/repositories/comments.repository';
@@ -22,7 +20,6 @@ import { BasicStrategy } from './auth/strategies/basic.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth/controller/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { Security, SecuritySchema } from './securityDevices/domain/security.entity';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthService } from './auth/application/auth.service';
@@ -31,11 +28,9 @@ import { EmailManager } from './email/emailManager';
 import { SecurityController } from './securityDevices/controller/security.controller';
 import { SecurityRepository } from './securityDevices/repositories/security.repository';
 import { SecurityQueryRepository } from './securityDevices/repositories/security.query-repository';
-import { AuthBlackList, AuthBlackListSchema } from './auth/domain/auth-black_list.entity';
 import { AuthBlackListRepository } from './auth/repositories/auth-black-list-repository.service';
 import { LikesService } from './likes/application/likes.service';
 import { LikesQueryRepository } from './likes/repositories/likes.query-repository';
-import { Likes, LikesSchema } from './likes/domain/likes.entity';
 import { LikesRepository } from './likes/repositories/likes.repository';
 import { AccessTokenGuard } from './auth/guards/accessToken.guard';
 import { CustomBlogIdValidation } from './base/middlewares/blogId.middleware';
@@ -112,14 +107,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
       envFilePath: '.env',
     }),
     MongooseModule.forRoot(process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'),
-    MongooseModule.forFeature([
-      { name: Post.name, schema: PostSchema },
-      { name: Comment.name, schema: CommentSchema },
-      { name: Security.name, schema: SecuritySchema },
-      { name: AuthWhitelist.name, schema: AuthWhiteListSchema },
-      { name: AuthBlackList.name, schema: AuthBlackListSchema },
-      { name: Likes.name, schema: LikesSchema },
-    ]),
+    MongooseModule.forFeature([{ name: AuthWhitelist.name, schema: AuthWhiteListSchema }]),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: PGHOST,

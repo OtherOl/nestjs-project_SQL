@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { securityViewModelSQL } from '../../base/types/security.model';
+import { securityViewModel } from '../../base/types/security.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -17,7 +17,7 @@ export class SecurityRepository {
     );
   }
 
-  async createSession(newSession: securityViewModelSQL, sessionId: string) {
+  async createSession(newSession: securityViewModel) {
     return await this.dataSource.query(
       `
         INSERT INTO public."Sessions"(
@@ -25,7 +25,7 @@ export class SecurityRepository {
             VALUES ($1, $2, $3, $4, $5, $6);
     `,
       [
-        sessionId,
+        newSession.id,
         newSession.ip,
         newSession.title,
         newSession.lastActiveDate,

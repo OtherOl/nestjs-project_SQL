@@ -191,7 +191,7 @@ export class PostsQueryRepository {
         .filter((l) => l.postId === post.id)
         .map((like) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { postId, id, type, ...rest } = like;
+          const { postId, id, type, commentId, ...rest } = like;
           return rest;
         })
         .slice(0, 3);

@@ -10,7 +10,6 @@ import { CommentsQueryRepository } from './comments/repositories/comments.query-
 import { UsersController } from './users/controller/users.controller';
 import { UsersQueryRepository } from './users/repositories/users.query-repository';
 import { UsersRepository } from './users/repositories/users.repository';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import * as process from 'process';
 import { TestingController } from './testing/controller/testing.controller';
@@ -51,7 +50,6 @@ import { CreateUserForRegistrationUseCase } from './users/use-cases/createUserFo
 import { DeleteUserUseCase } from './users/use-cases/deleteUser.use-case';
 import { RefreshTokenGuard } from './auth/guards/refreshToken.guard';
 import { GetDeviceIdUseCase } from './auth/use-cases/getDeviceId.use-case';
-import { AuthWhitelist, AuthWhiteListSchema } from './auth/domain/auth-white_list.entity';
 import { AuthWhiteListRepository } from './auth/repositories/auth-white_list.repository';
 import { DeleteTokensExceptOneUseCase } from './securityDevices/use-cases/deleteTokensExceptOne.use-case';
 import { CreateNewRefreshTokenUseCase } from './auth/use-cases/createNewRefreshToken.use-case';
@@ -106,8 +104,6 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
       isGlobal: true,
       envFilePath: '.env',
     }),
-    MongooseModule.forRoot(process.env.MONGO_URL || 'mongodb://0.0.0.0:27017'),
-    MongooseModule.forFeature([{ name: AuthWhitelist.name, schema: AuthWhiteListSchema }]),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: PGHOST,

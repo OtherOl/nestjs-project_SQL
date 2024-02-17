@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { blogViewModelSQL } from '../../base/types/blogs.model';
+import { blogViewModel } from '../../base/types/blogs.model';
 import { paginationModel } from '../../base/types/pagination.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -34,7 +34,7 @@ export class BlogsQueryRepository {
     `,
       [`%${searchNameTerm}%`, pageSize, (pageNumber - 1) * pageSize],
     );
-    const blogs: paginationModel<blogViewModelSQL> = {
+    const blogs: paginationModel<blogViewModel> = {
       pagesCount: Math.ceil(Number(countBlogs[0].count) / pageSize),
       page: pageNumber,
       pageSize: pageSize,
@@ -44,7 +44,7 @@ export class BlogsQueryRepository {
     return blogs;
   }
 
-  async getBlogByIdSQL(id: string): Promise<blogViewModelSQL | []> {
+  async getBlogById(id: string): Promise<blogViewModel | []> {
     return await this.dataSource.query(
       `
         SELECT *

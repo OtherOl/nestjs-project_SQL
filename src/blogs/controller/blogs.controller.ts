@@ -66,7 +66,7 @@ export class BlogsController {
   @Get(':id')
   @HttpCode(200)
   async getBlogById(@Param('id') id: string) {
-    const blog = await this.blogsQueryRepository.getBlogByIdSQL(id);
+    const blog = await this.blogsQueryRepository.getBlogById(id);
     if (!blog[0]) throw new NotFoundException("Blog doesn't exists");
     return blog[0];
   }

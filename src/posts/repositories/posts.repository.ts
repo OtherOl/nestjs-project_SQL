@@ -8,7 +8,7 @@ import { DataSource } from 'typeorm';
 export class PostsRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createPostSQL(newPost: postModel) {
+  async createPost(newPost: postModel) {
     await this.dataSource.query(
       `
         INSERT INTO public."Posts"(
@@ -49,7 +49,7 @@ export class PostsRepository {
     };
   }
 
-  async updatePostSQL(postId: string, inputData: createBlogPostModel) {
+  async updatePost(postId: string, inputData: createBlogPostModel) {
     return await this.dataSource.query(
       `
         UPDATE public."Posts"

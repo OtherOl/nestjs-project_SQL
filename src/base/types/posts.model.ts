@@ -64,27 +64,3 @@ export class postModel {
   createdAt: string;
   extendedLikesInfo: likesInfo;
 }
-
-export class updatePostModel {
-  @IsNotEmpty()
-  @IsNotEmptyCustom()
-  @IsString()
-  @Length(1, 30)
-  title: string;
-
-  @IsNotEmpty()
-  @IsNotEmptyCustom()
-  @IsString()
-  @Length(1, 100)
-  shortDescription: string;
-
-  @IsNotEmpty()
-  @IsNotEmptyCustom()
-  @IsString()
-  @Length(1, 1000)
-  content: string;
-
-  @Validate(CustomBlogIdValidation)
-  @IsString()
-  blogId: string;
-}

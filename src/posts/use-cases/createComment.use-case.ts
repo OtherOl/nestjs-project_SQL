@@ -15,7 +15,7 @@ export class CreateCommentUseCase {
 
   async createComment(postId: string, content: createCommentModel, userId: string) {
     const post = await this.postsQueryRepository.getPostByIdSQL(postId);
-    const user = await this.usersQueryRepository.getUserByIdSQL(userId);
+    const user = await this.usersQueryRepository.getUserById(userId);
     if (!post[0]) throw new NotFoundException("Post doesn't exists");
     if (!user) throw new UnauthorizedException();
     const comment: commentsModel = Comment.createNewComment(postId, content, user.id, user.login);

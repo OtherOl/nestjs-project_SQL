@@ -8,7 +8,7 @@ export class CustomBlogIdValidation implements ValidatorConstraintInterface {
   constructor(private blogsQueryRepository: BlogsQueryRepository) {}
 
   async validate(blogId: string, args: ValidationArguments) {
-    const blog = await this.blogsQueryRepository.getBlogByIdSQL(blogId);
+    const blog = await this.blogsQueryRepository.getBlogById(blogId);
     if (!blog[0]) {
       return false;
     } else {

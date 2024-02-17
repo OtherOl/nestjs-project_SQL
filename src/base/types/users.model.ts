@@ -56,20 +56,3 @@ export class userModel {
   };
   isConfirmed: boolean;
 }
-
-export class userModelSQL {
-  id: string;
-  login: string;
-  email: string;
-  passwordHash: string;
-  createdAt: string;
-  emailConfirmation: {
-    confirmationCode: string;
-    expirationDate: any;
-  };
-  recoveryConfirmation: {
-    recoveryCode: string;
-    expirationDate: any;
-  };
-  isConfirmed: boolean;
-}

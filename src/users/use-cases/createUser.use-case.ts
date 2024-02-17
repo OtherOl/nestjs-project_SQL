@@ -15,6 +15,6 @@ export class CreateUserUseCase {
     const passwordHash = await this.authService.createPasswordHash(inputData.password);
 
     const newUser: userModel = User.createNewUser(inputData.login, inputData.email, passwordHash, true);
-    return await this.usersRepository.createUserSQL(newUser);
+    return await this.usersRepository.createUser(newUser);
   }
 }

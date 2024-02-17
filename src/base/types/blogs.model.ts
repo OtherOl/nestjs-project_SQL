@@ -9,8 +9,8 @@ function IsNotEmptyCustom() {
 }
 
 export class createBlogModel {
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   @IsNotEmptyCustom()
   @Length(1, 15)
   name: string;
@@ -24,7 +24,7 @@ export class createBlogModel {
   websiteUrl: string;
 }
 
-export class blogViewModelSQL {
+export class blogViewModel {
   id: string;
   name: string;
   description: string;

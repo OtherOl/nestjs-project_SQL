@@ -18,7 +18,7 @@ export class DoPostLikesUseCase {
 
   async doLikes(userId: string, post: postModel, likeStatus: string) {
     const like = await this.likesQueryRepository.getLikeByPostId(userId, post.id);
-    const user = await this.usersQueryRepository.getUserByIdSQL(userId);
+    const user = await this.usersQueryRepository.getUserById(userId);
     if (likeStatus === 'Like') {
       if (!like) {
         await this.likesService.createNewPostLike(userId, post.id, 'Like', user!.login);

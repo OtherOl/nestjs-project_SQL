@@ -11,7 +11,7 @@ export class UpdateBlogUseCase {
   ) {}
 
   async updateBlog(blogId: string, inputData: createBlogModel) {
-    const blog = await this.blogsQueryRepository.getBlogByIdSQL(blogId);
+    const blog = await this.blogsQueryRepository.getBlogById(blogId);
     if (!blog[0]) throw new NotFoundException("Blog doesn't exists");
     return this.blogsRepository.updateBlog(blog[0].id, inputData);
   }

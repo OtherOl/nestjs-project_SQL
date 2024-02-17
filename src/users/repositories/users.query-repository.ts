@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ConfirmationCode, userModel, userModelSQL } from '../../base/types/users.model';
+import { ConfirmationCode, userModel } from '../../base/types/users.model';
 import { paginationModel } from '../../base/types/pagination.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -43,7 +43,7 @@ export class UsersQueryRepository {
     return users;
   }
 
-  async getUserByIdSQL(id: string) {
+  async getUserById(id: string) {
     const result = await this.dataSource.query(
       `SELECT id, login, email, "createdAt"
             FROM public."Users"
@@ -64,7 +64,7 @@ export class UsersQueryRepository {
     return foundedUser[0];
   }
 
-  async findUserByConfirmationCode(code: ConfirmationCode): Promise<userModelSQL | null> {
+  async findUserByConfirmationCode(code: ConfirmationCode): Promise<userModel | null> {
     const user = await this.dataSource.query(
       `
            SELECT *

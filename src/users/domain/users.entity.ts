@@ -31,6 +31,7 @@ export class User {
   static createNewUser(login: string, email: string, passwordHash: string, isConfirmed: boolean) {
     const user = new User();
 
+    user.id = uuidv4();
     user.login = login;
     user.email = email;
     user.passwordHash = passwordHash;

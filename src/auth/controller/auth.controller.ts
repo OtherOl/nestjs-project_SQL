@@ -135,7 +135,7 @@ export class AuthController {
   async getProfile(@Req() request: Request) {
     const accessToken = request.headers.authorization;
     const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
-    const user = await this.usersQueryRepository.getUserByIdSQL(userId);
+    const user = await this.usersQueryRepository.getUserById(userId);
     return {
       email: user!.email,
       login: user!.login,

@@ -10,7 +10,7 @@ export class DeleteUserUseCase {
   ) {}
 
   async deleteUser(id: string) {
-    const user = await this.usersQueryRepository.getUserByIdSQL(id);
+    const user = await this.usersQueryRepository.getUserById(id);
     if (!user) throw new NotFoundException("User doesn't exists");
     return await this.usersRepository.deleteUser(id);
   }

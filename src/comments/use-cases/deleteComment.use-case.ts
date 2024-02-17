@@ -12,7 +12,7 @@ export class DeleteCommentUseCase {
   ) {}
 
   async deleteComment(commentId: string, userId: string) {
-    const user = await this.usersQueryRepository.getUserByIdSQL(userId);
+    const user = await this.usersQueryRepository.getUserById(userId);
     const comment = await this.commentsQueryRepository.getCommentById(commentId);
     if (!comment) throw new NotFoundException("Comment doesn't exists");
     if (user!.id !== comment.commentatorInfo.userId) throw new ForbiddenException();

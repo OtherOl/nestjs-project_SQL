@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { blogViewModelSQL, createBlogModel } from '../../base/types/blogs.model';
+import { blogViewModel, createBlogModel } from '../../base/types/blogs.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
@@ -7,7 +7,7 @@ import { DataSource } from 'typeorm';
 export class BlogsRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  async createBlog(blog: blogViewModelSQL) {
+  async createBlog(blog: blogViewModel) {
     await this.dataSource.query(
       `
         INSERT INTO public."Blogs"

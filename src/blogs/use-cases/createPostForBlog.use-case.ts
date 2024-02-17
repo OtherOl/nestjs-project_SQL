@@ -12,7 +12,7 @@ export class CreatePostForBlogUseCase {
   ) {}
 
   async createPostForBlog(blogId: string, inputData: createBlogPostModel) {
-    const blog = await this.blogsQueryRepository.getBlogByIdSQL(blogId);
+    const blog = await this.blogsQueryRepository.getBlogById(blogId);
     if (!blog[0]) throw new NotFoundException("Blog doesn't exists");
 
     const newPost = Post.createNewPost(
@@ -23,6 +23,6 @@ export class CreatePostForBlogUseCase {
       blog[0].name,
     );
 
-    return this.postsRepository.createPostSQL(newPost);
+    return this.postsRepository.createPost(newPost);
   }
 }

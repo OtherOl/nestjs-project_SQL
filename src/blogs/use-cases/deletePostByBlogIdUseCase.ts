@@ -14,7 +14,7 @@ export class DeletePostByBlogIdUseCase {
   async deletePost(blogId: string, postId: string) {
     const post = await this.postsQueryRepository.getPostByIdSQL(postId);
     if (!post[0]) throw new NotFoundException("Post doesn't exists");
-    const blog = await this.blogsQueryRepository.getBlogByIdSQL(blogId);
+    const blog = await this.blogsQueryRepository.getBlogById(blogId);
     if (!blog[0]) throw new NotFoundException("Blog doesn't exists");
     const isExists = await this.postsQueryRepository.getPostByBlogId(blogId);
     if (!isExists[0]) throw new NotFoundException("Post doesn't exists");

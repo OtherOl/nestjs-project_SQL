@@ -2,20 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { userModel } from '../../base/types/users.model';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns/add';
 
 @Injectable()
 export class UsersRepository {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
-  async createUserSQL(newUser: userModel) {
-    const id = uuidv4();
+  async createUser(newUser: userModel) {
     await this.dataSource.query(
       `INSERT INTO public."Users"
         (id, login, email, "passwordHash", "createdAt", "emailConfirmation", "recoveryConfirmation", "isConfirmed")
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`,
       [
-        id,
+        newUser.id,
         newUser.login,
         newUser.email,
         newUser.passwordHash,
@@ -33,7 +31,7 @@ export class UsersRepository {
     );
 
     return {
-      id: id,
+      id: newUser.id,
       login: newUser.login,
       email: newUser.email,
       createdAt: newUser.createdAt,

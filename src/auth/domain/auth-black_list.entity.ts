@@ -1,5 +1,10 @@
-export class AuthBlackList {
-  token: string;
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-  deviceId: string;
+@Entity()
+export class AuthBlackList {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  token: string;
 }

@@ -49,7 +49,7 @@ export class SuperAdminBlogsController {
     query: {
       searchNameTerm: string;
       sortBy: string;
-      sortDirection: string;
+      sortDirection: 'DESC' | 'ASC' | undefined;
       pageNumber: number;
       pageSize: number;
     },
@@ -75,8 +75,8 @@ export class SuperAdminBlogsController {
   @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(204)
-  async updateBlog(@Param('id') blogId: string, @Body() inputData: createBlogModel) {
-    return await this.updateBlogUseCase.updateBlog(blogId, inputData);
+  async updateBlog(@Param('id') id: string, @Body() inputData: createBlogModel) {
+    return await this.updateBlogUseCase.updateBlog(id, inputData);
   }
 
   @SkipThrottle()

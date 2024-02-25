@@ -1,36 +1,26 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { securityViewModel } from '../../base/types/security.model';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Security } from '../domain/security.entity';
 
 @Injectable()
 export class SecurityQueryRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(@InjectRepository(Security) private securityRepository: Repository<Security>) {}
 
-  async getAllSessions(userId: string): Promise<securityViewModel[]> {
-    return await this.dataSource.query(
-      `
-        SELECT ip, title, "lastActiveDate", "deviceId"
-            FROM public."Sessions"
-            WHERE "userId" = $1
-    `,
-      [userId],
-    );
+  async getAllSessions(userId: string): Promise<Security[]> {
+    return await this.securityRepository
+      .createQueryBuilder()
+      .select(['ip', 'title', 'lastActiveDate', 'deviceId'])
+      .where('userId = :userId', { userId })
+      .getMany();
   }
 
   async getSessionById(deviceId: string) {
-    const session = await this.dataSource.query(
-      `
-         SELECT *
-         FROM public."Sessions"
-         WHERE "deviceId" = $1
-    `,
-      [deviceId],
-    );
-    if (!session[0]) {
+    const session = await this.securityRepository.findOneBy({ deviceId });
+    if (!session) {
       throw new NotFoundException("Session doesn't exists");
     } else {
-      return session[0];
+      return session;
     }
   }
 }

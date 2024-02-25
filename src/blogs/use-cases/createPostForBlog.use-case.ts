@@ -13,14 +13,14 @@ export class CreatePostForBlogUseCase {
 
   async createPostForBlog(blogId: string, inputData: createBlogPostModel) {
     const blog = await this.blogsQueryRepository.getBlogById(blogId);
-    if (!blog[0]) throw new NotFoundException("Blog doesn't exists");
+    if (!blog) throw new NotFoundException("Blog doesn't exists");
 
     const newPost = Post.createNewPost(
       inputData.title,
       inputData.shortDescription,
       inputData.content,
-      blog[0].id,
-      blog[0].name,
+      blog.id,
+      blog.name,
     );
 
     return this.postsRepository.createPost(newPost);

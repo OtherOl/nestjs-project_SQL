@@ -62,6 +62,11 @@ import { DeletePostByBlogIdUseCase } from './blogs/use-cases/deletePostByBlogIdU
 import { UpdatePostByBlogIdUseCase } from './blogs/use-cases/updatePostByBlogId.use-case';
 import { BlogsController } from './blogs/controller/blogs.controller';
 import { DeleteCommentUseCase } from './comments/use-cases/deleteComment.use-case';
+import { Blog } from './blogs/domain/blogs.entity';
+import { User } from './users/domain/users.entity';
+import { AuthWhiteList } from './auth/domain/auth-white_list.entity';
+import { AuthBlackList } from './auth/domain/auth-black_list.entity';
+import { Security } from './securityDevices/domain/security.entity';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -111,10 +116,11 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
       username: PGUSER,
       password: PGPASSWORD,
       database: PGDATABASE,
-      autoLoadEntities: false,
+      autoLoadEntities: true,
       synchronize: true,
       ssl: true,
     }),
+    TypeOrmModule.forFeature([Blog, User, AuthWhiteList, AuthBlackList, Security]),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',

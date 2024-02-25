@@ -1,34 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { userModel } from '../../base/types/users.model';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { add } from 'date-fns/add';
+import { User } from '../domain/users.entity';
 
 @Injectable()
 export class UsersRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
   async createUser(newUser: userModel) {
-    await this.dataSource.query(
-      `INSERT INTO public."Users"
-        (id, login, email, "passwordHash", "createdAt", "emailConfirmation", "recoveryConfirmation", "isConfirmed")
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8);`,
-      [
-        newUser.id,
-        newUser.login,
-        newUser.email,
-        newUser.passwordHash,
-        newUser.createdAt,
-        {
-          confirmationCode: newUser.emailConfirmation.confirmationCode,
-          expirationDate: newUser.emailConfirmation.expirationDate,
-        },
-        {
-          recoveryCode: newUser.recoveryConfirmation.recoveryCode,
-          expirationDate: newUser.recoveryConfirmation.expirationDate,
-        },
-        newUser.isConfirmed,
-      ],
-    );
+    await this.usersRepository.insert(newUser);
 
     return {
       id: newUser.id,
@@ -39,52 +20,35 @@ export class UsersRepository {
   }
 
   async deleteUser(id: string) {
-    return await this.dataSource.query(
-      `
-        DELETE
-        FROM public."Users"
-        WHERE "id" = $1`,
-      [`${id}`],
-    );
+    return await this.usersRepository.delete({ id });
   }
 
   async updateConfirmation(userId: string) {
-    return await this.dataSource.query(
-      `
-        UPDATE public."Users"
-            SET "isConfirmed" = true
-            WHERE id = $1;`,
-      [userId],
-    );
+    return await this.usersRepository.update({ id: userId }, { isConfirmed: true });
   }
 
   async changeConfirmationCode(userId: string, code: string) {
     const newExpDate = add(new Date(), { minutes: 3 }).toISOString();
-    await this.dataSource.query(
-      `
-        UPDATE public."Users"
-            SET "emailConfirmation" = jsonb_set("emailConfirmation", '{confirmationCode}', '"${code}"')
-            WHERE id = $1;`,
-      [userId],
-    );
-    return await this.dataSource.query(
-      `
-         UPDATE public."Users"
-            SET "emailConfirmation" = jsonb_set("emailConfirmation", '{expirationDate}', '"${newExpDate}"')
-            WHERE id = $1;
-    `,
-      [userId],
-    );
+    await this.usersRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({
+        emailConfirmation: () => `jsonb_set("emailConfirmation", '{confirmationCode}', '"${code}"')`,
+      })
+      .where('id = :id', { id: userId })
+      .execute();
+
+    return await this.usersRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({
+        emailConfirmation: () => `jsonb_set("emailConfirmation", '{expirationDate}', '"${newExpDate}"')`,
+      })
+      .where(`id = :id`, { id: userId })
+      .execute();
   }
 
   async updatePassword(userId: string, passwordHash: string) {
-    return await this.dataSource.query(
-      `
-           UPDATE public."Users"
-            SET "passwordHash" = $1
-            WHERE id = $2;
-    `,
-      [passwordHash, userId],
-    );
+    return await this.usersRepository.update({ id: userId }, { passwordHash });
   }
 }

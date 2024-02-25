@@ -1,7 +1,6 @@
 import { likesInfo } from './likes.model';
-import { IsNotEmpty, IsString, Length, Validate } from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 import { Transform, TransformFnParams } from 'class-transformer';
-import { CustomBlogIdValidation } from '../middlewares/blogId.middleware';
 import { applyDecorators } from '@nestjs/common';
 
 const Trim = () => Transform(({ value }: TransformFnParams) => value?.trim());
@@ -28,30 +27,6 @@ export class createBlogPostModel {
   @IsString()
   @Length(1, 1000)
   content: string;
-}
-
-export class createPostModel {
-  @IsNotEmpty()
-  @IsNotEmptyCustom()
-  @IsString()
-  @Length(1, 30)
-  title: string;
-
-  @IsNotEmpty()
-  @IsNotEmptyCustom()
-  @IsString()
-  @Length(1, 100)
-  shortDescription: string;
-
-  @IsNotEmpty()
-  @IsNotEmptyCustom()
-  @IsString()
-  @Length(1, 1000)
-  content: string;
-
-  @IsString()
-  @Validate(CustomBlogIdValidation)
-  blogId: string;
 }
 
 export class postModel {

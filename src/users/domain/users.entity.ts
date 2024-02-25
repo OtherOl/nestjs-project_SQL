@@ -1,5 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns/add';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Security } from '../../securityDevices/domain/security.entity';
 
 export class EmailConfirmation {
   confirmationCode: string;
@@ -11,22 +13,34 @@ export class RecoveryConfirmation {
   expirationDate: string;
 }
 
+@Entity()
 export class User {
+  @PrimaryColumn()
   id: string;
 
+  @Column()
   login: string;
 
+  @Column()
   email: string;
 
+  @Column()
   passwordHash: string;
 
+  @Column()
   createdAt: string;
 
+  @Column({ type: 'jsonb' })
   emailConfirmation: EmailConfirmation;
 
+  @Column({ type: 'jsonb' })
   recoveryConfirmation: RecoveryConfirmation;
 
+  @Column()
   isConfirmed: boolean;
+
+  @OneToMany(() => Security, (s) => s.userId)
+  sessions: Security[];
 
   static createNewUser(login: string, email: string, passwordHash: string, isConfirmed: boolean) {
     const user = new User();

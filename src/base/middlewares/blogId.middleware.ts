@@ -9,7 +9,7 @@ export class CustomBlogIdValidation implements ValidatorConstraintInterface {
 
   async validate(blogId: string, args: ValidationArguments) {
     const blog = await this.blogsQueryRepository.getBlogById(blogId);
-    if (!blog[0]) {
+    if (!blog) {
       return false;
     } else {
       return true;

@@ -21,7 +21,7 @@ export class BlogsController {
     query: {
       searchNameTerm: string;
       sortBy: string;
-      sortDirection: string;
+      sortDirection: 'DESC' | 'ASC' | undefined;
       pageNumber: number;
       pageSize: number;
     },
@@ -67,7 +67,7 @@ export class BlogsController {
   @HttpCode(200)
   async getBlogById(@Param('id') id: string) {
     const blog = await this.blogsQueryRepository.getBlogById(id);
-    if (!blog[0]) throw new NotFoundException("Blog doesn't exists");
-    return blog[0];
+    if (!blog) throw new NotFoundException("Blog doesn't exists");
+    return blog;
   }
 }

@@ -1,17 +1,27 @@
 import { v4 as uuidv4 } from 'uuid';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { User } from '../../users/domain/users.entity';
 
+@Entity()
 export class Security {
+  @PrimaryColumn()
   id: string;
 
+  @Column()
   ip: string;
 
+  @Column()
   title: string;
 
+  @Column()
   lastActiveDate: string;
 
+  @Column()
   deviceId: string;
 
-  userId: string;
+  @ManyToOne(() => User, (u) => u.sessions)
+  @JoinColumn({ name: 'userId' })
+  userId: User;
 
   static createSession(ip: string, title: string = 'Chrome 105', verifiedToken: any) {
     const session = new Security();

@@ -1,30 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AuthBlackList } from '../domain/auth-black_list.entity';
 
 @Injectable()
 export class AuthBlackListRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(@InjectRepository(AuthBlackList) private authBlackListRepository: Repository<AuthBlackList>) {}
 
   async blackList(token: string) {
-    return await this.dataSource.query(
-      `
-        INSERT INTO public."AuthBlackList"(
-            token)
-            VALUES ($1);
-    `,
-      [token],
-    );
+    return await this.authBlackListRepository.insert({ token });
   }
 
   async findInvalidToken(token: string) {
-    return await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."AuthBlackList"
-        WHERE token = $1
-    `,
-      [token],
-    );
+    return await this.authBlackListRepository.findOneBy({ token });
   }
 }

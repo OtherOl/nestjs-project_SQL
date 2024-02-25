@@ -1,34 +1,40 @@
 import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../src/app.module';
-import { appSettings } from '../src/settings';
 import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
+import { beforeGetAppAndCleanDb } from './test-utils';
+import { blogViewModel } from '../src/base/types/blogs.model';
+import { postModel } from '../src/base/types/posts.model';
+import { userModel } from '../src/base/types/users.model';
+
+const postCreateModel = (title: string, shortDescription: string, content: string) => {
+  return {
+    title,
+    shortDescription,
+    content,
+  };
+};
+
+const blogModel = (name: string, description: string, websiteUrl: string) => {
+  return {
+    name,
+    description,
+    websiteUrl,
+  };
+};
+
+const userCreateModel = (login: string, email: string, password: string) => {
+  return {
+    login,
+    email,
+    password,
+  };
+};
 
 describe('Testing Posts', () => {
   let app: INestApplication;
 
-  const postModel = {
-    title: 'Post created by static method',
-    shortDescription: 'We are doing likes and dislikes for posts',
-    content: 'The content',
-  };
-
-  const blogModel = {
-    name: 'NEW BLOG',
-    description: 'description',
-    websiteUrl: 'https://google.com',
-  };
-
   beforeAll(async () => {
-    const module: TestingModule = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    app = module.createNestApplication();
-
-    appSettings(app);
-
-    await app.init();
-    const db = await request(app.getHttpServer()).delete('/testing/all-data').send();
-    expect(db.status).toBe(204);
+    app = await beforeGetAppAndCleanDb();
   });
 
   afterAll(async () => {
@@ -58,16 +64,23 @@ describe('Testing Posts', () => {
     expect(posts.status).toBe(404);
   });
 
+  let blog1: blogViewModel;
+  let post1: postModel;
   it('should create new post and return it (Post: createBlog, createPostForBlog; Get: getPostById) => 201 status + 200 status', async () => {
-    const blog = await request(app.getHttpServer()).post('/sa/blogs').send(blogModel).auth('admin', 'qwerty');
-
-    expect(blog.status).toBe(201);
-
-    const newPost = await request(app.getHttpServer())
-      .post(`/sa/blogs/${blog.body.id}/posts`)
-      .send(postModel)
+    const blog = await request(app.getHttpServer())
+      .post('/sa/blogs')
+      .send(blogModel('Posts blog', 'This text is about..', 'google.com'))
       .auth('admin', 'qwerty');
 
+    expect(blog.status).toBe(201);
+    blog1 = blog.body;
+
+    const newPost = await request(app.getHttpServer())
+      .post(`/sa/blogs/${blog1.id}/posts`)
+      .send(postCreateModel('JojoBen', 'We will talk about our lessons.', 'HOHO mr. ej es or no?????'))
+      .auth('admin', 'qwerty');
+
+    post1 = newPost.body;
     expect(newPost.status).toBe(201);
     expect(newPost.body).toEqual({
       id: newPost.body.id,
@@ -85,7 +98,7 @@ describe('Testing Posts', () => {
       },
     });
 
-    const foundedPost = await request(app.getHttpServer()).get(`/posts/${newPost.body.id}`);
+    const foundedPost = await request(app.getHttpServer()).get(`/posts/${post1.id}`);
 
     expect(foundedPost.status).toBe(200);
     expect(foundedPost.body).toEqual({
@@ -106,11 +119,8 @@ describe('Testing Posts', () => {
   });
 
   it('Should update post (Get: getAllPosts, Put: updatePostByBlogId) => status 204', async () => {
-    const posts = await request(app.getHttpServer()).get('/posts');
-    expect(posts.status).toBe(200);
-
     const updatedPost = await request(app.getHttpServer())
-      .put(`/sa/blogs/${posts.body.items[0].blogId}/posts/${posts.body.items[0].id}`)
+      .put(`/sa/blogs/${post1.blogId}/posts/${post1.id}`)
       .send({
         content: 'Update post in tests',
         shortDescription: 'shortDescription after update',
@@ -120,14 +130,14 @@ describe('Testing Posts', () => {
 
     expect(updatedPost.status).toBe(204);
 
-    const post = await request(app.getHttpServer()).get(`/posts/${posts.body.items[0].id}`);
+    const post = await request(app.getHttpServer()).get(`/posts/${post1.id}`);
     expect(post.status).toBe(200);
     expect(post.body).toEqual({
-      id: posts.body.items[0].id,
+      id: post1.id,
       title: 'title updated',
       shortDescription: 'shortDescription after update',
       content: 'Update post in tests',
-      blogId: posts.body.items[0].blogId,
+      blogId: post1.blogId,
       blogName: expect.any(String),
       createdAt: expect.any(String),
       extendedLikesInfo: {
@@ -143,76 +153,53 @@ describe('Testing Posts', () => {
 describe('Testing post likes', () => {
   let app: INestApplication;
 
-  const postModel = {
-    title: 'Post created by static method',
-    shortDescription: 'We are doing likes and dislikes for posts',
-    content: 'The content',
-  };
-
-  const blogModel = {
-    name: 'NEW BLOG',
-    description: 'description',
-    websiteUrl: 'https://google.com',
-  };
-
   beforeAll(async () => {
-    const module: TestingModule = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    app = module.createNestApplication();
-
-    appSettings(app);
-
-    await app.init();
-    const db = await request(app.getHttpServer()).delete('/testing/all-data').send();
-    expect(db.status).toBe(204);
+    app = await beforeGetAppAndCleanDb();
   });
 
-  afterAll(async () => {
-    const db = await request(app.getHttpServer()).delete('/testing/all-data').send();
-    expect(db.status).toBe(204);
-    await app.close();
-  });
-
+  let user1: userModel;
+  let blog1: blogViewModel;
+  let post1: postModel;
   it('should like post + successfully get post by blogId  => 204 status', async () => {
     const newUser = await request(app.getHttpServer())
       .post('/sa/users')
-      .send({
-        login: 'OtherOl',
-        email: 'pilyak003@gmail.com',
-        password: '12345678',
-      })
+      .send(userCreateModel('OtherOl', 'someemail@gmail.com', '12345678'))
       .auth('admin', 'qwerty');
     expect(newUser.status).toBe(201);
+    user1 = newUser.body;
 
     const newBlog = await request(app.getHttpServer())
       .post('/sa/blogs')
-      .send(blogModel)
+      .send(blogModel('Old blog', 'Seat with my cat ^)', 'google.com'))
       .auth('admin', 'qwerty');
     expect(newBlog.status).toBe(201);
+    blog1 = newBlog.body;
 
     const newPost = await request(app.getHttpServer())
       .post(`/sa/blogs/${newBlog.body.id}/posts`)
-      .send(postModel)
+      .send(postCreateModel('Some post', 'Some short description!', 'This post is about IT'))
       .auth('admin', 'qwerty');
     expect(newPost.status).toBe(201);
+    post1 = newPost.body;
 
     const login = await request(app.getHttpServer()).post('/auth/login').send({
-      loginOrEmail: 'OtherOl',
+      loginOrEmail: user1.login,
       password: '12345678',
     });
     expect(login.status).toBe(200);
 
     const like = await request(app.getHttpServer())
-      .put(`/posts/${newPost.body.id}/like-status`)
+      .put(`/posts/${post1.id}/like-status`)
       .send({ likeStatus: 'Like' })
       .set('Authorization', 'bearer ' + login.body.accessToken);
     expect(like.status).toBe(204);
 
     const post = await request(app.getHttpServer())
-      .get(`/posts/${newPost.body.id}`)
+      .get(`/posts/${post1.id}`)
       .set('Authorization', 'bearer ' + login.body.accessToken);
     expect(post.status).toBe(200);
     expect(post.body).toEqual({
-      id: newPost.body.id,
+      id: post1.id,
       title: expect.any(String),
       shortDescription: expect.any(String),
       content: expect.any(String),
@@ -223,12 +210,12 @@ describe('Testing post likes', () => {
         likesCount: 1,
         dislikesCount: 0,
         myStatus: 'Like',
-        newestLikes: [],
+        newestLikes: [{ addedAt: expect.any(String), login: user1.login, userId: expect.any(String) }],
       },
     });
 
     const postsByBlogId = await request(app.getHttpServer())
-      .get(`/blogs/${newBlog.body.id}/posts`)
+      .get(`/blogs/${blog1.id}/posts`)
       .set('Authorization', 'bearer ' + login.body.accessToken);
     expect(postsByBlogId.status).toBe(200);
     expect(postsByBlogId.body).toEqual({
@@ -242,14 +229,14 @@ describe('Testing post likes', () => {
           shortDescription: expect.any(String),
           title: expect.any(String),
           content: expect.any(String),
-          blogId: newBlog.body.id,
+          blogId: blog1.id,
           blogName: expect.any(String),
           createdAt: expect.any(String),
           extendedLikesInfo: {
             likesCount: 1,
             dislikesCount: 0,
             myStatus: 'Like',
-            newestLikes: [],
+            newestLikes: [{ addedAt: expect.any(String), login: user1.login, userId: expect.any(String) }],
           },
         },
       ],
@@ -258,7 +245,7 @@ describe('Testing post likes', () => {
 
   it("shouldn't do like => 404 status", async () => {
     const login = await request(app.getHttpServer()).post('/auth/login').send({
-      loginOrEmail: 'OtherOl',
+      loginOrEmail: user1.login,
       password: '12345678',
     });
     expect(login.status).toBe(200);
@@ -271,17 +258,8 @@ describe('Testing post likes', () => {
   });
 
   it("shouldn't do like => 401 status", async () => {
-    const blog = await request(app.getHttpServer()).post('/sa/blogs').send(blogModel).auth('admin', 'qwerty');
-    expect(blog.status).toBe(201);
-
-    const post = await request(app.getHttpServer())
-      .post(`/sa/blogs/${blog.body.id}/posts`)
-      .send(postModel)
-      .auth('admin', 'qwerty');
-    expect(post.status).toBe(201);
-
     const like = await request(app.getHttpServer())
-      .put(`/posts/${post.body.items[0].id}/like-status`)
+      .put(`/posts/${post1.id}/like-status`)
       .send({ likeStatus: 'Like' })
       .set('Authorization', 'bearer ' + uuidv4());
     expect(like.status).toBe(401);

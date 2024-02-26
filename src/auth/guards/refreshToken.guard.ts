@@ -15,7 +15,7 @@ export class RefreshTokenGuard implements CanActivate {
 
     const token = req.cookies.refreshToken;
     const isInvalid = await this.authRepository.findInvalidToken(token);
-    if (!isInvalid) throw new UnauthorizedException();
+    if (isInvalid) throw new UnauthorizedException();
 
     try {
       await this.jwtService.verify(token);

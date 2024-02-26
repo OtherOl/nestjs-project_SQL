@@ -10,12 +10,18 @@ export class UsersQueryRepository {
   constructor(@InjectRepository(User) private usersRepository: Repository<User>) {}
   async getAllUsers(
     sortBy: string = 'createdAt',
-    sortDirection: 'DESC' | 'ASC' | undefined = 'DESC',
+    sortDirection: string,
     pageNumber: number,
     pageSize: number,
     searchLoginTerm: string,
     searchEmailTerm: string,
   ) {
+    let sortDir: 'ASC' | 'DESC';
+    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
+      sortDir = 'DESC';
+    } else {
+      sortDir = 'ASC';
+    }
     const countUsers = await this.usersRepository
       .createQueryBuilder('u')
       .where('u.login ilike :login', { login: `%${searchLoginTerm}%` })
@@ -27,7 +33,7 @@ export class UsersQueryRepository {
       .select(['u.id', 'u.login', 'u.email', 'u.createdAt'])
       .where('u.login ilike :login', { login: `%${searchLoginTerm}%` })
       .andWhere('u.email ilike :email', { email: `%${searchEmailTerm}%` })
-      .orderBy(`u.${sortBy}`, sortDirection)
+      .orderBy(`u.${sortBy}`, sortDir)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
       .getMany();

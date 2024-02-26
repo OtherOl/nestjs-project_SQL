@@ -22,7 +22,7 @@ export class UsersController {
     @Query()
     query: {
       sortBy: string;
-      sortDirection: 'DESC' | 'ASC' | undefined;
+      sortDirection: string;
       pageNumber: number;
       pageSize: number;
       searchLoginTerm: string;

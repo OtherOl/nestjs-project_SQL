@@ -19,14 +19,14 @@ export class UsersQueryRepository {
     const countUsers = await this.usersRepository
       .createQueryBuilder('u')
       .where('u.login ilike :login', { login: `%${searchLoginTerm}%` })
-      .orWhere('u.email ilike :email', { email: `%${searchEmailTerm}%` })
+      .andWhere('u.email ilike :email', { email: `%${searchEmailTerm}%` })
       .getCount();
 
     const foundUsers = await this.usersRepository
       .createQueryBuilder('u')
       .select(['u.id', 'u.login', 'u.email', 'u.createdAt'])
       .where('u.login ilike :login', { login: `%${searchLoginTerm}%` })
-      .orWhere('u.email ilike :email', { email: `%${searchEmailTerm}%` })
+      .andWhere('u.email ilike :email', { email: `%${searchEmailTerm}%` })
       .orderBy(`u.${sortBy}`, sortDirection)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)

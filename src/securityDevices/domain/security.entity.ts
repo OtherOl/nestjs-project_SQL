@@ -19,9 +19,12 @@ export class Security {
   @Column()
   deviceId: string;
 
+  @Column()
+  userId: string;
+
   @ManyToOne(() => User, (u) => u.sessions)
   @JoinColumn({ name: 'userId' })
-  userId: User;
+  user: User;
 
   static createSession(ip: string, title: string = 'Chrome 105', verifiedToken: any) {
     const session = new Security();

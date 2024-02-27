@@ -50,6 +50,7 @@ export class SecurityController {
     const refreshToken = request.cookies.refreshToken;
     const inputUserId = await this.authService.getUserIdByToken(refreshToken);
     const session = await this.securityQueryRepository.getSessionById(deviceId);
+    console.log(session.userId, inputUserId);
     if (inputUserId !== session.userId) throw new ForbiddenException();
     await this.securityRepository.deleteSpecifiedSession(deviceId);
     await this.authWhiteListRepository.deleteTokenByDeviceId(deviceId);

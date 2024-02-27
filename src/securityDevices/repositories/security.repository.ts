@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { securityTimeViewModel } from '../../base/types/security.model';
+import { securityViewModel } from '../../base/types/security.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Security } from '../domain/security.entity';
@@ -17,7 +17,7 @@ export class SecurityRepository {
       .execute();
   }
 
-  async createSession(newSession: securityTimeViewModel) {
+  async createSession(newSession: securityViewModel) {
     return await this.securityRepository.insert(newSession);
   }
 

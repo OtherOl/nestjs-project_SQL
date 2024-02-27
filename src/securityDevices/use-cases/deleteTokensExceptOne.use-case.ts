@@ -14,6 +14,7 @@ export class DeleteTokensExceptOneUseCase {
   async deleteAllTokens(refreshToken: string) {
     const decodedToken = await this.decodeRefreshTokenUseCase.decodeRefreshToken(refreshToken);
     const tokens = await this.authWhileListRepository.findTokens(decodedToken.userId, decodedToken.deviceId);
+    if (!tokens) return;
     for (let i = 0; i < tokens.length; i++) {
       await this.authBlackListRepository.blackList(tokens[i].token);
     }

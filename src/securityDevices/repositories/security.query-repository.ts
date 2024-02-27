@@ -9,9 +9,9 @@ export class SecurityQueryRepository {
 
   async getAllSessions(userId: string): Promise<Security[]> {
     return await this.securityRepository
-      .createQueryBuilder()
-      .select(['ip', 'title', 'lastActiveDate', 'deviceId'])
-      .where('userId = :userId', { userId })
+      .createQueryBuilder('s')
+      .select(['s.ip', 's.title', 's.lastActiveDate', 's.deviceId'])
+      .where('s.userId = :userId', { userId })
       .getMany();
   }
 

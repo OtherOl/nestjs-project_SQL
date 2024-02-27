@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ObjectId } from 'mongodb';
 import { AuthBlackListRepository } from './auth-black-list-repository.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -33,15 +32,16 @@ export class AuthWhiteListRepository {
       .delete()
       .from(AuthWhiteList)
       .where('userId = :userId', { userId })
-      .andWhere('deviceId = :deviceId', { deviceId })
+      .andWhere('deviceId != :deviceId', { deviceId })
       .execute();
   }
 
-  async findTokens(userId: ObjectId, deviceId: string): Promise<any | null> {
+  async findTokens(userId: string, deviceId: string): Promise<AuthWhiteList[] | null> {
     return await this.authWhiteListRepository
-      .createQueryBuilder()
-      .where('userId = :userId', { userId })
-      .andWhere(`deviceId = :deviceId`, { deviceId })
+      .createQueryBuilder('aw')
+      .select()
+      .where('aw.userId = :userId', { userId })
+      .andWhere('aw.deviceId != :deviceId', { deviceId })
       .getMany();
   }
 }

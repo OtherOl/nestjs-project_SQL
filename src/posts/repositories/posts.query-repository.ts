@@ -3,14 +3,16 @@ import { postModel } from '../../base/types/posts.model';
 import { paginationModel } from '../../base/types/pagination.model';
 import { commentsModel } from '../../base/types/comments.model';
 import { LikesQueryRepository } from '../../likes/repositories/likes.query-repository';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { Post } from '../domain/posts.entity';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectDataSource() private dataSource: DataSource,
     private likesQueryRepository: LikesQueryRepository,
+    @InjectRepository(Post) private postsRepository: Repository<Post>,
   ) {}
 
   async getCommentsByPostId(
@@ -86,20 +88,21 @@ export class PostsQueryRepository {
     pageSize: number,
     userId: string,
   ) {
-    const countPosts = await this.dataSource.query(`
-        SELECT COUNT(*)
-        FROM public."Posts"
-    `);
+    let sortDir: 'ASC' | 'DESC';
+    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
+      sortDir = 'DESC';
+    } else {
+      sortDir = 'ASC';
+    }
+    const countPosts: number = await this.postsRepository.createQueryBuilder().select().getCount();
 
-    const foundedPosts = await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Posts"
-        ORDER BY "${sortBy}" ${sortDirection}
-        LIMIT $1 OFFSET $2
-    `,
-      [pageSize, (pageNumber - 1) * pageSize],
-    );
+    const foundedPosts = await this.postsRepository
+      .createQueryBuilder('p')
+      .select()
+      .orderBy(`p.${sortBy}`, sortDir)
+      .limit(pageSize)
+      .offset((pageNumber - 1) * pageSize)
+      .getMany();
     const like = await this.likesQueryRepository.getLikeByUserId(userId);
     const likes: any[] = await this.likesQueryRepository.getNewestLikes('Like');
 
@@ -137,10 +140,10 @@ export class PostsQueryRepository {
       };
     });
     const posts: paginationModel<postModel> = {
-      pagesCount: Math.ceil(Number(countPosts[0].count) / pageSize),
+      pagesCount: Math.ceil(countPosts / pageSize),
       page: pageNumber,
       pageSize: pageSize,
-      totalCount: Number(countPosts[0].count),
+      totalCount: countPosts,
       items: postsQuery,
     };
     return posts;
@@ -153,28 +156,30 @@ export class PostsQueryRepository {
     pageNumber: number,
     pageSize: number,
     userId: string,
-  ) {
-    const countPosts = await this.dataSource.query(
-      `
-        SELECT COUNT(*)
-        FROM public."Posts"
-        WHERE "blogId" = $1
-    `,
-      [blogId],
-    );
+  ): Promise<paginationModel<postModel>> {
+    let sortDir: 'ASC' | 'DESC';
+    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
+      sortDir = 'DESC';
+    } else {
+      sortDir = 'ASC';
+    }
+    const countPosts: number = await this.postsRepository
+      .createQueryBuilder('p')
+      .select()
+      .where('p.blogId = :blogId', { blogId })
+      .getCount();
 
-    if (Number(countPosts[0].count) === 0) throw new NotFoundException("Blog doesn't exists");
+    if (countPosts === 0) throw new NotFoundException("Blog doesn't exists");
 
-    const foundedPosts = await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Posts"
-        WHERE "blogId" = $1
-        ORDER BY "${sortBy}" ${sortDirection}
-        LIMIT $2 OFFSET $3
-    `,
-      [blogId, pageSize, (pageNumber - 1) * pageSize],
-    );
+    const foundedPosts = await this.postsRepository
+      .createQueryBuilder('p')
+      .select()
+      .where('p.blogId = :blogId', { blogId })
+      .orderBy(`p.${sortBy}`, sortDir)
+      .limit(pageSize)
+      .offset((pageNumber - 1) * pageSize)
+      .getMany();
+
     const postLike = await this.likesQueryRepository.getLikeByUserId(userId);
     const likes: any[] = await this.likesQueryRepository.getNewestLikes('Like');
 
@@ -213,64 +218,42 @@ export class PostsQueryRepository {
       };
     });
 
-    const posts: paginationModel<postModel> = {
-      pagesCount: Math.ceil(Number(countPosts[0].count) / pageSize),
+    return {
+      pagesCount: Math.ceil(countPosts / pageSize),
       page: pageNumber,
       pageSize: pageSize,
-      totalCount: Number(countPosts[0].count),
+      totalCount: countPosts,
       items: postsQuery,
     };
-    return posts;
   }
 
-  async getPostByBlogId(blogId: string) {
-    return await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Posts"
-        WHERE "blogId" = $1
-    `,
-      [blogId],
-    );
+  async getPostByBlogId(blogId: string): Promise<Post | null> {
+    return await this.postsRepository.findOneBy({ blogId });
   }
 
-  async getPostByIdSQL(postId: string) {
-    return await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Posts"
-        WHERE id = $1
-    `,
-      [postId],
-    );
+  async getPostByIdSQL(postId: string): Promise<Post | null> {
+    return await this.postsRepository.findOneBy({ id: postId });
   }
 
-  async getPostById(postId: string, userId: string) {
+  async getPostById(postId: string, userId: string): Promise<postModel | null> {
     let likeStatus: string;
-    const post = await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Posts"
-        WHERE id = $1
-    `,
-      [postId],
-    );
+    const post = await this.postsRepository.findOneBy({ id: postId });
     const like = await this.likesQueryRepository.getLikeByPostId(userId, postId);
-    if (!post[0]) throw new NotFoundException("Post doesn't exists");
+    if (!post) throw new NotFoundException("Post doesn't exists");
     like ? (likeStatus = like.type) : (likeStatus = 'None');
     const newestLikes = await this.likesQueryRepository.getNewestLikeForCurrentPost(postId, 'Like');
 
     return {
-      id: post[0].id,
-      title: post[0].title,
-      shortDescription: post[0].shortDescription,
-      content: post[0].content,
-      blogId: post[0].blogId,
-      blogName: post[0].blogName,
-      createdAt: post[0].createdAt,
+      id: post.id,
+      title: post.title,
+      shortDescription: post.shortDescription,
+      content: post.content,
+      blogId: post.blogId,
+      blogName: post.blogName,
+      createdAt: post.createdAt,
       extendedLikesInfo: {
-        likesCount: post[0].extendedLikesInfo.likesCount,
-        dislikesCount: post[0].extendedLikesInfo.dislikesCount,
+        likesCount: post.extendedLikesInfo.likesCount,
+        dislikesCount: post.extendedLikesInfo.dislikesCount,
         myStatus: likeStatus,
         newestLikes: newestLikes,
       },

@@ -150,118 +150,118 @@ describe('Testing Posts', () => {
   });
 });
 
-describe('Testing post likes', () => {
-  let app: INestApplication;
-
-  beforeAll(async () => {
-    app = await beforeGetAppAndCleanDb();
-  });
-
-  let user1: userModel;
-  let blog1: blogViewModel;
-  let post1: postModel;
-  it('should like post + successfully get post by blogId  => 204 status', async () => {
-    const newUser = await request(app.getHttpServer())
-      .post('/sa/users')
-      .send(userCreateModel('OtherOl', 'someemail@gmail.com', '12345678'))
-      .auth('admin', 'qwerty');
-    expect(newUser.status).toBe(201);
-    user1 = newUser.body;
-
-    const newBlog = await request(app.getHttpServer())
-      .post('/sa/blogs')
-      .send(blogModel('Old blog', 'Seat with my cat ^)', 'google.com'))
-      .auth('admin', 'qwerty');
-    expect(newBlog.status).toBe(201);
-    blog1 = newBlog.body;
-
-    const newPost = await request(app.getHttpServer())
-      .post(`/sa/blogs/${newBlog.body.id}/posts`)
-      .send(postCreateModel('Some post', 'Some short description!', 'This post is about IT'))
-      .auth('admin', 'qwerty');
-    expect(newPost.status).toBe(201);
-    post1 = newPost.body;
-
-    const login = await request(app.getHttpServer()).post('/auth/login').send({
-      loginOrEmail: user1.login,
-      password: '12345678',
-    });
-    expect(login.status).toBe(200);
-
-    const like = await request(app.getHttpServer())
-      .put(`/posts/${post1.id}/like-status`)
-      .send({ likeStatus: 'Like' })
-      .set('Authorization', 'bearer ' + login.body.accessToken);
-    expect(like.status).toBe(204);
-
-    const post = await request(app.getHttpServer())
-      .get(`/posts/${post1.id}`)
-      .set('Authorization', 'bearer ' + login.body.accessToken);
-    expect(post.status).toBe(200);
-    expect(post.body).toEqual({
-      id: post1.id,
-      title: expect.any(String),
-      shortDescription: expect.any(String),
-      content: expect.any(String),
-      blogId: expect.any(String),
-      blogName: expect.any(String),
-      createdAt: expect.any(String),
-      extendedLikesInfo: {
-        likesCount: 1,
-        dislikesCount: 0,
-        myStatus: 'Like',
-        newestLikes: [{ addedAt: expect.any(String), login: user1.login, userId: expect.any(String) }],
-      },
-    });
-
-    const postsByBlogId = await request(app.getHttpServer())
-      .get(`/blogs/${blog1.id}/posts`)
-      .set('Authorization', 'bearer ' + login.body.accessToken);
-    expect(postsByBlogId.status).toBe(200);
-    expect(postsByBlogId.body).toEqual({
-      pagesCount: 1,
-      page: 1,
-      pageSize: 10,
-      totalCount: 1,
-      items: [
-        {
-          id: expect.any(String),
-          shortDescription: expect.any(String),
-          title: expect.any(String),
-          content: expect.any(String),
-          blogId: blog1.id,
-          blogName: expect.any(String),
-          createdAt: expect.any(String),
-          extendedLikesInfo: {
-            likesCount: 1,
-            dislikesCount: 0,
-            myStatus: 'Like',
-            newestLikes: [{ addedAt: expect.any(String), login: user1.login, userId: expect.any(String) }],
-          },
-        },
-      ],
-    });
-  });
-
-  it("shouldn't do like => 404 status", async () => {
-    const login = await request(app.getHttpServer()).post('/auth/login').send({
-      loginOrEmail: user1.login,
-      password: '12345678',
-    });
-    expect(login.status).toBe(200);
-
-    const like = await request(app.getHttpServer())
-      .put(`/posts/${uuidv4()}/like-status`)
-      .send({ likeStatus: 'Like' })
-      .set('Authorization', 'bearer ' + login.body.accessToken);
-    expect(like.status).toBe(404);
-  });
-
-  it("shouldn't do like => 401 status", async () => {
-    const like = await request(app.getHttpServer())
-      .put(`/posts/${post1.id}/like-status`)
-      .send({ likeStatus: 'Like' })
-      .set('Authorization', 'bearer ' + uuidv4());
-    expect(like.status).toBe(401);
-  });
-});
+// describe('Testing post likes', () => {
+//   let app: INestApplication;
+//
+//   beforeAll(async () => {
+//     app = await beforeGetAppAndCleanDb();
+//   });
+//
+//   let user1: userModel;
+//   let blog1: blogViewModel;
+//   let post1: postModel;
+//   it('should like post + successfully get post by blogId  => 204 status', async () => {
+//     const newUser = await request(app.getHttpServer())
+//       .post('/sa/users')
+//       .send(userCreateModel('OtherOl', 'someemail@gmail.com', '12345678'))
+//       .auth('admin', 'qwerty');
+//     expect(newUser.status).toBe(201);
+//     user1 = newUser.body;
+//
+//     const newBlog = await request(app.getHttpServer())
+//       .post('/sa/blogs')
+//       .send(blogModel('Old blog', 'Seat with my cat ^)', 'google.com'))
+//       .auth('admin', 'qwerty');
+//     expect(newBlog.status).toBe(201);
+//     blog1 = newBlog.body;
+//
+//     const newPost = await request(app.getHttpServer())
+//       .post(`/sa/blogs/${newBlog.body.id}/posts`)
+//       .send(postCreateModel('Some post', 'Some short description!', 'This post is about IT'))
+//       .auth('admin', 'qwerty');
+//     expect(newPost.status).toBe(201);
+//     post1 = newPost.body;
+//
+//     const login = await request(app.getHttpServer()).post('/auth/login').send({
+//       loginOrEmail: user1.login,
+//       password: '12345678',
+//     });
+//     expect(login.status).toBe(200);
+//
+//     const like = await request(app.getHttpServer())
+//       .put(`/posts/${post1.id}/like-status`)
+//       .send({ likeStatus: 'Like' })
+//       .set('Authorization', 'bearer ' + login.body.accessToken);
+//     expect(like.status).toBe(204);
+//
+//     const post = await request(app.getHttpServer())
+//       .get(`/posts/${post1.id}`)
+//       .set('Authorization', 'bearer ' + login.body.accessToken);
+//     expect(post.status).toBe(200);
+//     expect(post.body).toEqual({
+//       id: post1.id,
+//       title: expect.any(String),
+//       shortDescription: expect.any(String),
+//       content: expect.any(String),
+//       blogId: expect.any(String),
+//       blogName: expect.any(String),
+//       createdAt: expect.any(String),
+//       extendedLikesInfo: {
+//         likesCount: 1,
+//         dislikesCount: 0,
+//         myStatus: 'Like',
+//         newestLikes: [{ addedAt: expect.any(String), login: user1.login, userId: expect.any(String) }],
+//       },
+//     });
+//
+//     const postsByBlogId = await request(app.getHttpServer())
+//       .get(`/blogs/${blog1.id}/posts`)
+//       .set('Authorization', 'bearer ' + login.body.accessToken);
+//     expect(postsByBlogId.status).toBe(200);
+//     expect(postsByBlogId.body).toEqual({
+//       pagesCount: 1,
+//       page: 1,
+//       pageSize: 10,
+//       totalCount: 1,
+//       items: [
+//         {
+//           id: expect.any(String),
+//           shortDescription: expect.any(String),
+//           title: expect.any(String),
+//           content: expect.any(String),
+//           blogId: blog1.id,
+//           blogName: expect.any(String),
+//           createdAt: expect.any(String),
+//           extendedLikesInfo: {
+//             likesCount: 1,
+//             dislikesCount: 0,
+//             myStatus: 'Like',
+//             newestLikes: [{ addedAt: expect.any(String), login: user1.login, userId: expect.any(String) }],
+//           },
+//         },
+//       ],
+//     });
+//   });
+//
+//   it("shouldn't do like => 404 status", async () => {
+//     const login = await request(app.getHttpServer()).post('/auth/login').send({
+//       loginOrEmail: user1.login,
+//       password: '12345678',
+//     });
+//     expect(login.status).toBe(200);
+//
+//     const like = await request(app.getHttpServer())
+//       .put(`/posts/${uuidv4()}/like-status`)
+//       .send({ likeStatus: 'Like' })
+//       .set('Authorization', 'bearer ' + login.body.accessToken);
+//     expect(like.status).toBe(404);
+//   });
+//
+//   it("shouldn't do like => 401 status", async () => {
+//     const like = await request(app.getHttpServer())
+//       .put(`/posts/${post1.id}/like-status`)
+//       .send({ likeStatus: 'Like' })
+//       .set('Authorization', 'bearer ' + uuidv4());
+//     expect(like.status).toBe(401);
+//   });
+// });

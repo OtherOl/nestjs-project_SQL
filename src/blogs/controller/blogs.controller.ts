@@ -21,7 +21,7 @@ export class BlogsController {
     query: {
       searchNameTerm: string;
       sortBy: string;
-      sortDirection: 'DESC' | 'ASC' | undefined;
+      sortDirection: string;
       pageNumber: number;
       pageSize: number;
     },

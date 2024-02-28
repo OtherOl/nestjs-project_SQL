@@ -49,7 +49,7 @@ export class SuperAdminBlogsController {
     query: {
       searchNameTerm: string;
       sortBy: string;
-      sortDirection: 'DESC' | 'ASC' | undefined;
+      sortDirection: string;
       pageNumber: number;
       pageSize: number;
     },

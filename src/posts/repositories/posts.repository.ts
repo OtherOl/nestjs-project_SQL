@@ -1,63 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { createBlogPostModel, postModel } from '../../base/types/posts.model';
 import { commentsModel } from '../../base/types/comments.model';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Post } from '../domain/posts.entity';
 
 @Injectable()
 export class PostsRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(
+    @InjectDataSource() private dataSource: DataSource,
+    @InjectRepository(Post) private postsRepository: Repository<Post>,
+  ) {}
 
-  async createPost(newPost: postModel) {
-    await this.dataSource.query(
-      `
-        INSERT INTO public."Posts"(
-        id, title, "shortDescription", content, "blogId", "blogName", "createdAt", "extendedLikesInfo")
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-    `,
-      [
-        newPost.id,
-        newPost.title,
-        newPost.shortDescription,
-        newPost.content,
-        newPost.blogId,
-        newPost.blogName,
-        newPost.createdAt,
-        {
-          likesCount: newPost.extendedLikesInfo.likesCount,
-          dislikesCount: newPost.extendedLikesInfo.dislikesCount,
-          myStatus: newPost.extendedLikesInfo.myStatus,
-          newestLikes: newPost.extendedLikesInfo.newestLikes,
-        },
-      ],
-    );
-
-    return {
-      id: newPost.id,
-      title: newPost.title,
-      shortDescription: newPost.shortDescription,
-      content: newPost.content,
-      blogId: newPost.blogId,
-      blogName: newPost.blogName,
-      createdAt: newPost.createdAt,
-      extendedLikesInfo: {
-        likesCount: newPost.extendedLikesInfo.likesCount,
-        dislikesCount: newPost.extendedLikesInfo.dislikesCount,
-        myStatus: newPost.extendedLikesInfo.myStatus,
-        newestLikes: newPost.extendedLikesInfo.newestLikes,
-      },
-    };
+  async createPost(newPost: postModel): Promise<postModel> {
+    await this.postsRepository.insert(newPost);
+    return newPost;
   }
 
-  async updatePost(postId: string, inputData: createBlogPostModel) {
-    return await this.dataSource.query(
-      `
-        UPDATE public."Posts"
-        SET title = $1, "shortDescription" = $2, content = $3
-        WHERE id = $4
-    `,
-      [inputData.title, inputData.shortDescription, inputData.content, postId],
-    );
+  async updatePost(postId: string, inputData: createBlogPostModel): Promise<UpdateResult> {
+    return await this.postsRepository.update({ id: postId }, inputData);
+  }
+
+  async deletePostById(postId: string): Promise<DeleteResult> {
+    return await this.postsRepository.delete({ id: postId });
   }
 
   async createComment(newComment: commentsModel) {
@@ -94,16 +59,6 @@ export class PostsRepository {
         myStatus: newComment.likesInfo.myStatus,
       },
     };
-  }
-
-  async deletePostById(postId: string) {
-    return await this.dataSource.query(
-      `
-        DELETE FROM public."Posts"
-        WHERE id = $1
-    `,
-      [postId],
-    );
   }
 
   async addLike(postId: string) {

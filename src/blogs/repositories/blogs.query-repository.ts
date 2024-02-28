@@ -12,10 +12,16 @@ export class BlogsQueryRepository {
   async getAllBlogs(
     searchNameTerm: string,
     sortBy: string = 'createdAt',
-    sortDirection: 'DESC' | 'ASC' | undefined = 'DESC',
+    sortDirection: string,
     pageNumber: number,
     pageSize: number,
-  ) {
+  ): Promise<paginationModel<blogViewModel>> {
+    let sortDir: 'ASC' | 'DESC';
+    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
+      sortDir = 'DESC';
+    } else {
+      sortDir = 'ASC';
+    }
     const countBlogs = await this.blogsRepository
       .createQueryBuilder('b')
       .where('b.name ilike :name', { name: `%${searchNameTerm}%` })
@@ -24,19 +30,18 @@ export class BlogsQueryRepository {
     const foundedBlogs = await this.blogsRepository
       .createQueryBuilder('b')
       .where('b.name ilike :name', { name: `%${searchNameTerm}%` })
-      .orderBy(`b.${sortBy}`, sortDirection)
+      .orderBy(`b.${sortBy}`, sortDir)
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
       .getMany();
 
-    const blogs: paginationModel<blogViewModel> = {
+    return {
       pagesCount: Math.ceil(Number(countBlogs) / pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: Number(countBlogs),
       items: foundedBlogs,
     };
-    return blogs;
   }
 
   async getBlogById(id: string): Promise<blogViewModel | null> {

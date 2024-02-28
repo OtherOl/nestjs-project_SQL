@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Blog } from '../../blogs/domain/blogs.entity';
 
 export class LikesInfo {
   likesCount: number;
@@ -10,21 +12,38 @@ export class LikesInfo {
   newestLikes: [];
 }
 
+@Entity()
 export class Post {
+  @PrimaryColumn()
   id: string;
 
+  @Column()
   title: string;
 
+  @Column()
   shortDescription: string;
 
+  @Column()
   content: string;
 
+  @Column()
   blogId: string;
 
+  @ManyToOne(() => Blog, (b) => b.posts)
+  @JoinColumn({ name: 'blogId' })
+  blogsId: Blog;
+
+  @Column()
   blogName: string;
 
+  // @ManyToOne(() => Blog, (b) => b.posts)
+  // @JoinColumn({ name: 'blogName' })
+  // blogsName: Blog;
+
+  @Column()
   createdAt: string;
 
+  @Column({ type: 'jsonb' })
   extendedLikesInfo: LikesInfo;
 
   static createNewPost(

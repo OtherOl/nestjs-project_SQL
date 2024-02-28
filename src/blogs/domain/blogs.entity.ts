@@ -1,6 +1,7 @@
 import { createBlogModel } from '../../base/types/blogs.model';
 import { v4 as uuidv4 } from 'uuid';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Post } from '../../posts/domain/posts.entity';
 
 @Entity()
 export class Blog {
@@ -21,6 +22,9 @@ export class Blog {
 
   @Column()
   isMembership: boolean;
+
+  @OneToMany(() => Post, (p) => p.blogsId)
+  posts: Post;
 
   static createNewBlog(inputData: createBlogModel) {
     const blog = new Blog();

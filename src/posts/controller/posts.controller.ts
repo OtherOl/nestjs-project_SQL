@@ -115,7 +115,7 @@ export class PostsController {
     const accessToken = request.headers.authorization;
     const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
     const post = await this.postsQueryRepository.getPostByIdSQL(postId);
-    if (!post[0]) throw new NotFoundException("Post doesn't exists");
-    return await this.doPostLikesUseCase.doLikes(userId, post[0], likeStatus.likeStatus);
+    if (!post) throw new NotFoundException("Post doesn't exists");
+    return await this.doPostLikesUseCase.doLikes(userId, post, likeStatus.likeStatus);
   }
 }

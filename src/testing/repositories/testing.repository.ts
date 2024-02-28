@@ -6,6 +6,7 @@ import { AuthWhiteList } from '../../auth/domain/auth-white_list.entity';
 import { Blog } from '../../blogs/domain/blogs.entity';
 import { User } from '../../users/domain/users.entity';
 import { Security } from '../../securityDevices/domain/security.entity';
+import { Post } from '../../posts/domain/posts.entity';
 
 @Injectable()
 export class TestingRepository {
@@ -17,12 +18,11 @@ export class TestingRepository {
     @InjectRepository(Blog) private blogsRepository: Repository<Blog>,
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(Security) private securityRepository: Repository<Security>,
+    @InjectRepository(Post) private postsRepository: Repository<Post>,
   ) {}
 
   async clearDB() {
-    await this.dataSource.query(`
-        DELETE FROM public."Posts"
-    `);
+    await this.postsRepository.delete({});
     await this.blogsRepository.delete({});
     await this.dataSource.query(`
         DELETE FROM public."Comments"

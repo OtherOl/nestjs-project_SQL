@@ -1,42 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { CommentLikes, PostLikes } from '../../base/types/likes.model';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { InsertResult, Repository, UpdateResult } from 'typeorm';
+import { Likes } from '../domain/likes.entity';
 
 @Injectable()
 export class LikesRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(@InjectRepository(Likes) private likesRepository: Repository<Likes>) {}
 
-  async createCommentLike(like: CommentLikes) {
-    return await this.dataSource.query(
-      `
-        INSERT INTO public."Likes"(
-            id, type, "addedAt", "userId", "commentId")
-            VALUES ($1, $2, $3, $4, $5);
-    `,
-      [like.id, like.type, like.addedAt, like.userId, like.commentId],
-    );
+  async createCommentLike(like: CommentLikes): Promise<InsertResult> {
+    return await this.likesRepository.insert(like);
   }
 
-  async createPostLike(like: PostLikes) {
-    return await this.dataSource.query(
-      `
-        INSERT INTO public."Likes"(
-            id, type, "addedAt", "userId", "postId", login)
-            VALUES ($1, $2, $3, $4, $5, $6);
-    `,
-      [like.id, like.type, like.addedAt, like.userId, like.postId, like.login],
-    );
+  async createPostLike(like: PostLikes): Promise<InsertResult> {
+    return await this.likesRepository.insert(like);
   }
 
-  async updateLike(likeId: string, type: string) {
-    return await this.dataSource.query(
-      `
-        UPDATE public."Likes"
-        SET type = $1
-        WHERE id = $2
-    `,
-      [type, likeId],
-    );
+  async updateLike(likeId: string, type: string): Promise<UpdateResult> {
+    return await this.likesRepository.update({ id: likeId }, { type });
   }
 }

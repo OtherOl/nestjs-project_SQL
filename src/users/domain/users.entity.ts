@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns/add';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Security } from '../../securityDevices/domain/security.entity';
+import { Likes } from '../../likes/domain/likes.entity';
 
 export class EmailConfirmation {
   confirmationCode: string;
@@ -41,6 +42,9 @@ export class User {
 
   @OneToMany(() => Security, (s) => s.userId)
   sessions: Security[];
+
+  @OneToMany(() => Likes, (l) => l.usersId)
+  likes: Likes;
 
   static createNewUser(login: string, email: string, passwordHash: string, isConfirmed: boolean) {
     const user = new User();

@@ -1,71 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Likes } from '../domain/likes.entity';
 
 @Injectable()
 export class LikesQueryRepository {
-  constructor(@InjectDataSource() private dataSource: DataSource) {}
+  constructor(@InjectRepository(Likes) private likesRepository: Repository<Likes>) {}
 
-  async getLikeByCommentId(userId: string, commentId: string) {
-    return await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Likes"
-        WHERE "commentId" = $1
-        AND "userId" = $2
-    `,
-      [commentId, userId],
-    );
+  async getLikeByCommentId(userId: string, commentId: string): Promise<Likes | null> {
+    return await this.likesRepository.findOneBy({ userId, commentId });
   }
 
-  async getLikeByUserId(userId: string) {
-    return await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Likes"
-        WHERE "userId" = $1
-    `,
-      [userId],
-    );
+  async getLikeByUserId(userId: string): Promise<Likes[] | null> {
+    return await this.likesRepository.findBy({ userId });
   }
 
-  async getLikeByPostId(userId: string, postId: string) {
-    const like = await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Likes"
-        WHERE "userId" = $1 
-        AND "postId" = $2
-    `,
-      [userId, postId],
-    );
-    return like[0];
+  async getLikeByPostId(userId: string, postId: string): Promise<Likes | null> {
+    return await this.likesRepository.findOneBy({ userId, postId });
   }
 
-  async getNewestLikes(type: string) {
-    return await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Likes"
-        WHERE "postId" IS NOT NULL
-        AND type = $1
-        ORDER BY "addedAt" DESC
-    `,
-      [type],
-    );
+  async getNewestLikes(type: string): Promise<Likes[] | null> {
+    return await this.likesRepository
+      .createQueryBuilder('l')
+      .select()
+      .where('l.postId IS NOT NULL')
+      .andWhere('l.type = :type', { type })
+      .orderBy('l.addedAt', 'DESC')
+      .limit(3)
+      .getMany();
   }
 
-  async getNewestLikeForCurrentPost(postId: string, type: string) {
-    return await this.dataSource.query(
-      `
-        SELECT "addedAt", "userId", login
-        FROM public."Likes"
-        WHERE "postId" = $1
-        AND type = $2
-        ORDER BY "addedAt" DESC
-        LIMIT 3
-    `,
-      [postId, type],
-    );
+  async getNewestLikeForCurrentPost(postId: string, type: string): Promise<Likes[] | null> {
+    return await this.likesRepository
+      .createQueryBuilder('l')
+      .select(['l.addedAt', 'l.userId', 'l.login'])
+      .where('l.postId = :postId', { postId })
+      .andWhere('l.type = :type', { type })
+      .orderBy('l.addedAt', 'DESC')
+      .limit(3)
+      .getMany();
   }
 }

@@ -1,18 +1,37 @@
 import { v4 as uuidv4 } from 'uuid';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Post } from '../../posts/domain/posts.entity';
+import { User } from '../../users/domain/users.entity';
 
+@Entity()
 export class Likes {
+  @PrimaryColumn()
   id: string;
 
+  @Column()
   type: string;
 
+  @Column()
   addedAt: string;
 
+  @Column()
   userId: string;
 
+  @ManyToOne(() => User, (u) => u.likes)
+  @JoinColumn({ name: 'userId' })
+  usersId: User;
+
+  @Column({ nullable: true })
   postId: string;
 
+  @ManyToOne(() => Post, (p) => p.likes)
+  @JoinColumn({ name: 'postId' })
+  postsId: Post;
+
+  @Column({ nullable: true })
   commentId: string;
 
+  @Column()
   login: string;
 
   static createCommentLike(userId: string, commentId: string, type: string) {

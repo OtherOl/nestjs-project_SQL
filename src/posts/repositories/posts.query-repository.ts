@@ -48,11 +48,15 @@ export class PostsQueryRepository {
     const like = await this.likesQueryRepository.getLikeByUserId(userId);
     const commentsQuery: any[] = foundedComments.map((comment) => {
       let likeStatus: string;
-      const status = like.find((like) => like.commentId === comment.id);
-      if (!status) {
+      if (!like) {
         likeStatus = 'None';
       } else {
-        likeStatus = status.type;
+        const status = like.find((like) => like.commentId === comment.id);
+        if (!status) {
+          likeStatus = 'None';
+        } else {
+          likeStatus = status.type;
+        }
       }
 
       return {
@@ -104,24 +108,34 @@ export class PostsQueryRepository {
       .offset((pageNumber - 1) * pageSize)
       .getMany();
     const like = await this.likesQueryRepository.getLikeByUserId(userId);
-    const likes: any[] = await this.likesQueryRepository.getNewestLikes('Like');
+    const likes = await this.likesQueryRepository.getNewestLikes('Like');
 
     const postsQuery: any[] = foundedPosts.map((post) => {
       let likeStatus: string;
-      const status = like.find((l) => l.postId === post.id);
-      if (!status) {
+      if (!like) {
         likeStatus = 'None';
       } else {
-        likeStatus = status.type;
+        const status = like.find((l) => l.postId === post.id);
+        if (!status) {
+          likeStatus = 'None';
+        } else {
+          likeStatus = status.type;
+        }
       }
-      const newestLikes = likes
-        .filter((l) => l.postId === post.id)
-        .map((like) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { postId, id, type, commentId, ...rest } = like;
-          return rest;
-        })
-        .slice(0, 3);
+
+      let newestLikes;
+
+      if (!likes) {
+        newestLikes = [];
+      } else {
+        newestLikes = likes
+          .filter((l) => l.postId === post.id)
+          .map((like) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { postId, id, type, commentId, ...rest } = like;
+            return rest;
+          });
+      }
 
       return {
         id: post.id,
@@ -181,25 +195,34 @@ export class PostsQueryRepository {
       .getMany();
 
     const postLike = await this.likesQueryRepository.getLikeByUserId(userId);
-    const likes: any[] = await this.likesQueryRepository.getNewestLikes('Like');
+    const likes = await this.likesQueryRepository.getNewestLikes('Like');
 
     const postsQuery: any[] = foundedPosts.map((post) => {
       let likeStatus: string;
-      const postStatus = postLike.find((l) => l.postId === post.id);
-
-      if (!postStatus) {
+      if (!postLike) {
         likeStatus = 'None';
       } else {
-        likeStatus = postStatus.type;
+        const postStatus = postLike.find((l) => l.postId === post.id);
+        if (!postStatus) {
+          likeStatus = 'None';
+        } else {
+          likeStatus = postStatus.type;
+        }
       }
-      const newestPostLikes = likes
-        .filter((l) => l.postId === post.id)
-        .map((like) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { postId, id, type, commentId, ...rest } = like;
-          return rest;
-        })
-        .slice(0, 3);
+
+      let newestPostLikes;
+
+      if (!likes) {
+        newestPostLikes = [];
+      } else {
+        newestPostLikes = likes
+          .filter((l) => l.postId === post.id)
+          .map((like) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { postId, id, type, commentId, ...rest } = like;
+            return rest;
+          });
+      }
 
       return {
         id: post.id,
@@ -241,7 +264,9 @@ export class PostsQueryRepository {
     const like = await this.likesQueryRepository.getLikeByPostId(userId, postId);
     if (!post) throw new NotFoundException("Post doesn't exists");
     like ? (likeStatus = like.type) : (likeStatus = 'None');
-    const newestLikes = await this.likesQueryRepository.getNewestLikeForCurrentPost(postId, 'Like');
+    const likes = await this.likesQueryRepository.getNewestLikeForCurrentPost(postId, 'Like');
+    let newestLikes;
+    likes ? (newestLikes = likes) : (newestLikes = []);
 
     return {
       id: post.id,

@@ -17,52 +17,52 @@ export class DoLikesUseCase {
   async doLikes(userId: string, comment: CommentViewModel, likeStatus: string) {
     const like = await this.likesQueryRepository.getLikeByCommentId(userId, comment.id);
     if (likeStatus === 'Like') {
-      if (!like[0]) {
+      if (!like) {
         await this.likesService.createNewCommentLike(userId, comment.id, 'Like');
         await this.commentsRepository.addLike(comment.id);
         return;
       }
-      if (like[0].type === 'Dislike') {
-        await this.likesRepository.updateLike(like[0].id, 'Like');
+      if (like.type === 'Dislike') {
+        await this.likesRepository.updateLike(like.id, 'Like');
         await this.commentsRepository.decreaseDislike(comment.id);
         await this.commentsRepository.addLike(comment.id);
         return;
       }
-      if (like[0].type === 'None') {
-        await this.likesRepository.updateLike(like[0].id, 'Like');
+      if (like.type === 'None') {
+        await this.likesRepository.updateLike(like.id, 'Like');
         await this.commentsRepository.addLike(comment.id);
         return;
       }
     }
 
     if (likeStatus === 'Dislike') {
-      if (!like[0]) {
+      if (!like) {
         await this.likesService.createNewCommentLike(userId, comment.id, 'Dislike');
         await this.commentsRepository.addDislike(comment.id);
         return;
       }
-      if (like[0].type === 'Like') {
-        await this.likesRepository.updateLike(like[0].id, 'Dislike');
+      if (like.type === 'Like') {
+        await this.likesRepository.updateLike(like.id, 'Dislike');
         await this.commentsRepository.decreaseLike(comment.id);
         await this.commentsRepository.addDislike(comment.id);
         return;
       }
-      if (like[0].type === 'None') {
-        await this.likesRepository.updateLike(like[0].id, 'Dislike');
+      if (like.type === 'None') {
+        await this.likesRepository.updateLike(like.id, 'Dislike');
         await this.commentsRepository.addDislike(comment.id);
         return;
       }
     }
 
     if (likeStatus === 'None') {
-      if (!like[0]) return;
-      if (like[0].type === 'Like') {
-        await this.likesRepository.updateLike(like[0].id, 'None');
+      if (!like) return;
+      if (like.type === 'Like') {
+        await this.likesRepository.updateLike(like.id, 'None');
         await this.commentsRepository.decreaseLike(comment.id);
         return;
       }
-      if (like[0].type === 'Dislike') {
-        await this.likesRepository.updateLike(like[0].id, 'None');
+      if (like.type === 'Dislike') {
+        await this.likesRepository.updateLike(like.id, 'None');
         await this.commentsRepository.decreaseDislike(comment.id);
         return;
       }

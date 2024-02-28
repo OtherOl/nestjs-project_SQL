@@ -15,7 +15,7 @@ export class UsersQueryRepository {
     pageSize: number,
     searchLoginTerm: string,
     searchEmailTerm: string,
-  ) {
+  ): Promise<paginationModel<userModel>> {
     let sortDir: 'ASC' | 'DESC';
     if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
       sortDir = 'DESC';
@@ -38,18 +38,16 @@ export class UsersQueryRepository {
       .offset((pageNumber - 1) * pageSize)
       .getMany();
 
-    const users: paginationModel<userModel> = {
+    return {
       pagesCount: Math.ceil(countUsers / pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: countUsers,
       items: foundUsers,
     };
-
-    return users;
   }
 
-  async getUserById(id: string) {
+  async getUserById(id: string): Promise<User | null> {
     return await this.usersRepository
       .createQueryBuilder('u')
       .select([`u.id`, 'u.login', 'u.email', `u.createdAt`])

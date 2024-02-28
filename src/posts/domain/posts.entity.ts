@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 import { Blog } from '../../blogs/domain/blogs.entity';
+import { Likes } from '../../likes/domain/likes.entity';
+import { Comment } from '../../comments/domain/comments.entity';
 
 export class LikesInfo {
   likesCount: number;
@@ -45,6 +47,12 @@ export class Post {
 
   @Column({ type: 'jsonb' })
   extendedLikesInfo: LikesInfo;
+
+  @OneToMany(() => Likes, (l) => l.postsId)
+  likes: Likes;
+
+  @OneToMany(() => Comment, (c) => c.postId)
+  comments: Comment;
 
   static createNewPost(
     title: string,

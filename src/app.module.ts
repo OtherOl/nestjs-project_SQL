@@ -68,6 +68,8 @@ import { AuthWhiteList } from './auth/domain/auth-white_list.entity';
 import { AuthBlackList } from './auth/domain/auth-black_list.entity';
 import { Security } from './securityDevices/domain/security.entity';
 import { Post } from './posts/domain/posts.entity';
+import { Likes } from './likes/domain/likes.entity';
+import { Comment } from './comments/domain/comments.entity';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -121,7 +123,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
       synchronize: true,
       ssl: true,
     }),
-    TypeOrmModule.forFeature([Blog, User, AuthWhiteList, AuthBlackList, Security, Post]),
+    TypeOrmModule.forFeature([Blog, User, AuthWhiteList, AuthBlackList, Security, Post, Likes, Comment]),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',

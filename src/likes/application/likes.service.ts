@@ -6,8 +6,8 @@ import { LikesRepository } from '../repositories/likes.repository';
 export class LikesService {
   constructor(private likesRepository: LikesRepository) {}
 
-  async createNewCommentLike(userId: string, commentId: string, type: string) {
-    const like = Likes.createCommentLike(userId, commentId, type);
+  async createNewCommentLike(userId: string, commentId: string, type: string, login: string) {
+    const like = Likes.createCommentLike(userId, commentId, type, login);
     await this.likesRepository.createCommentLike(like);
     return like;
   }

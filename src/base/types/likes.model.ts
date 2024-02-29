@@ -24,6 +24,7 @@ export class CommentLikes {
   userId: string;
   commentId: string;
   addedAt: string;
+  login: string;
 }
 
 export class PostLikes {

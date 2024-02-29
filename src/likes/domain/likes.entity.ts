@@ -34,7 +34,7 @@ export class Likes {
   @Column()
   login: string;
 
-  static createCommentLike(userId: string, commentId: string, type: string) {
+  static createCommentLike(userId: string, commentId: string, type: string, login: string) {
     const commentLike = new Likes();
 
     commentLike.id = uuidv4();
@@ -42,6 +42,7 @@ export class Likes {
     commentLike.userId = userId;
     commentLike.commentId = commentId;
     commentLike.addedAt = new Date().toISOString();
+    commentLike.login = login;
 
     return commentLike;
   }

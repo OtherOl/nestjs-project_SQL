@@ -4,6 +4,7 @@ import { LikesService } from '../../likes/application/likes.service';
 import { CommentsRepository } from '../repositories/comments.repository';
 import { LikesRepository } from '../../likes/repositories/likes.repository';
 import { CommentViewModel } from '../../base/types/comments.model';
+import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
 
 @Injectable()
 export class DoLikesUseCase {
@@ -12,13 +13,15 @@ export class DoLikesUseCase {
     private likesRepository: LikesRepository,
     private likesService: LikesService,
     private commentsRepository: CommentsRepository,
+    private usersQueryRepository: UsersQueryRepository,
   ) {}
 
   async doLikes(userId: string, comment: CommentViewModel, likeStatus: string) {
     const like = await this.likesQueryRepository.getLikeByCommentId(userId, comment.id);
+    const user = await this.usersQueryRepository.getUserById(userId);
     if (likeStatus === 'Like') {
       if (!like) {
-        await this.likesService.createNewCommentLike(userId, comment.id, 'Like');
+        await this.likesService.createNewCommentLike(userId, comment.id, 'Like', user!.login);
         await this.commentsRepository.addLike(comment.id);
         return;
       }
@@ -37,7 +40,7 @@ export class DoLikesUseCase {
 
     if (likeStatus === 'Dislike') {
       if (!like) {
-        await this.likesService.createNewCommentLike(userId, comment.id, 'Dislike');
+        await this.likesService.createNewCommentLike(userId, comment.id, 'Dislike', user!.login);
         await this.commentsRepository.addDislike(comment.id);
         return;
       }

@@ -54,7 +54,7 @@ export class CommentsController {
   ) {
     const accessToken = request.headers.authorization;
     const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
-    const comment = await this.commentsQueryRepository.getCommentById(commentId); //был userId
+    const comment = await this.commentsQueryRepository.getCommentById(commentId);
     return await this.doLikesUseCase.doLikes(userId, comment, likeStatus.likeStatus);
   }
 

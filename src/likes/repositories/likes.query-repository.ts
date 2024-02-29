@@ -26,7 +26,6 @@ export class LikesQueryRepository {
       .where('l.postId IS NOT NULL')
       .andWhere('l.type = :type', { type })
       .orderBy('l.addedAt', 'DESC')
-      .limit(3)
       .getMany();
   }
 

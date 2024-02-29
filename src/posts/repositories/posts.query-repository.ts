@@ -3,16 +3,17 @@ import { postModel } from '../../base/types/posts.model';
 import { paginationModel } from '../../base/types/pagination.model';
 import { commentsModel } from '../../base/types/comments.model';
 import { LikesQueryRepository } from '../../likes/repositories/likes.query-repository';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Post } from '../domain/posts.entity';
+import { Comment } from '../../comments/domain/comments.entity';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
-    @InjectDataSource() private dataSource: DataSource,
-    private likesQueryRepository: LikesQueryRepository,
     @InjectRepository(Post) private postsRepository: Repository<Post>,
+    @InjectRepository(Comment) private commentsRepository: Repository<Comment>,
+    private likesQueryRepository: LikesQueryRepository,
   ) {}
 
   async getCommentsByPostId(
@@ -22,28 +23,28 @@ export class PostsQueryRepository {
     pageNumber: number,
     pageSize: number,
     userId: string,
-  ) {
-    const countComments = await this.dataSource.query(
-      `
-        SELECT COUNT(*)
-        FROM public."Comments"
-        WHERE "postId" = $1
-    `,
-      [postId],
-    );
-    if (Number(countComments[0].count) === 0)
-      throw new NotFoundException("Comments with this id aren't exists");
+  ): Promise<paginationModel<commentsModel>> {
+    let sortDir: 'ASC' | 'DESC';
+    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
+      sortDir = 'DESC';
+    } else {
+      sortDir = 'ASC';
+    }
+    const countComments = await this.commentsRepository
+      .createQueryBuilder('c')
+      .select()
+      .where('c.postId = :postId', { postId })
+      .getCount();
+    if (countComments === 0) throw new NotFoundException("Comments with this id aren't exists");
 
-    const foundedComments = await this.dataSource.query(
-      `
-        SELECT *
-        FROM public."Comments"
-        WHERE "postId" = $1
-        ORDER BY "${sortBy}" ${sortDirection}
-        LIMIT $2 OFFSET $3
-    `,
-      [postId, pageSize, (pageNumber - 1) * pageSize],
-    );
+    const foundedComments = await this.commentsRepository
+      .createQueryBuilder('c')
+      .select()
+      .where('c.postId = :postId', { postId })
+      .orderBy(`c.${sortBy}`, sortDir)
+      .limit(pageSize)
+      .offset((pageNumber - 1) * pageSize)
+      .getMany();
 
     const like = await this.likesQueryRepository.getLikeByUserId(userId);
     const commentsQuery: any[] = foundedComments.map((comment) => {
@@ -75,14 +76,13 @@ export class PostsQueryRepository {
       };
     });
 
-    const posts: paginationModel<commentsModel> = {
-      pagesCount: Math.ceil(Number(countComments[0].count) / pageSize),
+    return {
+      pagesCount: Math.ceil(countComments / pageSize),
       page: pageNumber,
       pageSize: pageSize,
-      totalCount: Number(countComments[0].count),
+      totalCount: countComments,
       items: commentsQuery,
     };
-    return posts;
   }
 
   async getAllPosts(
@@ -91,7 +91,7 @@ export class PostsQueryRepository {
     pageNumber: number,
     pageSize: number,
     userId: string,
-  ) {
+  ): Promise<paginationModel<postModel>> {
     let sortDir: 'ASC' | 'DESC';
     if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
       sortDir = 'DESC';
@@ -134,7 +134,8 @@ export class PostsQueryRepository {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { postId, id, type, commentId, ...rest } = like;
             return rest;
-          });
+          })
+          .slice(0, 3);
       }
 
       return {
@@ -153,14 +154,13 @@ export class PostsQueryRepository {
         },
       };
     });
-    const posts: paginationModel<postModel> = {
+    return {
       pagesCount: Math.ceil(countPosts / pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: countPosts,
       items: postsQuery,
     };
-    return posts;
   }
 
   async getAllPostsByBlogId(
@@ -221,7 +221,8 @@ export class PostsQueryRepository {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { postId, id, type, commentId, ...rest } = like;
             return rest;
-          });
+          })
+          .slice(0, 3);
       }
 
       return {

@@ -8,8 +8,6 @@ import {
 } from '../../base/types/users.model';
 import { AuthService } from '../application/auth.service';
 import { Request, Response } from 'express';
-import { AuthBlackListRepository } from '../repositories/auth-black-list-repository.service';
-import { SecurityRepository } from '../../securityDevices/repositories/security.repository';
 import { CreateUserForRegistrationUseCase } from '../../users/use-cases/createUserForRegistration.use-case';
 import { CreateNewPasswordUseCase } from '../../users/use-cases/createNewPassword.use-case';
 import { CheckCredentialsUseCase } from '../use-cases/checkCredentials.use-case';
@@ -18,32 +16,28 @@ import { ResendConfirmationUseCase } from '../use-cases/resendConfirmation.use-c
 import { PasswordRecoveryCodeUseCase } from '../use-cases/passwordRecoveryCode.use-case';
 import { SkipThrottle } from '@nestjs/throttler';
 import { AccessTokenGuard } from '../guards/accessToken.guard';
-import { UsersQueryRepository } from '../../users/repositories/users.query-repository';
-import { GetDeviceIdUseCase } from '../use-cases/getDeviceId.use-case';
 import { RefreshTokenGuard } from '../guards/refreshToken.guard';
-import { AuthWhiteListRepository } from '../repositories/auth-white_list.repository';
 import { CreateRefreshTokenUseCase } from '../use-cases/createRefreshToken.use-case';
-import { CreateNewRefreshTokenUseCase } from '../use-cases/createNewRefreshToken.use-case';
 import { CreateSessionUseCase } from '../../securityDevices/use-cases/createSession.use-case';
+import { GetProfileUseCase } from '../use-cases/getProfile-use.case';
+import { LogoutUseCase } from '../use-cases/logout.use-case';
+import { RefreshTokenUseCase } from '../use-cases/refreshToken.use-case';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private securityRepository: SecurityRepository,
     private authService: AuthService,
-    private authBlackListRepository: AuthBlackListRepository,
-    private authWhiteListRepository: AuthWhiteListRepository,
-    private usersQueryRepository: UsersQueryRepository,
     private createUserForRegistrationUseCase: CreateUserForRegistrationUseCase,
     private createNewPasswordUseCase: CreateNewPasswordUseCase,
     private checkCredentialsUseCase: CheckCredentialsUseCase,
     private confirmEmailUseCase: ConfirmEmailUseCase,
     private resendConfirmationUseCase: ResendConfirmationUseCase,
     private passwordRecoveryCodeUseCase: PasswordRecoveryCodeUseCase,
-    private getDeviceIdUseCase: GetDeviceIdUseCase,
     private createRefreshTokenUseCase: CreateRefreshTokenUseCase,
-    private createNewRefreshTokenUseCase: CreateNewRefreshTokenUseCase,
     private createSessionUseCase: CreateSessionUseCase,
+    private getProfileUseCase: GetProfileUseCase,
+    private logoutUseCase: LogoutUseCase,
+    private refreshTokenUseCase: RefreshTokenUseCase,
   ) {}
 
   @HttpCode(204)
@@ -77,24 +71,12 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @Post('refresh-token')
   async refreshToken(@Req() request: Request, @Res() response: Response) {
-    const refreshToken = request.cookies.refreshToken;
-    const verify = await this.authService.verifyToken(refreshToken);
-    const userId = await this.authService.getUserIdByToken(refreshToken);
-    await this.authWhiteListRepository.deleteToken(refreshToken);
-    await this.authBlackListRepository.blackList(refreshToken);
-
-    const accessToken = await this.authService.createAccessToken(userId);
-    const newRefreshToken = await this.createNewRefreshTokenUseCase.createNewRefreshToken(
-      userId,
-      verify.deviceId,
-    );
-
-    await this.securityRepository.updateSession(verify.deviceId);
-    response.cookie('refreshToken', newRefreshToken, {
+    const token = await this.refreshTokenUseCase.refreshToken(request.cookies.refreshToken);
+    response.cookie('refreshToken', token.newRefreshToken, {
       httpOnly: true,
       secure: true,
     });
-    return response.send({ accessToken: accessToken });
+    return response.send({ accessToken: token.accessToken });
   }
 
   @HttpCode(204)
@@ -120,11 +102,7 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @Post('logout')
   async logout(@Req() request: Request, @Res() response: Response) {
-    const refreshToken = request.cookies.refreshToken;
-    const deviceId = await this.getDeviceIdUseCase.getDeviceId(refreshToken);
-    await this.authBlackListRepository.blackList(refreshToken);
-    await this.authWhiteListRepository.deleteToken(refreshToken);
-    await this.securityRepository.deleteSpecifiedSession(deviceId);
+    await this.logoutUseCase.logout(request.cookies.refreshToken);
     return response.clearCookie('refreshToken').sendStatus(204);
   }
 
@@ -133,9 +111,7 @@ export class AuthController {
   @HttpCode(200)
   @Get('me')
   async getProfile(@Req() request: Request) {
-    const accessToken = request.headers.authorization;
-    const userId = await this.authService.getUserIdByToken(accessToken?.split(' ')[1]);
-    const user = await this.usersQueryRepository.getUserById(userId);
+    const user = await this.getProfileUseCase.profile(request.headers.authorization!);
     return {
       email: user!.email,
       login: user!.login,

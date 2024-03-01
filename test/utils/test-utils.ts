@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../src/app.module';
-import { appSettings } from '../src/settings';
+import { AppModule } from '../../src/app.module';
+import { appSettings } from '../../src/settings';
 import request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 
@@ -17,3 +17,27 @@ export async function beforeGetAppAndCleanDb() {
 
   return app;
 }
+
+export const blogModel = (name: string, desc: string, web: string) => {
+  return {
+    name: name,
+    description: desc,
+    websiteUrl: web,
+  };
+};
+
+export const userCreateModel = (login: string, password: string, email: string) => {
+  return {
+    login,
+    password,
+    email,
+  };
+};
+
+export const postCreateModel = (title: string, shortDescription: string, content: string) => {
+  return {
+    title,
+    shortDescription,
+    content,
+  };
+};

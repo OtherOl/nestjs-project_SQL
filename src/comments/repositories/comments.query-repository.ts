@@ -16,7 +16,7 @@ export class CommentsQueryRepository {
     const comment = await this.commentsRepository.findOneBy({ id });
     if (!comment) throw new NotFoundException("Comment doesn't exists");
 
-    let likeStatus = '';
+    let likeStatus: string;
 
     const like = await this.likesQueryRepository.getLikeByCommentId(userId, comment.id);
     if (!like) {

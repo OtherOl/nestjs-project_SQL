@@ -4,6 +4,7 @@ import { paginationModel } from '../../base/types/pagination.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../domain/users.entity';
+import { sortDirectionHelper } from '../../base/helpers/sortDirection.helper';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -16,12 +17,7 @@ export class UsersQueryRepository {
     searchLoginTerm: string,
     searchEmailTerm: string,
   ): Promise<paginationModel<userModel>> {
-    let sortDir: 'ASC' | 'DESC';
-    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
-      sortDir = 'DESC';
-    } else {
-      sortDir = 'ASC';
-    }
+    const sortDir = sortDirectionHelper(sortDirection);
     const countUsers = await this.usersRepository
       .createQueryBuilder('u')
       .where('u.login ilike :login', { login: `%${searchLoginTerm}%` })
@@ -55,7 +51,7 @@ export class UsersQueryRepository {
       .getOne();
   }
 
-  async findByLoginOrEmail(loginOrEmail: string) {
+  async findByLoginOrEmail(loginOrEmail: string): Promise<User | null> {
     return await this.usersRepository
       .createQueryBuilder('u')
       .select([

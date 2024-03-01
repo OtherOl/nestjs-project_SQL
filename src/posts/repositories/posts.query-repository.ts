@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from '../domain/posts.entity';
 import { Comment } from '../../comments/domain/comments.entity';
+import { sortDirectionHelper } from '../../base/helpers/sortDirection.helper';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -24,12 +25,7 @@ export class PostsQueryRepository {
     pageSize: number,
     userId: string,
   ): Promise<paginationModel<commentsModel>> {
-    let sortDir: 'ASC' | 'DESC';
-    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
-      sortDir = 'DESC';
-    } else {
-      sortDir = 'ASC';
-    }
+    const sortDir = sortDirectionHelper(sortDirection);
     const countComments = await this.commentsRepository
       .createQueryBuilder('c')
       .select()
@@ -92,12 +88,7 @@ export class PostsQueryRepository {
     pageSize: number,
     userId: string,
   ): Promise<paginationModel<postModel>> {
-    let sortDir: 'ASC' | 'DESC';
-    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
-      sortDir = 'DESC';
-    } else {
-      sortDir = 'ASC';
-    }
+    const sortDir = sortDirectionHelper(sortDirection);
     const countPosts: number = await this.postsRepository.createQueryBuilder().select().getCount();
 
     const foundedPosts = await this.postsRepository
@@ -123,7 +114,7 @@ export class PostsQueryRepository {
         }
       }
 
-      let newestLikes;
+      let newestLikes: any[];
 
       if (!likes) {
         newestLikes = [];
@@ -171,12 +162,7 @@ export class PostsQueryRepository {
     pageSize: number,
     userId: string,
   ): Promise<paginationModel<postModel>> {
-    let sortDir: 'ASC' | 'DESC';
-    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
-      sortDir = 'DESC';
-    } else {
-      sortDir = 'ASC';
-    }
+    const sortDir = sortDirectionHelper(sortDirection);
     const countPosts: number = await this.postsRepository
       .createQueryBuilder('p')
       .select()
@@ -210,7 +196,7 @@ export class PostsQueryRepository {
         }
       }
 
-      let newestPostLikes;
+      let newestPostLikes: any[];
 
       if (!likes) {
         newestPostLikes = [];

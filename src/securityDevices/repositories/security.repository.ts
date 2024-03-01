@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { securityViewModel } from '../../base/types/security.model';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, InsertResult, Repository, UpdateResult } from 'typeorm';
 import { Security } from '../domain/security.entity';
 
 @Injectable()
 export class SecurityRepository {
   constructor(@InjectRepository(Security) private securityRepository: Repository<Security>) {}
 
-  async deleteAllSessions(deviceId: string): Promise<any> {
+  async deleteAllSessions(deviceId: string): Promise<DeleteResult> {
     return await this.securityRepository
       .createQueryBuilder()
       .delete()
@@ -17,15 +17,15 @@ export class SecurityRepository {
       .execute();
   }
 
-  async createSession(newSession: securityViewModel) {
+  async createSession(newSession: securityViewModel): Promise<InsertResult> {
     return await this.securityRepository.insert(newSession);
   }
 
-  async updateSession(deviceId: string) {
+  async updateSession(deviceId: string): Promise<UpdateResult> {
     return await this.securityRepository.update({ deviceId }, { lastActiveDate: new Date().toISOString() });
   }
 
-  async deleteSpecifiedSession(deviceId: string) {
+  async deleteSpecifiedSession(deviceId: string): Promise<DeleteResult> {
     return await this.securityRepository.delete({ deviceId });
   }
 }

@@ -70,6 +70,10 @@ import { Security } from './securityDevices/domain/security.entity';
 import { Post } from './posts/domain/posts.entity';
 import { Likes } from './likes/domain/likes.entity';
 import { Comment } from './comments/domain/comments.entity';
+import { GetProfileUseCase } from './auth/use-cases/getProfile-use.case';
+import { LogoutUseCase } from './auth/use-cases/logout.use-case';
+import { RefreshTokenUseCase } from './auth/use-cases/refreshToken.use-case';
+import { DeleteSessionByIdUseCase } from './securityDevices/use-cases/deleteSessionById.use-case';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -80,6 +84,7 @@ const authUseCases = [
   PasswordRecoveryCodeUseCase,
   ResendConfirmationUseCase,
   GetDeviceIdUseCase,
+  GetProfileUseCase,
 ];
 
 const blogsUseCases = [
@@ -89,6 +94,8 @@ const blogsUseCases = [
   DeleteBlogUseCase,
   DeletePostByBlogIdUseCase,
   UpdatePostByBlogIdUseCase,
+  LogoutUseCase,
+  RefreshTokenUseCase,
 ];
 
 const commentsUseCases = [DoLikesUseCase, UpdateCommentUseCase, DeleteCommentUseCase];
@@ -102,7 +109,7 @@ const usersUseCases = [
   DeleteUserUseCase,
 ];
 
-const securityUseCases = [CreateSessionUseCase, DeleteTokensExceptOneUseCase];
+const securityUseCases = [CreateSessionUseCase, DeleteTokensExceptOneUseCase, DeleteSessionByIdUseCase];
 
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 
@@ -122,6 +129,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
       autoLoadEntities: true,
       synchronize: true,
       ssl: true,
+      //      logging: ['query'],
     }),
     TypeOrmModule.forFeature([Blog, User, AuthWhiteList, AuthBlackList, Security, Post, Likes, Comment]),
     MailerModule.forRoot({

@@ -15,13 +15,12 @@ export class SecurityQueryRepository {
       .getMany();
   }
 
-  async getSessionById(deviceId: string) {
+  async getSessionById(deviceId: string): Promise<Security> {
     const session = await this.securityRepository
       .createQueryBuilder('s')
       .select()
       .where('s.deviceId = :deviceId', { deviceId })
       .getOne();
-    console.log(session);
     if (!session) {
       throw new NotFoundException("Session doesn't exists");
     } else {

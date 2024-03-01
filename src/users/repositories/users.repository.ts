@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { userModel } from '../../base/types/users.model';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { add } from 'date-fns/add';
 import { User } from '../domain/users.entity';
 
@@ -19,15 +19,15 @@ export class UsersRepository {
     };
   }
 
-  async deleteUser(id: string) {
+  async deleteUser(id: string): Promise<DeleteResult> {
     return await this.usersRepository.delete({ id });
   }
 
-  async updateConfirmation(userId: string) {
+  async updateConfirmation(userId: string): Promise<UpdateResult> {
     return await this.usersRepository.update({ id: userId }, { isConfirmed: true });
   }
 
-  async changeConfirmationCode(userId: string, code: string) {
+  async changeConfirmationCode(userId: string, code: string): Promise<UpdateResult> {
     const newExpDate = add(new Date(), { minutes: 3 }).toISOString();
     await this.usersRepository
       .createQueryBuilder()
@@ -48,7 +48,7 @@ export class UsersRepository {
       .execute();
   }
 
-  async updatePassword(userId: string, passwordHash: string) {
+  async updatePassword(userId: string, passwordHash: string): Promise<UpdateResult> {
     return await this.usersRepository.update({ id: userId }, { passwordHash });
   }
 }

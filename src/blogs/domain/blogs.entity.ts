@@ -23,7 +23,7 @@ export class Blog {
   @Column()
   isMembership: boolean;
 
-  @OneToMany(() => Post, (p) => p.blogsId)
+  @OneToMany(() => Post, (p) => p.blogsId, { onDelete: 'CASCADE' })
   posts: Post;
 
   static createNewBlog(inputData: createBlogModel) {

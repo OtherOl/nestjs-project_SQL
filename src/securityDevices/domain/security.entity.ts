@@ -22,7 +22,7 @@ export class Security {
   @Column()
   userId: string;
 
-  @ManyToOne(() => User, (u) => u.sessions)
+  @ManyToOne(() => User, (u) => u.sessions, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 

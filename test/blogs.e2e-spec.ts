@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { beforeGetAppAndCleanDb } from './test-utils';
+import { beforeGetAppAndCleanDb, blogModel } from './utils/test-utils';
 import { blogViewModel } from '../src/base/types/blogs.model';
 
 describe('Testing Blogs', () => {
@@ -13,14 +13,6 @@ describe('Testing Blogs', () => {
   afterAll(async () => {
     await app.close();
   });
-
-  const blogModel = (name: string, desc: string, web: string) => {
-    return {
-      name: name,
-      description: desc,
-      websiteUrl: web,
-    };
-  };
 
   it("shouldn't create newBlog => 401 status", async () => {
     const createdBlog = await request(app.getHttpServer())

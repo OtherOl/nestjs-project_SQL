@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AuthBlackListRepository } from './auth-black-list-repository.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { AuthWhiteList } from '../domain/auth-white_list.entity';
 
 @Injectable()
@@ -16,17 +16,17 @@ export class AuthWhiteListRepository {
     return await this.authWhiteListRepository.insert({ token, userId, deviceId });
   }
 
-  async deleteToken(token: string) {
+  async deleteToken(token: string): Promise<DeleteResult> {
     return await this.authWhiteListRepository.delete({ token });
   }
 
-  async deleteTokenByDeviceId(deviceId: string) {
+  async deleteTokenByDeviceId(deviceId: string): Promise<DeleteResult> {
     const refreshToken = await this.authWhiteListRepository.findOneBy({ deviceId });
     await this.authBlackListRepository.blackList(refreshToken!.token);
     return await this.authWhiteListRepository.delete({ deviceId });
   }
 
-  async deleteAllExceptOne(userId: string, deviceId: string) {
+  async deleteAllExceptOne(userId: string, deviceId: string): Promise<DeleteResult> {
     return await this.authWhiteListRepository
       .createQueryBuilder()
       .delete()

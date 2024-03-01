@@ -4,6 +4,7 @@ import { paginationModel } from '../../base/types/pagination.model';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Blog } from '../domain/blogs.entity';
+import { sortDirectionHelper } from '../../base/helpers/sortDirection.helper';
 
 @Injectable()
 export class BlogsQueryRepository {
@@ -16,12 +17,7 @@ export class BlogsQueryRepository {
     pageNumber: number,
     pageSize: number,
   ): Promise<paginationModel<blogViewModel>> {
-    let sortDir: 'ASC' | 'DESC';
-    if (!sortDirection || sortDirection === 'desc' || sortDirection === 'DESC') {
-      sortDir = 'DESC';
-    } else {
-      sortDir = 'ASC';
-    }
+    const sortDir = sortDirectionHelper(sortDirection);
     const countBlogs = await this.blogsRepository
       .createQueryBuilder('b')
       .where('b.name ilike :name', { name: `%${searchNameTerm}%` })

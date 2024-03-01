@@ -31,7 +31,7 @@ export class Post {
   @Column()
   blogId: string;
 
-  @ManyToOne(() => Blog, (b) => b.posts)
+  @ManyToOne(() => Blog, (b) => b.posts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'blogId' })
   blogsId: Blog;
 
@@ -48,10 +48,10 @@ export class Post {
   @Column({ type: 'jsonb' })
   extendedLikesInfo: LikesInfo;
 
-  @OneToMany(() => Likes, (l) => l.postsId)
+  @OneToMany(() => Likes, (l) => l.postsId, { onDelete: 'CASCADE' })
   likes: Likes;
 
-  @OneToMany(() => Comment, (c) => c.postId)
+  @OneToMany(() => Comment, (c) => c.postId, { onDelete: 'CASCADE' })
   comments: Comment;
 
   static createNewPost(

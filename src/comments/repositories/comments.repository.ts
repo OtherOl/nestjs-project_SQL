@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Comment } from '../domain/comments.entity';
 
 @Injectable()
 export class CommentsRepository {
   constructor(@InjectRepository(Comment) private commentsRepository: Repository<Comment>) {}
 
-  async updateComment(commentId: string, content: string) {
+  async updateComment(commentId: string, content: string): Promise<UpdateResult> {
     return await this.commentsRepository.update({ id: commentId }, { content });
   }
 
-  async deleteComment(commentId: string) {
+  async deleteComment(commentId: string): Promise<DeleteResult> {
     return await this.commentsRepository.delete({ id: commentId });
   }
 
-  async addLike(commentId: string) {
+  async addLike(commentId: string): Promise<UpdateResult> {
     return await this.commentsRepository
       .createQueryBuilder()
       .update(Comment)
@@ -27,7 +27,7 @@ export class CommentsRepository {
       .execute();
   }
 
-  async decreaseLike(commentId: string) {
+  async decreaseLike(commentId: string): Promise<UpdateResult> {
     return await this.commentsRepository
       .createQueryBuilder()
       .update(Comment)
@@ -39,7 +39,7 @@ export class CommentsRepository {
       .execute();
   }
 
-  async addDislike(commentId: string) {
+  async addDislike(commentId: string): Promise<UpdateResult> {
     return await this.commentsRepository
       .createQueryBuilder()
       .update(Comment)
@@ -51,7 +51,7 @@ export class CommentsRepository {
       .execute();
   }
 
-  async decreaseDislike(commentId: string) {
+  async decreaseDislike(commentId: string): Promise<UpdateResult> {
     return await this.commentsRepository
       .createQueryBuilder()
       .update(Comment)

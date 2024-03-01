@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '../../users/domain/users.entity';
 
 @Entity()
 export class AuthWhiteList {
@@ -10,6 +11,10 @@ export class AuthWhiteList {
 
   @Column()
   userId: string;
+
+  @ManyToOne(() => User, (u) => u.whiteTokens, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
+  usersId: User;
 
   @Column()
   deviceId: string;

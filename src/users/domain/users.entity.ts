@@ -3,6 +3,7 @@ import { add } from 'date-fns/add';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Security } from '../../securityDevices/domain/security.entity';
 import { Likes } from '../../likes/domain/likes.entity';
+import { AuthWhiteList } from '../../auth/domain/auth-white_list.entity';
 
 export class EmailConfirmation {
   confirmationCode: string;
@@ -40,11 +41,14 @@ export class User {
   @Column()
   isConfirmed: boolean;
 
-  @OneToMany(() => Security, (s) => s.userId)
+  @OneToMany(() => Security, (s) => s.userId, { onDelete: 'CASCADE' })
   sessions: Security[];
 
-  @OneToMany(() => Likes, (l) => l.usersId)
+  @OneToMany(() => Likes, (l) => l.usersId, { onDelete: 'CASCADE' })
   likes: Likes;
+
+  @OneToMany(() => AuthWhiteList, (aw) => aw.usersId, { onDelete: 'CASCADE' })
+  whiteTokens: AuthWhiteList;
 
   static createNewUser(login: string, email: string, passwordHash: string, isConfirmed: boolean) {
     const user = new User();

@@ -1,34 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { v4 as uuidv4 } from 'uuid';
-import { beforeGetAppAndCleanDb } from './test-utils';
+import { beforeGetAppAndCleanDb, blogModel, postCreateModel, userCreateModel } from './utils/test-utils';
 import { blogViewModel } from '../src/base/types/blogs.model';
 import { postModel } from '../src/base/types/posts.model';
 import { userModel } from '../src/base/types/users.model';
-
-const postCreateModel = (title: string, shortDescription: string, content: string) => {
-  return {
-    title,
-    shortDescription,
-    content,
-  };
-};
-
-const blogModel = (name: string, description: string, websiteUrl: string) => {
-  return {
-    name,
-    description,
-    websiteUrl,
-  };
-};
-
-const userCreateModel = (login: string, email: string, password: string) => {
-  return {
-    login,
-    email,
-    password,
-  };
-};
 
 describe('Testing Posts', () => {
   let app: INestApplication;
@@ -163,7 +139,7 @@ describe('Testing post likes', () => {
   it('should like post + successfully get post by blogId  => 204 status', async () => {
     const newUser = await request(app.getHttpServer())
       .post('/sa/users')
-      .send(userCreateModel('OtherOl', 'someemail@gmail.com', '12345678'))
+      .send(userCreateModel('OtherOl', '12345678', 'someemail@gmail.com'))
       .auth('admin', 'qwerty');
     expect(newUser.status).toBe(201);
     user1 = newUser.body;

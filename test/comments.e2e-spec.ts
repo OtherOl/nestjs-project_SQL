@@ -1,33 +1,9 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { beforeGetAppAndCleanDb } from './test-utils';
+import { beforeGetAppAndCleanDb, blogModel, postCreateModel, userCreateModel } from './utils/test-utils';
 import { blogViewModel } from '../src/base/types/blogs.model';
 import { postModel } from '../src/base/types/posts.model';
 import { userModel } from '../src/base/types/users.model';
-
-const blogModel = (name: string, desc: string, web: string) => {
-  return {
-    name: name,
-    description: desc,
-    websiteUrl: web,
-  };
-};
-
-const userCreateModel = (login: string, password: string, email: string) => {
-  return {
-    login,
-    password,
-    email,
-  };
-};
-
-const postCreateModel = (title: string, shortDescription: string, content: string) => {
-  return {
-    title,
-    shortDescription,
-    content,
-  };
-};
 
 describe('Testing comments', () => {
   let app: INestApplication;
@@ -188,7 +164,6 @@ describe('Testing comments likes', () => {
     });
     expect(login.status).toBe(200);
 
-    console.log('XOXO', login.body.accessToken);
     const comment = await request(app.getHttpServer())
       .post(`/posts/${likesPost1.id}/comments`)
       .send({

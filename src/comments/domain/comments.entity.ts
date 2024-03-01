@@ -26,7 +26,7 @@ export class Comment {
   @Column()
   postId: string;
 
-  @ManyToOne(() => Post, (p) => p.comments)
+  @ManyToOne(() => Post, (p) => p.comments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'postId' })
   postsId: Post;
 

@@ -59,7 +59,7 @@ describe('Test quizQuestions', () => {
     });
   });
 
-  it("Shouldn't create new question => 400 status (body)", async () => {
+  it("Shouldn't create new question => 400 status (body + correctAnswers)", async () => {
     const question = await request(app.getHttpServer())
       .post('/sa/quiz/questions')
       .send({ body: 1, correctAnswers: 's' })
@@ -93,7 +93,7 @@ describe('Test quizQuestions', () => {
       correctAnswers: ['Yes', 'Of course', 'BOMBOM'],
       published: false,
       createdAt: expect.any(String),
-      updatedAt: expect.any(String),
+      updatedAt: null,
     });
   });
 
@@ -112,7 +112,7 @@ describe('Test quizQuestions', () => {
           correctAnswers: ['Yes', 'Of course', 'BOMBOM'],
           published: false,
           createdAt: expect.any(String),
-          updatedAt: expect.any(String),
+          updatedAt: null,
         },
       ],
     });
@@ -156,7 +156,7 @@ describe('Test quizQuestions', () => {
       correctAnswers: ['1', '2', '3'],
       published: false,
       createdAt: expect.any(String),
-      updatedAt: expect.any(String),
+      updatedAt: null,
     });
   });
 

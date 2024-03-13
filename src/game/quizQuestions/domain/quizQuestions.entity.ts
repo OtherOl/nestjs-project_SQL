@@ -19,7 +19,7 @@ export class QuizQuestions {
   @Column()
   createdAt: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: null })
   updatedAt: string;
 
   static createQuestion(inputData: CreateQuestionModel) {

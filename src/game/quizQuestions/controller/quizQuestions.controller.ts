@@ -51,14 +51,6 @@ export class QuizQuestionsController {
     return await this.createQuizQuestionsUseCase.createQuestion(inputData);
   }
 
-  @Delete(':id')
-  @UseGuards(BasicAuthGuard)
-  @SkipThrottle()
-  @HttpCode(204)
-  async deleteQuestionById(@Param('id') id: string) {
-    return await this.deleteQuestionByIdUseCase.deleteQuestion(id);
-  }
-
   @Put(':id')
   @UseGuards(BasicAuthGuard)
   @SkipThrottle()
@@ -73,5 +65,13 @@ export class QuizQuestionsController {
   @HttpCode(204)
   async updateQuestionPublish(@Param('id') id: string, @Body() published: UpdatePublished) {
     return await this.updateQuestionPublishUseCase.updateQuestion(id, published.published);
+  }
+
+  @Delete(':id')
+  @UseGuards(BasicAuthGuard)
+  @SkipThrottle()
+  @HttpCode(204)
+  async deleteQuestionById(@Param('id') id: string) {
+    return await this.deleteQuestionByIdUseCase.deleteQuestion(id);
   }
 }

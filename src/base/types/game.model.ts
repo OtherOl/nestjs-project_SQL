@@ -1,5 +1,4 @@
 import { IsArray, IsBoolean, IsString, Length } from 'class-validator';
-import { Transform } from 'class-transformer';
 
 export enum AnswerStatus {
   Correct = 'Correct',
@@ -10,12 +9,6 @@ export enum GameStatus {
   PendingSecondPlayer = 'PendingSecondPlayer',
   Active = 'Active',
   Finished = 'Finished',
-}
-
-export class Answers {
-  questionId: string;
-  answerStatus: AnswerStatus;
-  addedAt: string;
 }
 
 export class AnswerViewModel {
@@ -46,14 +39,7 @@ export class GameViewModel {
 }
 
 export class PlayerGameModel {
-  answers: Answers[];
-  player: Player;
-  score: number;
-}
-
-export class PlayerViewModel {
-  id: string;
-  answers: Answers[];
+  answers: AnswerViewModel[];
   player: Player;
   score: number;
 }
@@ -69,6 +55,11 @@ export class CreateQuestionModel {
 
 export class UpdatePublished {
   @IsBoolean()
-  @Transform(({ value }) => (value === 'true' ? true : value === 'false' ? false : value))
+  // @Transform(({ value }) => (value === 'true' ? true : value === 'false' ? false : value))
   published: boolean;
+}
+
+export class FindById {
+  @IsString()
+  id: string;
 }

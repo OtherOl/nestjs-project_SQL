@@ -6,6 +6,7 @@ import { CreateOrConnectGameUseCase } from '../use-cases/createOrConnectGame.use
 import { GetGameByIdUseCase } from '../use-cases/getGameById.use-case';
 import { SendAnswersUseCase } from '../use-cases/sendAnswers.use-case';
 import { SkipThrottle } from '@nestjs/throttler';
+import { FindById } from '../../../base/types/game.model';
 
 @Controller('pair-game-quiz/pairs')
 export class PairQuizGameController {
@@ -28,8 +29,8 @@ export class PairQuizGameController {
   @UseGuards(AccessTokenGuard)
   @SkipThrottle()
   @HttpCode(200)
-  async getGameById(@Req() req: Request, @Param('id') id: string) {
-    return await this.getGameByIdUseCase.getGame(req.headers.authorization!, id);
+  async getGameById(@Req() req: Request, @Param('id') id: FindById) {
+    return await this.getGameByIdUseCase.getGame(req.headers.authorization!, id.id);
   }
 
   @Post('connection')

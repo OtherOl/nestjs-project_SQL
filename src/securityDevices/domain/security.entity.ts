@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from '../../users/domain/users.entity';
 
-@Entity()
+@Entity({ name: 'Security' })
 export class Security {
   @PrimaryColumn()
   id: string;

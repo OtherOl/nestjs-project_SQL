@@ -74,6 +74,28 @@ import { GetProfileUseCase } from './auth/use-cases/getProfile-use.case';
 import { LogoutUseCase } from './auth/use-cases/logout.use-case';
 import { RefreshTokenUseCase } from './auth/use-cases/refreshToken.use-case';
 import { DeleteSessionByIdUseCase } from './securityDevices/use-cases/deleteSessionById.use-case';
+import { PairQuizGame } from './game/pairQuizGame/domain/pairQuizGame.entity';
+import { FirstPlayerProgress } from './game/pairQuizGame/domain/firstPlayerProgress.entity';
+import { SecondPlayerProgress } from './game/pairQuizGame/domain/secondPlayerProgress.entity';
+import { PairQuizGameController } from './game/pairQuizGame/controller/pairQuizGame.controller';
+import { PairQuizGameQueryRepository } from './game/pairQuizGame/repositories/pairQuizGame.query-repository';
+import { GetUnfinishedGameUseCase } from './game/pairQuizGame/use-cases/getUnfinishedGame.use-case';
+import { CreateOrConnectGameUseCase } from './game/pairQuizGame/use-cases/createOrConnectGame.use-case';
+import { PairQuizGameRepository } from './game/pairQuizGame/repositories/pairQuizGame.repository';
+import { GetGameByIdUseCase } from './game/pairQuizGame/use-cases/getGameById.use-case';
+import { QuizQuestionsController } from './game/quizQuestions/controller/quizQuestions.controller';
+import { QuizQuestions } from './game/quizQuestions/domain/quizQuestions.entity';
+import { QuizQuestionsQueryRepository } from './game/quizQuestions/repositories/quizQuestions.query-repository';
+import { CreateQuizQuestionsUseCase } from './game/quizQuestions/use-cases/createQuizQuestions.use-case';
+import { QuizQuestionsRepository } from './game/quizQuestions/repositories/quizQuestions.repository';
+import { DeleteQuestionByIdUseCase } from './game/quizQuestions/use-cases/deleteQuestionById.use-case';
+import { GetAllQuestionsUseCase } from './game/quizQuestions/use-cases/getAllQuestions.use-case';
+import { UpdateQuestionUseCase } from './game/quizQuestions/use-cases/updateQuestion.use-case';
+import { UpdateQuestionPublishUseCase } from './game/quizQuestions/use-cases/updateQuestionPublish.use-case';
+import { SendAnswersUseCase } from './game/pairQuizGame/use-cases/sendAnswers.use-case';
+import { Answer } from './game/pairQuizGame/domain/answers.entity';
+import { FirstPlayerSendAnswerUseCase } from './game/pairQuizGame/use-cases/firstPlayerSendAnswer.use-case';
+import { SecondPlayerSendAnswerUseCase } from './game/pairQuizGame/use-cases/secondPlayerSendAnswer.use-case';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -111,6 +133,23 @@ const usersUseCases = [
 
 const securityUseCases = [CreateSessionUseCase, DeleteTokensExceptOneUseCase, DeleteSessionByIdUseCase];
 
+const gameUseCases = [
+  GetUnfinishedGameUseCase,
+  CreateOrConnectGameUseCase,
+  GetGameByIdUseCase,
+  SendAnswersUseCase,
+  FirstPlayerSendAnswerUseCase,
+  SecondPlayerSendAnswerUseCase,
+];
+
+const questionUseCases = [
+  CreateQuizQuestionsUseCase,
+  DeleteQuestionByIdUseCase,
+  GetAllQuestionsUseCase,
+  UpdateQuestionUseCase,
+  UpdateQuestionPublishUseCase,
+];
+
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
 
 @Module({
@@ -129,9 +168,23 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
       autoLoadEntities: true,
       synchronize: true,
       ssl: true,
-      //      logging: ['query'],
+      // logging: ['query'],
     }),
-    TypeOrmModule.forFeature([Blog, User, AuthWhiteList, AuthBlackList, Security, Post, Likes, Comment]),
+    TypeOrmModule.forFeature([
+      Blog,
+      User,
+      AuthWhiteList,
+      AuthBlackList,
+      Security,
+      Post,
+      Likes,
+      Comment,
+      PairQuizGame,
+      FirstPlayerProgress,
+      SecondPlayerProgress,
+      QuizQuestions,
+      Answer,
+    ]),
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',
@@ -158,6 +211,8 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     TestingController,
     AuthController,
     SecurityController,
+    PairQuizGameController,
+    QuizQuestionsController,
   ],
   providers: [
     BlogsQueryRepository,
@@ -182,12 +237,18 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
     AccessTokenGuard,
     RefreshTokenGuard,
     CustomBlogIdValidation,
+    PairQuizGameQueryRepository,
+    PairQuizGameRepository,
+    QuizQuestionsQueryRepository,
+    QuizQuestionsRepository,
     ...authUseCases,
     ...blogsUseCases,
     ...commentsUseCases,
     ...postsUseCases,
     ...usersUseCases,
     ...securityUseCases,
+    ...gameUseCases,
+    ...questionUseCases,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
   ],
 })

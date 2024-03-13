@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Post } from '../../posts/domain/posts.entity';
 import { User } from '../../users/domain/users.entity';
 
-@Entity()
+@Entity({ name: 'Likes' })
 export class Likes {
   @PrimaryColumn()
   id: string;

@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity({ name: 'AuthBlackList' })
 export class AuthBlackList {
   @PrimaryGeneratedColumn('uuid')
   id: string;

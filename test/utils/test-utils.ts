@@ -6,7 +6,6 @@ import { INestApplication } from '@nestjs/common';
 
 export async function beforeGetAppAndCleanDb() {
   let app: INestApplication;
-
   const module: TestingModule = await Test.createTestingModule({ imports: [AppModule] }).compile();
   // eslint-disable-next-line prefer-const
   app = module.createNestApplication();
@@ -39,5 +38,12 @@ export const postCreateModel = (title: string, shortDescription: string, content
     title,
     shortDescription,
     content,
+  };
+};
+
+export const questionCreateModel = (body: string, correctAnswers: string[]) => {
+  return {
+    body,
+    correctAnswers,
   };
 };

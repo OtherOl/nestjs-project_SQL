@@ -15,7 +15,7 @@ export class RecoveryConfirmation {
   expirationDate: string;
 }
 
-@Entity()
+@Entity({ name: 'User' })
 export class User {
   @PrimaryColumn()
   id: string;

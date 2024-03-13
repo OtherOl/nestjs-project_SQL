@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/domain/users.entity';
 
-@Entity()
+@Entity({ name: 'AuthWhiteList' })
 export class AuthWhiteList {
   @PrimaryGeneratedColumn('uuid')
   id: string;

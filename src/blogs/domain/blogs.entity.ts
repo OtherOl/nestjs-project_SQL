@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Post } from '../../posts/domain/posts.entity';
 
-@Entity()
+@Entity({ name: 'Blog' })
 export class Blog {
   @PrimaryColumn()
   id: string;

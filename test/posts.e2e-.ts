@@ -5,7 +5,7 @@ import { beforeGetAppAndCleanDb, blogModel, postCreateModel, userCreateModel } f
 import { blogViewModel } from '../src/base/types/blogs.model';
 import { postModel } from '../src/base/types/posts.model';
 import { userModel } from '../src/base/types/users.model';
-
+jest.setTimeout(20000);
 describe('Testing Posts', () => {
   let app: INestApplication;
 

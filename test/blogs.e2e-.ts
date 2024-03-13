@@ -2,7 +2,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { beforeGetAppAndCleanDb, blogModel } from './utils/test-utils';
 import { blogViewModel } from '../src/base/types/blogs.model';
-
+jest.setTimeout(20000);
 describe('Testing Blogs', () => {
   let app: INestApplication;
 

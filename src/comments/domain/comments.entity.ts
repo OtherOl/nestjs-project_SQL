@@ -18,7 +18,7 @@ export class LikesInfo {
   myStatus: LikesEnum;
 }
 
-@Entity()
+@Entity({ name: 'Comment' })
 export class Comment {
   @PrimaryColumn()
   id: string;

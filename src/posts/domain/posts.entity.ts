@@ -14,7 +14,7 @@ export class LikesInfo {
   newestLikes: [];
 }
 
-@Entity()
+@Entity({ name: 'Post' })
 export class Post {
   @PrimaryColumn()
   id: string;

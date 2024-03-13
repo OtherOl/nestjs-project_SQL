@@ -9,6 +9,11 @@ import { Security } from '../../securityDevices/domain/security.entity';
 import { Post } from '../../posts/domain/posts.entity';
 import { Likes } from '../../likes/domain/likes.entity';
 import { Comment } from '../../comments/domain/comments.entity';
+import { PairQuizGame } from '../../game/pairQuizGame/domain/pairQuizGame.entity';
+import { FirstPlayerProgress } from '../../game/pairQuizGame/domain/firstPlayerProgress.entity';
+import { SecondPlayerProgress } from '../../game/pairQuizGame/domain/secondPlayerProgress.entity';
+import { QuizQuestions } from '../../game/quizQuestions/domain/quizQuestions.entity';
+import { Answer } from '../../game/pairQuizGame/domain/answers.entity';
 
 @Injectable()
 export class TestingRepository {
@@ -22,6 +27,13 @@ export class TestingRepository {
     @InjectRepository(Post) private postsRepository: Repository<Post>,
     @InjectRepository(Likes) private likesRepository: Repository<Likes>,
     @InjectRepository(Comment) private commentsRepository: Repository<Comment>,
+    @InjectRepository(FirstPlayerProgress)
+    private firstPlayerProgressRepository: Repository<FirstPlayerProgress>,
+    @InjectRepository(SecondPlayerProgress)
+    private secondPlayerProgressRepository: Repository<SecondPlayerProgress>,
+    @InjectRepository(PairQuizGame) private pairQuizGameRepository: Repository<PairQuizGame>,
+    @InjectRepository(QuizQuestions) private quizQuestionsRepository: Repository<QuizQuestions>,
+    @InjectRepository(Answer) private answerRepository: Repository<Answer>,
   ) {}
 
   async clearDB() {
@@ -33,6 +45,11 @@ export class TestingRepository {
     await this.usersRepository.delete({});
     await this.authBlackListRepository.delete({});
     await this.authWhiteListRepository.delete({});
+    await this.firstPlayerProgressRepository.delete({});
+    await this.secondPlayerProgressRepository.delete({});
+    await this.pairQuizGameRepository.delete({});
+    await this.quizQuestionsRepository.delete({});
+    await this.answerRepository.delete({});
     return;
   }
 }

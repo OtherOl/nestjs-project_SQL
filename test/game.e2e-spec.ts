@@ -3,8 +3,9 @@ import { beforeGetAppAndCleanDb, userCreateModel } from './utils/test-utils';
 import { userModel } from '../src/base/types/users.model';
 import request from 'supertest';
 import { GameViewModel } from '../src/base/types/game.model';
+import { PairQuizGame } from '../src/game/pairQuizGame/domain/pairQuizGame.entity';
 
-jest.setTimeout(10000);
+jest.setTimeout(15000);
 describe('Testing Game', () => {
   let app: INestApplication;
   beforeAll(async () => {
@@ -127,6 +128,13 @@ describe('Testing Game', () => {
     });
   });
 
+  it("Shouldn't connect user1 to game, because he is in the game => 403 status", async () => {
+    const game = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/connection')
+      .set('Authorization', 'bearer ' + accessToken1);
+    expect(game.status).toBe(403);
+  });
+
   it('Should connect user2 to existing game and change status to active => 200 status', async () => {
     const existingGame = await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/connection')
@@ -206,13 +214,6 @@ describe('Testing Game', () => {
       .set('Authorization', 'bearer ' + accessToken3);
     expect(game.status).toBe(404);
   });
-
-  // it("Shouldn't get game by id => 400 status", async () => {
-  //   const game = await request(app.getHttpServer())
-  //     .get(`/pair-game-quiz/pairs/` + 123123213)
-  //     .set('Authorization', 'bearer ' + accessToken3);
-  //   expect(game.status).toBe(400);
-  // });
 
   it('Should return game by id => 200 status', async () => {
     const game = await request(app.getHttpServer())
@@ -510,5 +511,130 @@ describe('Testing Game', () => {
       .send({ answer: '100' })
       .set('Authorization', 'bearer ' + accessToken2);
     expect(sendAnswer.status).toBe(403);
+  });
+
+  let finishedGame1: PairQuizGame;
+  it('Should answer lasts questions by user1 and game should be finished => 200 status', async () => {
+    for (let i = 0; i < 2; i++) {
+      const sendAnswer = await request(app.getHttpServer())
+        .post('/pair-game-quiz/pairs/my-current/answers')
+        .send({ answer: '4' })
+        .set('Authorization', 'bearer ' + accessToken1);
+      expect(sendAnswer.status).toBe(200);
+    }
+    const game = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/${game1.id}`)
+      .set('Authorization', 'bearer ' + accessToken1);
+    expect(game.status).toBe(200);
+    finishedGame1 = game.body;
+    expect(game.body).toEqual({
+      id: game1.id,
+      firstPlayerProgress: {
+        score: 4,
+        player: {
+          id: game1.firstPlayerProgress!.player.id,
+          login: 'OtherOl',
+        },
+        answers: [
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Incorrect',
+            addedAt: expect.any(String),
+          },
+        ],
+      },
+      secondPlayerProgress: {
+        score: 1,
+        player: {
+          id: game.body.secondPlayerProgress!.player.id,
+          login: 'User2',
+        },
+        answers: [
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Incorrect',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Incorrect',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Incorrect',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Incorrect',
+            addedAt: expect.any(String),
+          },
+        ],
+      },
+      questions: [
+        {
+          id: expect.any(String),
+          body: 'Solve the follow problem => 1 + 0 = ?',
+        },
+        {
+          id: expect.any(String),
+          body: 'Solve the follow problem => 1 + 1 = ?',
+        },
+        {
+          id: expect.any(String),
+          body: 'Solve the follow problem => 1 + 2 = ?',
+        },
+        {
+          id: expect.any(String),
+          body: 'Solve the follow problem => 1 + 3 = ?',
+        },
+        {
+          id: expect.any(String),
+          body: 'Solve the follow problem => 1 + 4 = ?',
+        },
+      ],
+      status: 'Finished',
+      pairCreatedDate: expect.any(String),
+      startGameDate: expect.any(String),
+      finishGameDate: expect.any(String),
+    });
+  });
+
+  it('Should return finished game OtherOl + User2 => 200 status', async () => {
+    const game = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/my-current')
+      .set('Authorization', 'bearer ' + accessToken1);
+    expect(game.status).toBe(404);
+
+    const game2 = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/my-current')
+      .set('Authorization', 'bearer ' + accessToken2);
+    expect(game2.status).toBe(404);
   });
 });

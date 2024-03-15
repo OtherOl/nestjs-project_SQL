@@ -49,6 +49,13 @@ export class PairQuizGameRepository {
     );
   }
 
+  async changeGameStatusToFinished(gameId: string) {
+    return await this.pairQuizGameRepository.update(
+      { id: gameId },
+      { status: GameStatus.Finished, finishGameDate: new Date().toISOString() },
+    );
+  }
+
   async createAnswer(answer: Answer) {
     return await this.answerRepository.insert(answer);
   }

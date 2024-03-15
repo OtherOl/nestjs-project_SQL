@@ -96,6 +96,8 @@ import { SendAnswersUseCase } from './game/pairQuizGame/use-cases/sendAnswers.us
 import { Answer } from './game/pairQuizGame/domain/answers.entity';
 import { FirstPlayerSendAnswerUseCase } from './game/pairQuizGame/use-cases/firstPlayerSendAnswer.use-case';
 import { SecondPlayerSendAnswerUseCase } from './game/pairQuizGame/use-cases/secondPlayerSendAnswer.use-case';
+import { JoinOrCreateGameForMainUseCase } from './game/pairQuizGame/use-cases/joinOrCreateGameForMain.use-case';
+import { ChangeStatusToFinishedUseCase } from './game/pairQuizGame/use-cases/changeStatusToFinished.use-case';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -140,6 +142,8 @@ const gameUseCases = [
   SendAnswersUseCase,
   FirstPlayerSendAnswerUseCase,
   SecondPlayerSendAnswerUseCase,
+  JoinOrCreateGameForMainUseCase,
+  ChangeStatusToFinishedUseCase,
 ];
 
 const questionUseCases = [

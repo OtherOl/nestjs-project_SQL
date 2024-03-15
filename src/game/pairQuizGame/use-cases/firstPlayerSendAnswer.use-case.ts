@@ -5,6 +5,7 @@ import { FirstPlayerProgress } from '../domain/firstPlayerProgress.entity';
 import { PairQuizGameQueryRepository } from '../repositories/pairQuizGame.query-repository';
 import { PairQuizGameRepository } from '../repositories/pairQuizGame.repository';
 import { QuizQuestionsQueryRepository } from '../../quizQuestions/repositories/quizQuestions.query-repository';
+import { ChangeStatusToFinishedUseCase } from './changeStatusToFinished.use-case';
 
 @Injectable()
 export class FirstPlayerSendAnswerUseCase {
@@ -12,6 +13,7 @@ export class FirstPlayerSendAnswerUseCase {
     private pairQuizGameQueryRepository: PairQuizGameQueryRepository,
     private pairQuizGameRepository: PairQuizGameRepository,
     private quizQuestionsQueryRepository: QuizQuestionsQueryRepository,
+    private changeStatusToFinishedUseCase: ChangeStatusToFinishedUseCase,
   ) {}
 
   async sendAnswer(firstPlayer: FirstPlayerProgress, inputAnswer: string) {
@@ -35,6 +37,7 @@ export class FirstPlayerSendAnswerUseCase {
             },
             '+ 1',
           );
+          await this.changeStatusToFinishedUseCase.changeToFinished(firstPlayer.gameId);
           return {
             questionId: answer.questionId,
             answerStatus: answer.answerStatus,
@@ -52,6 +55,7 @@ export class FirstPlayerSendAnswerUseCase {
             },
             '- 0',
           );
+          await this.changeStatusToFinishedUseCase.changeToFinished(firstPlayer.gameId);
           return {
             questionId: answer.questionId,
             answerStatus: answer.answerStatus,

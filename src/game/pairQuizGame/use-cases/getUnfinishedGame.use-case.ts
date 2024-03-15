@@ -15,9 +15,13 @@ export class GetUnfinishedGameUseCase {
     const secondPlayer = await this.pairQuizGameQueryRepository.getSecondPlayerByUserId(userId);
     if (!firstPlayer && !secondPlayer) throw new NotFoundException('No active pair');
     if (firstPlayer) {
-      return await this.pairQuizGameQueryRepository.getGameById(firstPlayer.gameId);
+      const game = await this.pairQuizGameQueryRepository.getUnfinishedGame(firstPlayer.gameId);
+      if (!game) throw new NotFoundException('No active pair');
+      return game;
     } else if (secondPlayer) {
-      return await this.pairQuizGameQueryRepository.getGameById(secondPlayer.gameId);
+      const game = await this.pairQuizGameQueryRepository.getUnfinishedGame(secondPlayer.gameId);
+      if (!game) throw new NotFoundException('No active pair');
+      return game;
     }
   }
 }

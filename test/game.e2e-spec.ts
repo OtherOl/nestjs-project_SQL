@@ -13,7 +13,7 @@ describe('Testing Game', () => {
 
   let user1: userModel;
   let accessToken1: string;
-  it('should create user1 and login user1', async () => {
+  it('should create user1 and login user1 => 201 status', async () => {
     const newUser1 = await request(app.getHttpServer())
       .post('/sa/users')
       .send(userCreateModel('OtherOl', 'qwerty', 'pilya003@gmail.com'))
@@ -30,7 +30,7 @@ describe('Testing Game', () => {
 
   let user2: userModel;
   let accessToken2: string;
-  it('should create user2 and login user2', async () => {
+  it('should create user2 and login user2 => 201 status', async () => {
     const newUser2 = await request(app.getHttpServer())
       .post('/sa/users')
       .send(userCreateModel('User2', '12345678', 'pilya00@gmail.com'))
@@ -47,7 +47,7 @@ describe('Testing Game', () => {
 
   let user3: userModel;
   let accessToken3: string;
-  it('should create user3 and login user3', async () => {
+  it('should create user3 and login user3 => 201 status', async () => {
     const newUser3 = await request(app.getHttpServer())
       .post('/sa/users')
       .send(userCreateModel('User3', '12345678', 'pilya0@gmail.com'))
@@ -206,6 +206,13 @@ describe('Testing Game', () => {
       .set('Authorization', 'bearer ' + accessToken3);
     expect(game.status).toBe(404);
   });
+
+  // it("Shouldn't get game by id => 400 status", async () => {
+  //   const game = await request(app.getHttpServer())
+  //     .get(`/pair-game-quiz/pairs/` + 123123213)
+  //     .set('Authorization', 'bearer ' + accessToken3);
+  //   expect(game.status).toBe(400);
+  // });
 
   it('Should return game by id => 200 status', async () => {
     const game = await request(app.getHttpServer())

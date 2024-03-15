@@ -190,6 +190,25 @@ describe('Test quizQuestions', () => {
       .send(questionCreateModel('Update question and this is good', ['yes', 'no', 'maybe']))
       .auth('admin', 'qwerty');
     expect(questions.status).toBe(204);
+
+    const getQuestions = await request(app.getHttpServer()).get('/sa/quiz/questions').auth('admin', 'qwerty');
+    expect(getQuestions.status).toBe(200);
+    expect(getQuestions.body).toEqual({
+      pagesCount: 1,
+      page: 1,
+      pageSize: 10,
+      totalCount: 1,
+      items: [
+        {
+          id: expect.any(String),
+          body: 'Update question and this is good',
+          correctAnswers: ['yes', 'no', 'maybe'],
+          published: false,
+          createdAt: expect.any(String),
+          updatedAt: expect.any(String),
+        },
+      ],
+    });
   });
 
   it("Shouldn't update question published => 400 status", async () => {

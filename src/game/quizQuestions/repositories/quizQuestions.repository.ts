@@ -18,10 +18,16 @@ export class QuizQuestionsRepository {
   }
 
   async updateQuestion(id: string, inputData: CreateQuestionModel) {
-    return await this.quizQuestionsRepository.update({ id }, inputData);
+    return await this.quizQuestionsRepository.update(
+      { id },
+      { body: inputData.body, correctAnswers: inputData.correctAnswers, updatedAt: new Date().toISOString() },
+    );
   }
 
   async updateQuestionPublished(id: string, published: boolean) {
-    return await this.quizQuestionsRepository.update({ id }, { published });
+    return await this.quizQuestionsRepository.update(
+      { id },
+      { published, updatedAt: new Date().toISOString() },
+    );
   }
 }

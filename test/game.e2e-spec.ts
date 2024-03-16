@@ -1,9 +1,10 @@
 import { INestApplication } from '@nestjs/common';
-import { beforeGetAppAndCleanDb, userCreateModel } from './utils/test-utils';
+import { beforeGetAppAndCleanDb, questionCreateModel, userCreateModel } from './utils/test-utils';
 import { userModel } from '../src/base/types/users.model';
 import request from 'supertest';
-import { GameViewModel } from '../src/base/types/game.model';
-import { PairQuizGame } from '../src/game/pairQuizGame/domain/pairQuizGame.entity';
+import { GameViewModel, QuestionsViewModel } from '../src/base/types/game.model';
+// import { PairQuizGame } from '../src/game/pairQuizGame/domain/pairQuizGame.entity';
+import { QuizQuestions } from '../src/game/quizQuestions/domain/quizQuestions.entity';
 
 jest.setTimeout(15000);
 describe('Testing Game', () => {
@@ -61,6 +62,117 @@ describe('Testing Game', () => {
       .send({ loginOrEmail: user3.login, password: '12345678' });
     expect(login.status).toBe(200);
     accessToken3 = login.body.accessToken;
+  });
+
+  const questions: QuizQuestions[] = [];
+  it('Should create 5 new question => 201 status', async () => {
+    const createdQuestion1 = await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .send(questionCreateModel('Is this correct question ?', ['Yes', 'Of course']))
+      .auth('admin', 'qwerty');
+    expect(createdQuestion1.status).toBe(201);
+    questions.push(createdQuestion1.body);
+    expect(createdQuestion1.body).toEqual({
+      id: expect.any(String),
+      body: 'Is this correct question ?',
+      correctAnswers: ['Yes', 'Of course'],
+      published: false,
+      createdAt: expect.any(String),
+      updatedAt: null,
+    });
+
+    const createdQuestion2 = await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .send(questionCreateModel('How much is this cost ?', ['100', 'one hundred']))
+      .auth('admin', 'qwerty');
+    expect(createdQuestion2.status).toBe(201);
+    questions.push(createdQuestion2.body);
+    expect(createdQuestion2.body).toEqual({
+      id: expect.any(String),
+      body: 'How much is this cost ?',
+      correctAnswers: ['100', 'one hundred'],
+      published: false,
+      createdAt: expect.any(String),
+      updatedAt: null,
+    });
+
+    const createdQuestion3 = await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .send(questionCreateModel('Convert this money => 200 usd ?', ['550 BYN', '20000 RUB']))
+      .auth('admin', 'qwerty');
+    expect(createdQuestion3.status).toBe(201);
+    questions.push(createdQuestion3.body);
+    expect(createdQuestion3.body).toEqual({
+      id: expect.any(String),
+      body: 'Convert this money => 200 usd ?',
+      correctAnswers: ['550 BYN', '20000 RUB'],
+      published: false,
+      createdAt: expect.any(String),
+      updatedAt: null,
+    });
+
+    const createdQuestion4 = await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .send(questionCreateModel('What music do i listen now ?', ['Bring me the horizon', 'Metal', 'Rock']))
+      .auth('admin', 'qwerty');
+    expect(createdQuestion4.status).toBe(201);
+    questions.push(createdQuestion4.body);
+    expect(createdQuestion4.body).toEqual({
+      id: expect.any(String),
+      body: 'What music do i listen now ?',
+      correctAnswers: ['Bring me the horizon', 'Metal', 'Rock'],
+      published: false,
+      createdAt: expect.any(String),
+      updatedAt: null,
+    });
+
+    const createdQuestion5 = await request(app.getHttpServer())
+      .post('/sa/quiz/questions')
+      .send(questionCreateModel('Am i have a cat or a dog ?', ['Of course', 'You have both of them']))
+      .auth('admin', 'qwerty');
+    expect(createdQuestion5.status).toBe(201);
+    questions.push(createdQuestion5.body);
+    expect(createdQuestion5.body).toEqual({
+      id: expect.any(String),
+      body: 'Am i have a cat or a dog ?',
+      correctAnswers: ['Of course', 'You have both of them'],
+      published: false,
+      createdAt: expect.any(String),
+      updatedAt: null,
+    });
+  });
+
+  let questionsViewModel: QuestionsViewModel[];
+  it('Should publish 5 questions => 204 status', async () => {
+    for (let i = 0; i < 5; i++) {
+      const updatedQuestion = await request(app.getHttpServer())
+        .put(`/sa/quiz/questions/${questions[i].id}/publish`)
+        .send({ published: true })
+        .auth('admin', 'qwerty');
+      expect(updatedQuestion.status).toBe(204);
+    }
+    questionsViewModel = [
+      {
+        id: questions[0].id,
+        body: questions[0].body,
+      },
+      {
+        id: questions[1].id,
+        body: questions[1].body,
+      },
+      {
+        id: questions[2].id,
+        body: questions[2].body,
+      },
+      {
+        id: questions[3].id,
+        body: questions[3].body,
+      },
+      {
+        id: questions[4].id,
+        body: questions[4].body,
+      },
+    ];
   });
 
   it("Shouldn't return, because user doesn't playing => 404 status", async () => {
@@ -158,28 +270,7 @@ describe('Testing Game', () => {
         },
         answers: [],
       },
-      questions: [
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 0 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 1 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 2 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 3 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 4 = ?',
-        },
-      ],
+      questions: questionsViewModel,
       status: 'Active',
       pairCreatedDate: expect.any(String),
       startGameDate: expect.any(String),
@@ -245,28 +336,7 @@ describe('Testing Game', () => {
         },
         answers: [],
       },
-      questions: [
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 0 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 1 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 2 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 3 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 4 = ?',
-        },
-      ],
+      questions: questionsViewModel,
       status: 'Active',
       pairCreatedDate: expect.any(String),
       startGameDate: expect.any(String),
@@ -308,7 +378,7 @@ describe('Testing Game', () => {
   it('Should send right answers for 1-3 questions by firstPlayer and return it => 200 status', async () => {
     const sendAnswer = await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/my-current/answers')
-      .send({ answer: '1' })
+      .send({ answer: 'Yes' })
       .set('Authorization', 'bearer ' + accessToken1);
     expect(sendAnswer.status).toBe(200);
     expect(sendAnswer.body).toEqual({
@@ -319,7 +389,7 @@ describe('Testing Game', () => {
 
     const sendAnswer2 = await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/my-current/answers')
-      .send({ answer: '2' })
+      .send({ answer: '100' })
       .set('Authorization', 'bearer ' + accessToken1);
     expect(sendAnswer2.status).toBe(200);
     expect(sendAnswer2.body).toEqual({
@@ -330,7 +400,7 @@ describe('Testing Game', () => {
 
     const sendAnswer3 = await request(app.getHttpServer())
       .post('/pair-game-quiz/pairs/my-current/answers')
-      .send({ answer: '3' })
+      .send({ answer: '550 BYN' })
       .set('Authorization', 'bearer ' + accessToken1);
     expect(sendAnswer3.status).toBe(200);
     expect(sendAnswer3.body).toEqual({
@@ -377,28 +447,7 @@ describe('Testing Game', () => {
         },
         answers: [],
       },
-      questions: [
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 0 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 1 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 2 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 3 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 4 = ?',
-        },
-      ],
+      questions: questionsViewModel,
       status: 'Active',
       pairCreatedDate: expect.any(String),
       startGameDate: expect.any(String),
@@ -410,7 +459,7 @@ describe('Testing Game', () => {
     for (let i = 0; i < 5; i++) {
       const sendAnswer = await request(app.getHttpServer())
         .post('/pair-game-quiz/pairs/my-current/answers')
-        .send({ answer: '1' })
+        .send({ answer: 'Yes' })
         .set('Authorization', 'bearer ' + accessToken2);
       expect(sendAnswer.status).toBe(200);
       expect(sendAnswer.body).toEqual({
@@ -483,28 +532,7 @@ describe('Testing Game', () => {
           },
         ],
       },
-      questions: [
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 0 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 1 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 2 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 3 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 4 = ?',
-        },
-      ],
+      questions: questionsViewModel,
       status: 'Active',
       pairCreatedDate: expect.any(String),
       startGameDate: expect.any(String),
@@ -520,12 +548,12 @@ describe('Testing Game', () => {
     expect(sendAnswer.status).toBe(403);
   });
 
-  let finishedGame1: PairQuizGame;
+  // let finishedGame1: PairQuizGame;
   it('Should answer lasts questions by user1 and game should be finished => 200 status', async () => {
     for (let i = 0; i < 2; i++) {
       const sendAnswer = await request(app.getHttpServer())
         .post('/pair-game-quiz/pairs/my-current/answers')
-        .send({ answer: '4' })
+        .send({ answer: 'Metal' })
         .set('Authorization', 'bearer ' + accessToken1);
       expect(sendAnswer.status).toBe(200);
     }
@@ -533,7 +561,7 @@ describe('Testing Game', () => {
       .get(`/pair-game-quiz/pairs/${game1.id}`)
       .set('Authorization', 'bearer ' + accessToken1);
     expect(game.status).toBe(200);
-    finishedGame1 = game.body;
+    // finishedGame1 = game.body;
     expect(game.body).toEqual({
       id: game1.id,
       firstPlayerProgress: {
@@ -604,28 +632,7 @@ describe('Testing Game', () => {
           },
         ],
       },
-      questions: [
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 0 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 1 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 2 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 3 = ?',
-        },
-        {
-          id: expect.any(String),
-          body: 'Solve the follow problem => 1 + 4 = ?',
-        },
-      ],
+      questions: questionsViewModel,
       status: 'Finished',
       pairCreatedDate: expect.any(String),
       startGameDate: expect.any(String),

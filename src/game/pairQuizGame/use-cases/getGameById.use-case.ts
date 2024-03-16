@@ -26,7 +26,6 @@ export class GetGameByIdUseCase {
     }
     if (secondPlayer) {
       if (secondPlayer?.gameId !== gameId) {
-        console.log('xui', secondPlayer?.gameId, gameId);
         throw new ForbiddenException('You are not a participant in this game');
       } else if (secondPlayer.gameId === gameId) {
         return await this.pairQuizGameQueryRepository.getGameById(gameId);

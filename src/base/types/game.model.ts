@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsOptional, IsString, Length } from 'class-validator';
+import { IsArray, IsBoolean, IsString, Length } from 'class-validator';
 
 export enum AnswerStatus {
   Correct = 'Correct',
@@ -55,12 +55,5 @@ export class CreateQuestionModel {
 
 export class UpdatePublished {
   @IsBoolean()
-  // @Transform(({ value }) => (value === 'true' ? true : value === 'false' ? false : value))
   published: boolean;
-}
-
-export class FindById {
-  @IsOptional()
-  @IsString()
-  id: string;
 }

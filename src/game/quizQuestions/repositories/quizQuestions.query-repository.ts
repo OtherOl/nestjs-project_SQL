@@ -42,4 +42,13 @@ export class QuizQuestionsQueryRepository {
   async getQuestionById(id: string): Promise<QuizQuestions | null> {
     return await this.quizQuestionsRepository.findOneBy({ id });
   }
+
+  async getQuestionsForGame() {
+    return await this.quizQuestionsRepository
+      .createQueryBuilder('q')
+      .select(['q.id', 'q.body'])
+      .where('q.published = :status', { status: true })
+      .limit(5)
+      .getMany();
+  }
 }

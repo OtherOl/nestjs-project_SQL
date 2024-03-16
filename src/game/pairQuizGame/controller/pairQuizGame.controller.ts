@@ -29,8 +29,8 @@ export class PairQuizGameController {
   @Get(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
-  async getGameById(@Req() req: Request, @Param() params: FindById) {
-    return await this.getGameByIdUseCase.getGame(req.headers.authorization!, params.id);
+  async getGameById(@Req() req: Request, @Param() id: FindById) {
+    return await this.getGameByIdUseCase.getGame(req.headers.authorization!, id.id);
   }
 
   @SkipThrottle()

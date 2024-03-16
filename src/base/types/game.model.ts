@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsString, Length } from 'class-validator';
+import { IsArray, IsBoolean, IsNumberString, IsOptional, IsString, Length } from 'class-validator';
 
 export enum AnswerStatus {
   Correct = 'Correct',
@@ -60,6 +60,7 @@ export class UpdatePublished {
 }
 
 export class FindById {
+  @IsOptional()
   @IsString()
   id: string;
 }

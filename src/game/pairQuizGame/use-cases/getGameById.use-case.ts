@@ -16,15 +16,21 @@ export class GetGameByIdUseCase {
     const firstPlayer = await this.pairQuizGameQueryRepository.getFirstPlayerByUserId(userId);
     const secondPlayer = await this.pairQuizGameQueryRepository.getSecondPlayerByUserId(userId);
     if (!firstPlayer && !secondPlayer) throw new ForbiddenException('You are not a participant in this game');
-    if (firstPlayer?.gameId !== gameId) {
-      throw new ForbiddenException('You are not a participant in this game');
-    } else if (firstPlayer.gameId === gameId) {
-      return await this.pairQuizGameQueryRepository.getGameById(gameId);
+    if (firstPlayer) {
+      if (firstPlayer?.gameId !== gameId) {
+        console.log('xui');
+        throw new ForbiddenException('You are not a participant in this game');
+      } else if (firstPlayer.gameId === gameId) {
+        return await this.pairQuizGameQueryRepository.getGameById(gameId);
+      }
     }
-    if (secondPlayer?.gameId !== gameId) {
-      throw new ForbiddenException('You are not a participant in this game');
-    } else if (secondPlayer.gameId === gameId) {
-      return await this.pairQuizGameQueryRepository.getGameById(gameId);
+    if (secondPlayer) {
+      if (secondPlayer?.gameId !== gameId) {
+        console.log('xui', secondPlayer?.gameId, gameId);
+        throw new ForbiddenException('You are not a participant in this game');
+      } else if (secondPlayer.gameId === gameId) {
+        return await this.pairQuizGameQueryRepository.getGameById(gameId);
+      }
     }
   }
 }

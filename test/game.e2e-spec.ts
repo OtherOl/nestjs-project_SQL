@@ -97,7 +97,7 @@ describe('Testing Game', () => {
         answers: [],
       },
       secondPlayerProgress: null,
-      questions: [],
+      questions: null,
       status: 'PendingSecondPlayer',
       pairCreatedDate: expect.any(String),
       startGameDate: null,
@@ -120,7 +120,7 @@ describe('Testing Game', () => {
         answers: [],
       },
       secondPlayerProgress: null,
-      questions: [],
+      questions: null,
       status: 'PendingSecondPlayer',
       pairCreatedDate: expect.any(String),
       startGameDate: null,
@@ -210,9 +210,16 @@ describe('Testing Game', () => {
 
   it("Shouldn't get game by id => 404 status", async () => {
     const game = await request(app.getHttpServer())
-      .get(`/pair-game-quiz/pairs/gameidmaybe`)
+      .get(`/pair-game-quiz/pairs/a7fa3abf-722f-4321-86c7-49c4db4fa77c`)
       .set('Authorization', 'bearer ' + accessToken3);
     expect(game.status).toBe(404);
+  });
+
+  it("Shouldn't get game by id => 400 status", async () => {
+    const game = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/thisisfake')
+      .set('Authorization', 'bearer ' + accessToken3);
+    expect(game.status).toBe(400);
   });
 
   it('Should return game by id => 200 status', async () => {

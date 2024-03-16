@@ -67,6 +67,47 @@ export class PairQuizGameQueryRepository {
         id: game.id,
         firstPlayerProgress: firstPlayer,
         secondPlayerProgress: secondPlayer,
+        questions: null,
+        status: game.status,
+        pairCreatedDate: game.pairCreatedDate,
+        startGameDate: game.startGameDate,
+        finishGameDate: game.finishGameDate,
+      };
+    } else {
+      return {
+        id: game.id,
+        firstPlayerProgress: firstPlayer,
+        secondPlayerProgress: secondPlayer,
+        questions: game.questions,
+        status: game.status,
+        pairCreatedDate: game.pairCreatedDate,
+        startGameDate: game.startGameDate,
+        finishGameDate: game.finishGameDate,
+      };
+    }
+  }
+
+  async getGameForMethod(gameId: string) {
+    const game = await this.pairQuizGameRepository.findOneBy({ id: gameId });
+    const firstPlayer = await this.firstPlayerProgressRepository
+      .createQueryBuilder('f')
+      .select(['f.answers', 'f.player', 'f.score'])
+      .where('f.gameId = :gameId', { gameId })
+      .getOne();
+
+    const secondPlayer = await this.secondPlayerProgressRepository
+      .createQueryBuilder('f')
+      .select(['f.answers', 'f.player', 'f.score'])
+      .where('f.gameId = :gameId', { gameId })
+      .getOne();
+
+    if (!game) {
+      return null;
+    } else if (game.status === 'PendingSecondPlayer') {
+      return {
+        id: game.id,
+        firstPlayerProgress: firstPlayer,
+        secondPlayerProgress: secondPlayer,
         questions: [],
         status: game.status,
         pairCreatedDate: game.pairCreatedDate,
@@ -108,7 +149,7 @@ export class PairQuizGameQueryRepository {
         id: game.id,
         firstPlayerProgress: firstPlayer,
         secondPlayerProgress: secondPlayer,
-        questions: [],
+        questions: null,
         status: game.status,
         pairCreatedDate: game.pairCreatedDate,
         startGameDate: game.startGameDate,

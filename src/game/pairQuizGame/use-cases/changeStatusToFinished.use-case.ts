@@ -10,7 +10,7 @@ export class ChangeStatusToFinishedUseCase {
   ) {}
 
   async changeToFinished(gameId: string) {
-    const game = await this.pairQuizGameQueryRepository.getGameById(gameId);
+    const game = await this.pairQuizGameQueryRepository.getGameForMethod(gameId);
     if (
       game!.firstPlayerProgress?.answers.length === game!.questions.length &&
       game!.secondPlayerProgress?.answers.length === game!.questions.length

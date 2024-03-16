@@ -6,7 +6,6 @@ import { CreateOrConnectGameUseCase } from '../use-cases/createOrConnectGame.use
 import { GetGameByIdUseCase } from '../use-cases/getGameById.use-case';
 import { SendAnswersUseCase } from '../use-cases/sendAnswers.use-case';
 import { SkipThrottle } from '@nestjs/throttler';
-import { FindById } from '../../../base/types/game.model';
 
 @Controller('pair-game-quiz/pairs')
 export class PairQuizGameController {

@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsNumberString, IsOptional, IsString, Length } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString, Length } from 'class-validator';
 
 export enum AnswerStatus {
   Correct = 'Correct',

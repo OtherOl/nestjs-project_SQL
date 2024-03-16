@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import { AccessTokenGuard } from '../../../auth/guards/accessToken.guard';
 import { GetUnfinishedGameUseCase } from '../use-cases/getUnfinishedGame.use-case';
 import { Request } from 'express';
@@ -29,8 +29,8 @@ export class PairQuizGameController {
   @Get(':id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
-  async getGameById(@Req() req: Request, @Param() id: FindById) {
-    return await this.getGameByIdUseCase.getGame(req.headers.authorization!, id.id);
+  async getGameById(@Req() req: Request, @Param('id', ParseUUIDPipe) id: string) {
+    return await this.getGameByIdUseCase.getGame(req.headers.authorization!, id);
   }
 
   @SkipThrottle()

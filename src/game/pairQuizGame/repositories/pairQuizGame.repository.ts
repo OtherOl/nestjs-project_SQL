@@ -85,4 +85,36 @@ export class PairQuizGameRepository {
       .where('gameId = :gameId', { gameId })
       .execute();
   }
+
+  async setFinishAnswerDateFirstPlayer(gameId: string) {
+    return await this.firstPlayerProgressRepository.update(
+      { gameId },
+      { answerFinishDate: new Date().toISOString() },
+    );
+  }
+
+  async setFinishAnswerDateSecondPlayer(gameId: string) {
+    return await this.secondPlayerProgressRepository.update(
+      { gameId },
+      { answerFinishDate: new Date().toISOString() },
+    );
+  }
+
+  async addBonusFirstPlayer(gameId: string) {
+    return await this.firstPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ score: () => 'score + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+  }
+
+  async addBonusSecondPlayer(gameId: string) {
+    return await this.secondPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ score: () => 'score + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+  }
 }

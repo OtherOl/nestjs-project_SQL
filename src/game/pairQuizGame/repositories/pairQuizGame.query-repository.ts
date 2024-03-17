@@ -40,6 +40,14 @@ export class PairQuizGameQueryRepository {
       .getOne();
   }
 
+  async getFirstPlayerByGameId(gameId: string) {
+    return await this.firstPlayerProgressRepository.findOneBy({ gameId });
+  }
+
+  async getSecondPlayerByGameId(gameId: string) {
+    return await this.secondPlayerProgressRepository.findOneBy({ gameId });
+  }
+
   async getUnfinishedGame(gameId: string) {
     const game = await this.pairQuizGameRepository
       .createQueryBuilder('g')

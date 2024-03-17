@@ -6,7 +6,7 @@ import { GameViewModel, QuestionsViewModel } from '../src/base/types/game.model'
 // import { PairQuizGame } from '../src/game/pairQuizGame/domain/pairQuizGame.entity';
 import { QuizQuestions } from '../src/game/quizQuestions/domain/quizQuestions.entity';
 
-jest.setTimeout(15000);
+jest.setTimeout(18000);
 describe('Testing Game', () => {
   let app: INestApplication;
   beforeAll(async () => {
@@ -455,7 +455,7 @@ describe('Testing Game', () => {
     });
   });
 
-  it('Should send incorrect/correct answers for 1-5 questions by secondPlayer and return it => 200 status', async () => {
+  it('Should send incorrect/correct answers for 1-5 questions by secondPlayer + bonus and return it => 200 status', async () => {
     for (let i = 0; i < 5; i++) {
       const sendAnswer = await request(app.getHttpServer())
         .post('/pair-game-quiz/pairs/my-current/answers')
@@ -599,7 +599,7 @@ describe('Testing Game', () => {
         ],
       },
       secondPlayerProgress: {
-        score: 1,
+        score: 2,
         player: {
           id: game.body.secondPlayerProgress!.player.id,
           login: 'User2',

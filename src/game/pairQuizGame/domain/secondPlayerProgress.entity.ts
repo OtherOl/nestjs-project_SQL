@@ -19,6 +19,9 @@ export class SecondPlayerProgress {
   @Column()
   gameId: string;
 
+  @Column({ nullable: true })
+  answerFinishDate: string;
+
   @OneToOne(() => PairQuizGame, (p) => p.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'gameId' })
   gamesId: string;

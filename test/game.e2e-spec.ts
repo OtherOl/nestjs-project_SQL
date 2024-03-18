@@ -886,4 +886,174 @@ describe('Testing Game', () => {
       finishGameDate: null,
     });
   });
+
+  it('Should answer leftover questions by User2 and OtherOl => 200 status', async () => {
+    const answerFirstPlayer2 = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .send({ answer: '100' })
+      .set('Authorization', 'bearer ' + accessToken2);
+    expect(answerFirstPlayer2.status).toBe(200);
+    expect(answerFirstPlayer2.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: 'Correct',
+      addedAt: expect.any(String),
+    });
+
+    const answerFirstPlayer3 = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .send({ answer: '20000 RUB' })
+      .set('Authorization', 'bearer ' + accessToken2);
+    expect(answerFirstPlayer3.status).toBe(200);
+    expect(answerFirstPlayer3.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: 'Correct',
+      addedAt: expect.any(String),
+    });
+
+    const answerFirstPlayer4 = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .send({ answer: 'Metal' })
+      .set('Authorization', 'bearer ' + accessToken2);
+    expect(answerFirstPlayer4.status).toBe(200);
+    expect(answerFirstPlayer4.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: 'Correct',
+      addedAt: expect.any(String),
+    });
+
+    const answerFirstPlayer5 = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .send({ answer: 'Incorrect' })
+      .set('Authorization', 'bearer ' + accessToken2);
+    expect(answerFirstPlayer5.status).toBe(200);
+    expect(answerFirstPlayer5.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: 'Incorrect',
+      addedAt: expect.any(String),
+    });
+
+    const answerSecondPlayer3 = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .send({ answer: '550 BYN' })
+      .set('Authorization', 'bearer ' + accessToken1);
+    expect(answerSecondPlayer3.status).toBe(200);
+    expect(answerSecondPlayer3.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: 'Correct',
+      addedAt: expect.any(String),
+    });
+
+    const answerSecondPlayer4 = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .send({ answer: 'Rock' })
+      .set('Authorization', 'bearer ' + accessToken1);
+    expect(answerSecondPlayer4.status).toBe(200);
+    expect(answerSecondPlayer4.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: 'Correct',
+      addedAt: expect.any(String),
+    });
+
+    const answerSecondPlayer5 = await request(app.getHttpServer())
+      .post('/pair-game-quiz/pairs/my-current/answers')
+      .send({ answer: 'Of course' })
+      .set('Authorization', 'bearer ' + accessToken1);
+    expect(answerSecondPlayer5.status).toBe(200);
+    expect(answerSecondPlayer5.body).toEqual({
+      questionId: expect.any(String),
+      answerStatus: 'Correct',
+      addedAt: expect.any(String),
+    });
+
+    const unfinishedGame1 = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/my-current')
+      .set('Authorization', 'bearer ' + accessToken1);
+    expect(unfinishedGame1.status).toBe(404);
+
+    const unfinishedGame2 = await request(app.getHttpServer())
+      .get('/pair-game-quiz/pairs/my-current')
+      .set('Authorization', 'bearer ' + accessToken2);
+    expect(unfinishedGame2.status).toBe(404);
+
+    const getGameById = await request(app.getHttpServer())
+      .get(`/pair-game-quiz/pairs/${game2.id}`)
+      .set('Authorization', 'bearer ' + accessToken2);
+    expect(getGameById.status).toBe(200);
+    expect(getGameById.body).toEqual({
+      id: game2.id,
+      firstPlayerProgress: {
+        score: 5,
+        player: {
+          id: getGameById.body.firstPlayerProgress.player.id,
+          login: 'User2',
+        },
+        answers: [
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Incorrect',
+            addedAt: expect.any(String),
+          },
+        ],
+      },
+      secondPlayerProgress: {
+        score: 4,
+        player: {
+          id: getGameById.body.secondPlayerProgress.player.id,
+          login: 'OtherOl',
+        },
+        answers: [
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Incorrect',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+          {
+            questionId: expect.any(String),
+            answerStatus: 'Correct',
+            addedAt: expect.any(String),
+          },
+        ],
+      },
+      questions: questionsViewModel,
+      status: 'Finished',
+      pairCreatedDate: expect.any(String),
+      startGameDate: expect.any(String),
+      finishGameDate: expect.any(String),
+    });
+  });
 });

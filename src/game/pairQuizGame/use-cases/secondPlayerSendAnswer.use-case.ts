@@ -5,6 +5,7 @@ import { PairQuizGameRepository } from '../repositories/pairQuizGame.repository'
 import { QuizQuestionsQueryRepository } from '../../quizQuestions/repositories/quizQuestions.query-repository';
 import { ChangeStatusToFinishedUseCase } from './changeStatusToFinished.use-case';
 import { FirstPlayerProgress } from '../domain/firstPlayerProgress.entity';
+import { ChangeAnswerStatusSecondPlayerUseCase } from './changeAnswerStatusSecondPlayer.use-case';
 
 @Injectable()
 export class SecondPlayerSendAnswerUseCase {
@@ -12,6 +13,7 @@ export class SecondPlayerSendAnswerUseCase {
     private pairQuizGameRepository: PairQuizGameRepository,
     private quizQuestionsQueryRepository: QuizQuestionsQueryRepository,
     private changeStatusToFinishedUseCase: ChangeStatusToFinishedUseCase,
+    private changeAnswerStatusSecondPlayerUseCase: ChangeAnswerStatusSecondPlayerUseCase,
   ) {}
 
   async sendAnswer(
@@ -40,6 +42,7 @@ export class SecondPlayerSendAnswerUseCase {
             },
             '+ 1',
           );
+          await this.changeAnswerStatusSecondPlayerUseCase.changeStatus(gameId);
           await this.changeStatusToFinishedUseCase.changeToFinished(gameId);
           return {
             questionId: answer.questionId,
@@ -58,6 +61,7 @@ export class SecondPlayerSendAnswerUseCase {
             },
             '- 0',
           );
+          await this.changeAnswerStatusSecondPlayerUseCase.changeStatus(gameId);
           await this.changeStatusToFinishedUseCase.changeToFinished(gameId);
           return {
             questionId: answer.questionId,

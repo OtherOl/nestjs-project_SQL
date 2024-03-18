@@ -13,19 +13,18 @@ export class ChangeStatusToFinishedUseCase {
     const game = await this.pairQuizGameQueryRepository.getGameForMethod(gameId);
     const firstPlayer = await this.pairQuizGameQueryRepository.getFirstPlayerByGameId(gameId);
     const secondPlayer = await this.pairQuizGameQueryRepository.getSecondPlayerByGameId(gameId);
-    if (game!.firstPlayerProgress?.answers.length === game!.questions.length) {
-      await this.pairQuizGameRepository.setFinishAnswerDateFirstPlayer(gameId);
-    } else if (game!.secondPlayerProgress?.answers.length === game!.questions.length) {
-      await this.pairQuizGameRepository.setFinishAnswerDateSecondPlayer(gameId);
-    }
     if (
-      game!.firstPlayerProgress?.answers.length === game!.questions.length &&
-      game!.secondPlayerProgress?.answers.length === game!.questions.length
+      firstPlayer!.answers.length === game!.questions.length &&
+      secondPlayer!.answers.length === game!.questions.length
     ) {
-      firstPlayer!.answerFinishDate < secondPlayer!.answerFinishDate
-        ? await this.pairQuizGameRepository.addBonusFirstPlayer(gameId)
-        : await this.pairQuizGameRepository.addBonusSecondPlayer(gameId);
-      return await this.pairQuizGameRepository.changeGameStatusToFinished(game!.id);
+      if (firstPlayer!.answerFinishDate < secondPlayer!.answerFinishDate) {
+        await this.pairQuizGameRepository.addBonusFirstPlayer(gameId);
+        return await this.pairQuizGameRepository.changeGameStatusToFinished(game!.id);
+      }
+      if (secondPlayer!.answerFinishDate < firstPlayer!.answerFinishDate) {
+        await this.pairQuizGameRepository.addBonusSecondPlayer(gameId);
+        return await this.pairQuizGameRepository.changeGameStatusToFinished(game!.id);
+      }
     }
   }
 }

@@ -98,6 +98,8 @@ import { FirstPlayerSendAnswerUseCase } from './game/pairQuizGame/use-cases/firs
 import { SecondPlayerSendAnswerUseCase } from './game/pairQuizGame/use-cases/secondPlayerSendAnswer.use-case';
 import { JoinOrCreateGameForMainUseCase } from './game/pairQuizGame/use-cases/joinOrCreateGameForMain.use-case';
 import { ChangeStatusToFinishedUseCase } from './game/pairQuizGame/use-cases/changeStatusToFinished.use-case';
+import { ChangeAnswerStatusFirstPlayerUseCase } from './game/pairQuizGame/use-cases/changeAnswerStatusFirstPlayer.use-case';
+import { ChangeAnswerStatusSecondPlayerUseCase } from './game/pairQuizGame/use-cases/changeAnswerStatusSecondPlayer.use-case';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -144,6 +146,8 @@ const gameUseCases = [
   SecondPlayerSendAnswerUseCase,
   JoinOrCreateGameForMainUseCase,
   ChangeStatusToFinishedUseCase,
+  ChangeAnswerStatusFirstPlayerUseCase,
+  ChangeAnswerStatusSecondPlayerUseCase,
 ];
 
 const questionUseCases = [

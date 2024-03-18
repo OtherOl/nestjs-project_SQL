@@ -16,7 +16,7 @@ export class SendAnswersUseCase {
   async sendAnswers(inputAnswer: string, accessToken: string) {
     const userId = await this.authService.getUserIdByToken(accessToken.split(' ')[1]);
     const game = await this.pairQuizGameQueryRepository.getUnfinishedGame(userId);
-    if (!game || (!game.firstPlayerProgress && !game.secondPlayerProgress))
+    if (!game || (!game.firstPlayerProgress && !game.secondPlayerProgress) || game.status !== 'Active')
       throw new ForbiddenException('No active pair');
     const firstPlayer = await this.pairQuizGameQueryRepository.getFirstPlayerByGameIdAndUserId(
       game.id,
@@ -30,7 +30,6 @@ export class SendAnswersUseCase {
       return await this.firstPlayerSendAnswerUseCase.sendAnswer(
         firstPlayer,
         game.id,
-        game.status,
         game.questions!,
         inputAnswer,
       );
@@ -38,7 +37,6 @@ export class SendAnswersUseCase {
       return await this.secondPlayerSendAnswerUseCase.sendAnswer(
         secondPlayer,
         game.id,
-        game.status,
         game.questions!,
         inputAnswer,
       );

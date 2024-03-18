@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PairQuizGameQueryRepository } from '../repositories/pairQuizGame.query-repository';
 import { PairQuizGameRepository } from '../repositories/pairQuizGame.repository';
+import { QuestionsViewModel } from '../../../base/types/game.model';
 
 @Injectable()
 export class ChangeAnswerStatusFirstPlayerUseCase {
@@ -9,10 +10,9 @@ export class ChangeAnswerStatusFirstPlayerUseCase {
     private pairQuizGameRepository: PairQuizGameRepository,
   ) {}
 
-  async changeStatus(gameId: string) {
-    const game = await this.pairQuizGameQueryRepository.getGameById(gameId);
+  async changeStatus(gameId: string, gameQuestions: QuestionsViewModel[]) {
     const firstPlayer = await this.pairQuizGameQueryRepository.getFirstPlayerByGameId(gameId);
-    if (firstPlayer!.answers.length === game!.questions!.length) {
+    if (firstPlayer!.answers.length === gameQuestions.length) {
       return await this.pairQuizGameRepository.setFinishAnswerDateFirstPlayer(gameId);
     } else {
       return;

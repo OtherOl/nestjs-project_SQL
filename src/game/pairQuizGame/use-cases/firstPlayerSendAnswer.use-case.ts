@@ -19,59 +19,54 @@ export class FirstPlayerSendAnswerUseCase {
   async sendAnswer(
     firstPlayer: FirstPlayerProgress,
     gameId: string,
-    gameStatus: string,
     gameQuestions: QuestionsViewModel[],
     inputAnswer: string,
   ) {
-    if (gameStatus === 'Active') {
-      if (firstPlayer.answers.length === gameQuestions.length) {
-        throw new ForbiddenException('You already answered all questions');
-      } else {
-        const questionNumber: number = firstPlayer.answers.length;
-        const gameQuestion: QuestionsViewModel = gameQuestions[questionNumber];
-        const question = await this.quizQuestionsQueryRepository.getQuestionById(gameQuestion.id);
-        if (question!.correctAnswers.includes(inputAnswer)) {
-          const answer = Answer.createAnswer(question!.id, AnswerStatus.Correct);
-          await this.pairQuizGameRepository.createAnswer(answer);
-          await this.pairQuizGameRepository.sendAnswerFirstPlayer(
-            gameId,
-            {
-              questionId: answer.questionId,
-              answerStatus: answer.answerStatus,
-              addedAt: answer.addedAt,
-            },
-            '+ 1',
-          );
-          await this.changeAnswerStatusFirstPlayerUseCase.changeStatus(gameId);
-          await this.changeStatusToFinishedUseCase.changeToFinished(gameId);
-          return {
-            questionId: answer.questionId,
-            answerStatus: answer.answerStatus,
-            addedAt: answer.addedAt,
-          };
-        } else if (!question!.correctAnswers.includes(inputAnswer)) {
-          const answer = Answer.createAnswer(question!.id, AnswerStatus.Incorrect);
-          await this.pairQuizGameRepository.createAnswer(answer);
-          await this.pairQuizGameRepository.sendAnswerFirstPlayer(
-            gameId,
-            {
-              questionId: answer.questionId,
-              answerStatus: answer.answerStatus,
-              addedAt: answer.addedAt,
-            },
-            '- 0',
-          );
-          await this.changeAnswerStatusFirstPlayerUseCase.changeStatus(gameId);
-          await this.changeStatusToFinishedUseCase.changeToFinished(gameId);
-          return {
-            questionId: answer.questionId,
-            answerStatus: answer.answerStatus,
-            addedAt: answer.addedAt,
-          };
-        }
-      }
+    if (firstPlayer.answers.length === gameQuestions.length) {
+      throw new ForbiddenException('You already answered all questions');
     } else {
-      throw new ForbiddenException('No active pair');
+      const questionNumber: number = firstPlayer.answers.length;
+      const gameQuestion: QuestionsViewModel = gameQuestions[questionNumber];
+      const question = await this.quizQuestionsQueryRepository.getQuestionById(gameQuestion.id);
+      if (question!.correctAnswers.includes(inputAnswer)) {
+        const answer = Answer.createAnswer(question!.id, AnswerStatus.Correct);
+        await this.pairQuizGameRepository.createAnswer(answer);
+        await this.pairQuizGameRepository.sendAnswerFirstPlayer(
+          gameId,
+          {
+            questionId: answer.questionId,
+            answerStatus: answer.answerStatus,
+            addedAt: answer.addedAt,
+          },
+          '+ 1',
+        );
+        await this.changeAnswerStatusFirstPlayerUseCase.changeStatus(gameId, gameQuestions);
+        await this.changeStatusToFinishedUseCase.changeToFinished(gameId, gameQuestions);
+        return {
+          questionId: answer.questionId,
+          answerStatus: answer.answerStatus,
+          addedAt: answer.addedAt,
+        };
+      } else if (!question!.correctAnswers.includes(inputAnswer)) {
+        const answer = Answer.createAnswer(question!.id, AnswerStatus.Incorrect);
+        await this.pairQuizGameRepository.createAnswer(answer);
+        await this.pairQuizGameRepository.sendAnswerFirstPlayer(
+          gameId,
+          {
+            questionId: answer.questionId,
+            answerStatus: answer.answerStatus,
+            addedAt: answer.addedAt,
+          },
+          '- 0',
+        );
+        await this.changeAnswerStatusFirstPlayerUseCase.changeStatus(gameId, gameQuestions);
+        await this.changeStatusToFinishedUseCase.changeToFinished(gameId, gameQuestions);
+        return {
+          questionId: answer.questionId,
+          answerStatus: answer.answerStatus,
+          addedAt: answer.addedAt,
+        };
+      }
     }
   }
 }

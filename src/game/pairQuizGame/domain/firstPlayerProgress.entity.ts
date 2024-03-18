@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { AnswerViewModel, Player } from '../../../base/types/game.model';
 import { PairQuizGame } from './pairQuizGame.entity';
 
@@ -16,6 +16,7 @@ export class FirstPlayerProgress {
   @Column()
   score: number;
 
+  @Index('indexGameIdFirst')
   @Column()
   gameId: string;
 

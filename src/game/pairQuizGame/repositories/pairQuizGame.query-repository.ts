@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PairQuizGame } from '../domain/pairQuizGame.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { FirstPlayerProgress } from '../domain/firstPlayerProgress.entity';
 import { SecondPlayerProgress } from '../domain/secondPlayerProgress.entity';
 import { GameStatus } from '../../../base/types/game.model';
@@ -48,51 +48,30 @@ export class PairQuizGameQueryRepository {
     return await this.secondPlayerProgressRepository.findOneBy({ gameId });
   }
 
-  async getUnfinishedGame(gameId: string) {
-    const game = await this.pairQuizGameRepository
-      .createQueryBuilder('g')
+  async getFirstPlayerByGameIdAndUserId(gameId: string, userId: string) {
+    return await this.firstPlayerProgressRepository
+      .createQueryBuilder('f')
       .select()
-      .where('g.id = :id', { id: gameId })
-      .andWhere('g.status != :status', { status: 'Finished' })
-      .getOne();
-
-    const firstPlayer = await this.firstPlayerProgressRepository
-      .createQueryBuilder('f')
-      .select(['f.answers', 'f.player', 'f.score'])
       .where('f.gameId = :gameId', { gameId })
+      .andWhere('f.player ::jsonb @> :player', {
+        player: {
+          id: userId,
+        },
+      })
       .getOne();
+  }
 
-    const secondPlayer = await this.secondPlayerProgressRepository
-      .createQueryBuilder('f')
-      .select(['f.answers', 'f.player', 'f.score'])
-      .where('f.gameId = :gameId', { gameId })
+  async getSecondPlayerByGameIdAndUserId(gameId: string, userId: string) {
+    return await this.secondPlayerProgressRepository
+      .createQueryBuilder('s')
+      .select()
+      .where('s.gameId = :gameId', { gameId })
+      .andWhere('s.player ::jsonb @> :player', {
+        player: {
+          id: userId,
+        },
+      })
       .getOne();
-
-    if (!game) {
-      return null;
-    } else if (game.status === 'PendingSecondPlayer') {
-      return {
-        id: game.id,
-        firstPlayerProgress: firstPlayer,
-        secondPlayerProgress: secondPlayer,
-        questions: null,
-        status: game.status,
-        pairCreatedDate: game.pairCreatedDate,
-        startGameDate: game.startGameDate,
-        finishGameDate: game.finishGameDate,
-      };
-    } else {
-      return {
-        id: game.id,
-        firstPlayerProgress: firstPlayer,
-        secondPlayerProgress: secondPlayer,
-        questions: game.questions,
-        status: game.status,
-        pairCreatedDate: game.pairCreatedDate,
-        startGameDate: game.startGameDate,
-        finishGameDate: game.finishGameDate,
-      };
-    }
   }
 
   async getGameForMethod(gameId: string) {
@@ -179,5 +158,64 @@ export class PairQuizGameQueryRepository {
 
   async getGameByStatus(status: GameStatus) {
     return await this.pairQuizGameRepository.findOneBy({ status });
+  }
+
+  async getUnfinishedGame(userId: string) {
+    const game = await this.pairQuizGameRepository
+      .createQueryBuilder('g')
+      .select()
+      .where('g.status != :status', { status: GameStatus.Finished })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('g.firstPlayerProgress :: jsonb @> :firstPlayerProgress', {
+            firstPlayerProgress: {
+              player: { id: userId },
+            },
+          }).orWhere('g.secondPlayerProgress :: jsonb @> :secondPlayerProgress', {
+            secondPlayerProgress: {
+              player: { id: userId },
+            },
+          });
+        }),
+      )
+      .getOne();
+
+    const firstPlayer = await this.firstPlayerProgressRepository
+      .createQueryBuilder('f')
+      .select(['f.answers', 'f.player', 'f.score'])
+      .where('f.gameId = :gameId', { gameId: game?.id })
+      .getOne();
+
+    const secondPlayer = await this.secondPlayerProgressRepository
+      .createQueryBuilder('f')
+      .select(['f.answers', 'f.player', 'f.score'])
+      .where('f.gameId = :gameId', { gameId: game?.id })
+      .getOne();
+
+    if (!game) {
+      return null;
+    } else if (game.status === 'PendingSecondPlayer') {
+      return {
+        id: game.id,
+        firstPlayerProgress: firstPlayer,
+        secondPlayerProgress: secondPlayer,
+        questions: null,
+        status: game.status,
+        pairCreatedDate: game.pairCreatedDate,
+        startGameDate: game.startGameDate,
+        finishGameDate: game.finishGameDate,
+      };
+    } else {
+      return {
+        id: game.id,
+        firstPlayerProgress: firstPlayer,
+        secondPlayerProgress: secondPlayer,
+        questions: game.questions,
+        status: game.status,
+        pairCreatedDate: game.pairCreatedDate,
+        startGameDate: game.startGameDate,
+        finishGameDate: game.finishGameDate,
+      };
+    }
   }
 }

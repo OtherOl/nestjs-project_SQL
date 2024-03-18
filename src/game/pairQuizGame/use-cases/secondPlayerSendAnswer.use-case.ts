@@ -1,35 +1,38 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { AnswerStatus, QuestionsViewModel } from '../../../base/types/game.model';
 import { Answer } from '../domain/answers.entity';
-import { PairQuizGameQueryRepository } from '../repositories/pairQuizGame.query-repository';
 import { PairQuizGameRepository } from '../repositories/pairQuizGame.repository';
 import { QuizQuestionsQueryRepository } from '../../quizQuestions/repositories/quizQuestions.query-repository';
-import { SecondPlayerProgress } from '../domain/secondPlayerProgress.entity';
 import { ChangeStatusToFinishedUseCase } from './changeStatusToFinished.use-case';
+import { FirstPlayerProgress } from '../domain/firstPlayerProgress.entity';
 
 @Injectable()
 export class SecondPlayerSendAnswerUseCase {
   constructor(
-    private pairQuizGameQueryRepository: PairQuizGameQueryRepository,
     private pairQuizGameRepository: PairQuizGameRepository,
     private quizQuestionsQueryRepository: QuizQuestionsQueryRepository,
     private changeStatusToFinishedUseCase: ChangeStatusToFinishedUseCase,
   ) {}
 
-  async sendAnswer(secondPlayer: SecondPlayerProgress, inputAnswer: string) {
-    const game = await this.pairQuizGameQueryRepository.getGameById(secondPlayer.gameId);
-    if (game!.status === 'Active') {
-      if (secondPlayer.answers.length === game!.questions.length) {
+  async sendAnswer(
+    secondPlayer: FirstPlayerProgress,
+    gameId: string,
+    gameStatus: string,
+    gameQuestions: QuestionsViewModel[],
+    inputAnswer: string,
+  ) {
+    if (gameStatus === 'Active') {
+      if (secondPlayer.answers.length === gameQuestions.length) {
         throw new ForbiddenException('You already answered all questions');
       } else {
         const questionNumber: number = secondPlayer.answers.length;
-        const gameQuestion: QuestionsViewModel = game!.questions[questionNumber];
+        const gameQuestion: QuestionsViewModel = gameQuestions[questionNumber];
         const question = await this.quizQuestionsQueryRepository.getQuestionById(gameQuestion.id);
         if (question!.correctAnswers.includes(inputAnswer)) {
           const answer = Answer.createAnswer(question!.id, AnswerStatus.Correct);
           await this.pairQuizGameRepository.createAnswer(answer);
           await this.pairQuizGameRepository.sendAnswerSecondPlayer(
-            secondPlayer.gameId,
+            gameId,
             {
               questionId: answer.questionId,
               answerStatus: answer.answerStatus,
@@ -37,7 +40,7 @@ export class SecondPlayerSendAnswerUseCase {
             },
             '+ 1',
           );
-          await this.changeStatusToFinishedUseCase.changeToFinished(secondPlayer.gameId);
+          await this.changeStatusToFinishedUseCase.changeToFinished(gameId);
           return {
             questionId: answer.questionId,
             answerStatus: answer.answerStatus,
@@ -47,7 +50,7 @@ export class SecondPlayerSendAnswerUseCase {
           const answer = Answer.createAnswer(question!.id, AnswerStatus.Incorrect);
           await this.pairQuizGameRepository.createAnswer(answer);
           await this.pairQuizGameRepository.sendAnswerSecondPlayer(
-            secondPlayer.gameId,
+            gameId,
             {
               questionId: answer.questionId,
               answerStatus: answer.answerStatus,
@@ -55,7 +58,7 @@ export class SecondPlayerSendAnswerUseCase {
             },
             '- 0',
           );
-          await this.changeStatusToFinishedUseCase.changeToFinished(secondPlayer.gameId);
+          await this.changeStatusToFinishedUseCase.changeToFinished(gameId);
           return {
             questionId: answer.questionId,
             answerStatus: answer.answerStatus,

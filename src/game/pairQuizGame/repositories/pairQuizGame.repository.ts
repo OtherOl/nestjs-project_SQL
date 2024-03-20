@@ -63,7 +63,7 @@ export class PairQuizGameRepository {
   async sendAnswerFirstPlayer(gameId: string, answer: AnswerViewModel, score: string) {
     return await this.firstPlayerProgressRepository
       .createQueryBuilder()
-      .update(FirstPlayerProgress)
+      .update()
       .set({
         answers: () =>
           `"answers" || '{"questionId": "${answer.questionId}", "answerStatus": "${answer.answerStatus}", "addedAt": "${answer.addedAt}"}' ::jsonb`,
@@ -76,7 +76,7 @@ export class PairQuizGameRepository {
   async sendAnswerSecondPlayer(gameId: string, answer: AnswerViewModel, score: string) {
     return await this.secondPlayerProgressRepository
       .createQueryBuilder()
-      .update(SecondPlayerProgress)
+      .update()
       .set({
         answers: () =>
           `"answers" || '{"questionId": "${answer.questionId}", "answerStatus": "${answer.answerStatus}", "addedAt": "${answer.addedAt}"}' ::jsonb`,

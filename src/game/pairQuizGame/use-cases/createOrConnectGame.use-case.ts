@@ -32,8 +32,7 @@ export class CreateOrConnectGameUseCase {
       } else if (game!.status === 'Finished') {
         return await this.joinOrCreateGameForMainUseCase.joinOrCreateGame(userId, user!);
       }
-    }
-    if (!firstPlayer && !secondPlayer) {
+    } else {
       return await this.joinOrCreateGameForMainUseCase.joinOrCreateGame(userId, user!);
     }
   }

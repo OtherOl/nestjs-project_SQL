@@ -117,4 +117,74 @@ export class PairQuizGameRepository {
       .where('gameId = :gameId', { gameId })
       .execute();
   }
+
+  async increaseGamesCountFirstPlayer(gameId: string) {
+    return await this.firstPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ gamesCount: () => 'gamesCount + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+  }
+
+  async increaseGamesCountSecondPlayer(gameId: string) {
+    return await this.secondPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ gamesCount: () => 'gamesCount + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+  }
+
+  async increaseWinsCountFirstPlayer(gameId: string) {
+    return await this.firstPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ winsCount: () => 'winsCount + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+  }
+
+  async increaseWinsCountSecondPlayer(gameId: string) {
+    return await this.secondPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ winsCount: () => 'winsCount + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+  }
+
+  async increaseLossesCountFirstPlayer(gameId: string) {
+    return await this.firstPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ lossesCount: () => 'lossesCount + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+  }
+
+  async increaseLossesCountSecondPlayer(gameId: string) {
+    return await this.secondPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ lossesCount: () => 'lossesCount + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+  }
+
+  async increaseDrawCount(gameId: string) {
+    await this.firstPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ drawsCount: () => 'drawsCount + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+
+    return await this.secondPlayerProgressRepository
+      .createQueryBuilder()
+      .update()
+      .set({ drawsCount: () => 'drawsCount + 1' })
+      .where('gameId = :gameId', { gameId })
+      .execute();
+  }
 }

@@ -25,7 +25,19 @@ export class SecondPlayerProgress {
 
   @OneToOne(() => PairQuizGame, (p) => p.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'gameId' })
-  gamesId: string;
+  game: string;
+
+  @Column({ default: 0 })
+  winsCount: number;
+
+  @Column({ default: 0 })
+  lossesCount: number;
+
+  @Column({ default: 0 })
+  drawsCount: number;
+
+  @Column({ default: 0 })
+  gamesCount: number;
 
   static createSecondPlayer(userId: string, login: string, gameId: string) {
     const player = new SecondPlayerProgress();

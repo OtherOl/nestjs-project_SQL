@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PairQuizGameQueryRepository } from '../repositories/pairQuizGame.query-repository';
 import { PairQuizGameRepository } from '../repositories/pairQuizGame.repository';
 import { QuestionsViewModel } from '../../../base/types/game.model';
+import { WinRateCountUseCase } from './winRateCount.use-case';
 
 @Injectable()
 export class ChangeStatusToFinishedUseCase {
   constructor(
     private pairQuizGameQueryRepository: PairQuizGameQueryRepository,
     private pairQuizGameRepository: PairQuizGameRepository,
+    private winRateCountUseCase: WinRateCountUseCase,
   ) {}
 
   async changeToFinished(gameId: string, gameQuestions: QuestionsViewModel[]) {
@@ -17,6 +19,9 @@ export class ChangeStatusToFinishedUseCase {
       firstPlayer!.answers.length === gameQuestions.length &&
       secondPlayer!.answers.length === gameQuestions.length
     ) {
+      await this.winRateCountUseCase.changeWinRate(gameId);
+      await this.pairQuizGameRepository.increaseGamesCountFirstPlayer(gameId);
+      await this.pairQuizGameRepository.increaseGamesCountSecondPlayer(gameId);
       if (firstPlayer!.answerFinishDate < secondPlayer!.answerFinishDate) {
         await this.pairQuizGameRepository.addBonusFirstPlayer(gameId);
         return await this.pairQuizGameRepository.changeGameStatusToFinished(gameId);

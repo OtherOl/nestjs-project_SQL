@@ -30,10 +30,10 @@ export class PairQuizGame {
   @Column({ nullable: true, default: null })
   finishGameDate: string;
 
-  @OneToOne(() => FirstPlayerProgress, (f) => f.gameId, { onDelete: 'CASCADE' })
+  @OneToOne(() => FirstPlayerProgress, (f) => f.game, { onDelete: 'CASCADE' })
   firstPlayer: FirstPlayerProgress;
 
-  @OneToOne(() => SecondPlayerProgress, (s) => s.gameId, { onDelete: 'CASCADE' })
+  @OneToOne(() => SecondPlayerProgress, (s) => s.game, { onDelete: 'CASCADE' })
   secondPlayer: SecondPlayerProgress;
 
   static createGame(questions: QuestionsViewModel[]) {

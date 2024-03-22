@@ -75,17 +75,25 @@ export class PairQuizGameQueryRepository {
   }
 
   async getGameById(gameId: string) {
-    const game = await this.pairQuizGameRepository.findOneBy({ id: gameId });
-    const firstPlayer = await this.firstPlayerProgressRepository
-      .createQueryBuilder('f')
-      .select(['f.answers', 'f.player', 'f.score'])
-      .where('f.gameId = :gameId', { gameId })
-      .getOne();
-
-    const secondPlayer = await this.secondPlayerProgressRepository
-      .createQueryBuilder('f')
-      .select(['f.answers', 'f.player', 'f.score'])
-      .where('f.gameId = :gameId', { gameId })
+    const game = await this.pairQuizGameRepository
+      .createQueryBuilder('g')
+      .where('g.id = :gameId', { gameId })
+      .leftJoinAndMapOne('g.firstPlayerProgress', 'g.firstPlayer', 'f')
+      .leftJoinAndMapOne('g.secondPlayerProgress', 'g.secondPlayer', 's')
+      .select([
+        'g.id',
+        'f.answers',
+        'f.player',
+        'f.score',
+        's.answers',
+        's.player',
+        's.score',
+        'g.questions',
+        'g.status',
+        'g.pairCreatedDate',
+        'g.startGameDate',
+        'g.finishGameDate',
+      ])
       .getOne();
 
     if (!game) {
@@ -93,8 +101,8 @@ export class PairQuizGameQueryRepository {
     } else if (game.status === 'PendingSecondPlayer') {
       return {
         id: game.id,
-        firstPlayerProgress: firstPlayer,
-        secondPlayerProgress: secondPlayer,
+        firstPlayerProgress: game.firstPlayerProgress,
+        secondPlayerProgress: game.secondPlayerProgress,
         questions: null,
         status: game.status,
         pairCreatedDate: game.pairCreatedDate,
@@ -104,8 +112,8 @@ export class PairQuizGameQueryRepository {
     } else {
       return {
         id: game.id,
-        firstPlayerProgress: firstPlayer,
-        secondPlayerProgress: secondPlayer,
+        firstPlayerProgress: game.firstPlayerProgress,
+        secondPlayerProgress: game.secondPlayerProgress,
         questions: game.questions,
         status: game.status,
         pairCreatedDate: game.pairCreatedDate,
@@ -122,7 +130,6 @@ export class PairQuizGameQueryRepository {
   async getUnfinishedGame(userId: string) {
     const game = await this.pairQuizGameRepository
       .createQueryBuilder('g')
-      .select()
       .where('g.status != :status', { status: GameStatus.Finished })
       .andWhere(
         new Brackets((qb) => {
@@ -137,18 +144,22 @@ export class PairQuizGameQueryRepository {
           });
         }),
       )
-      .getOne();
-
-    const firstPlayer = await this.firstPlayerProgressRepository
-      .createQueryBuilder('f')
-      .select(['f.answers', 'f.player', 'f.score'])
-      .where('f.gameId = :gameId', { gameId: game?.id })
-      .getOne();
-
-    const secondPlayer = await this.secondPlayerProgressRepository
-      .createQueryBuilder('f')
-      .select(['f.answers', 'f.player', 'f.score'])
-      .where('f.gameId = :gameId', { gameId: game?.id })
+      .leftJoinAndMapOne('g.firstPlayerProgress', 'g.firstPlayer', 'f')
+      .leftJoinAndMapOne('g.secondPlayerProgress', 'g.secondPlayer', 's')
+      .select([
+        'g.id',
+        'f.answers',
+        'f.player',
+        'f.score',
+        's.answers',
+        's.player',
+        's.score',
+        'g.questions',
+        'g.status',
+        'g.pairCreatedDate',
+        'g.startGameDate',
+        'g.finishGameDate',
+      ])
       .getOne();
 
     if (!game) {
@@ -156,8 +167,8 @@ export class PairQuizGameQueryRepository {
     } else if (game.status === 'PendingSecondPlayer') {
       return {
         id: game.id,
-        firstPlayerProgress: firstPlayer,
-        secondPlayerProgress: secondPlayer,
+        firstPlayerProgress: game.firstPlayerProgress,
+        secondPlayerProgress: game.secondPlayerProgress,
         questions: null,
         status: game.status,
         pairCreatedDate: game.pairCreatedDate,
@@ -167,8 +178,8 @@ export class PairQuizGameQueryRepository {
     } else {
       return {
         id: game.id,
-        firstPlayerProgress: firstPlayer,
-        secondPlayerProgress: secondPlayer,
+        firstPlayerProgress: game.firstPlayerProgress,
+        secondPlayerProgress: game.secondPlayerProgress,
         questions: game.questions,
         status: game.status,
         pairCreatedDate: game.pairCreatedDate,
@@ -176,5 +187,120 @@ export class PairQuizGameQueryRepository {
         finishGameDate: game.finishGameDate,
       };
     }
+  }
+
+  async getAllMyGames(
+    userId: string,
+    sortBy: string,
+    sortDirection: 'ASC' | 'DESC',
+    pageNumber: number,
+    pageSize: number,
+  ) {
+    const countGames = await this.pairQuizGameRepository
+      .createQueryBuilder('g')
+      .where(
+        new Brackets((qb) => {
+          qb.where('g.firstPlayerProgress :: jsonb @> :firstPlayerProgress', {
+            firstPlayerProgress: {
+              player: { id: userId },
+            },
+          }).orWhere('g.secondPlayerProgress :: jsonb @> :secondPlayerProgress', {
+            secondPlayerProgress: {
+              player: { id: userId },
+            },
+          });
+        }),
+      )
+      .getCount();
+
+    const game = await this.pairQuizGameRepository
+      .createQueryBuilder('g')
+      .where(
+        new Brackets((qb) => {
+          qb.where('g.firstPlayerProgress :: jsonb @> :firstPlayerProgress', {
+            firstPlayerProgress: {
+              player: { id: userId },
+            },
+          }).orWhere('g.secondPlayerProgress :: jsonb @> :secondPlayerProgress', {
+            secondPlayerProgress: {
+              player: { id: userId },
+            },
+          });
+        }),
+      )
+      .leftJoinAndMapOne('g.firstPlayerProgress', 'g.firstPlayer', 'f')
+      .leftJoinAndMapOne('g.secondPlayerProgress', 'g.secondPlayer', 's')
+      .select([
+        'g.id',
+        'f.answers',
+        'f.player',
+        'f.score',
+        's.answers',
+        's.player',
+        's.score',
+        'g.questions',
+        'g.status',
+        'g.pairCreatedDate',
+        'g.startGameDate',
+        'g.finishGameDate',
+      ])
+      .orderBy(`g.${sortBy}`, sortDirection)
+      .limit(pageSize)
+      .offset((pageNumber - 1) * pageSize)
+      .getMany();
+
+    return {
+      pagesCount: Math.ceil(Number(countGames) / pageSize),
+      page: pageNumber,
+      pageSize: pageSize,
+      totalCount: Number(countGames),
+      items: game,
+    };
+  }
+
+  async getMyStatistic(userId: string) {
+    const first = await this.firstPlayerProgressRepository
+      .createQueryBuilder('f')
+      .select([
+        'Sum(f.winsCount) as "winsCount"',
+        'Sum(f.lossesCount) as "lossesCount"',
+        'Sum(f.drawsCount) as "drawsCount"',
+        'Sum(f.gamesCount) as "gamesCount"',
+        'Sum(f.score) as score',
+      ])
+      .where('f.player ::jsonb @> :player', {
+        player: {
+          id: userId,
+        },
+      })
+      .getRawOne();
+
+    const second = await this.secondPlayerProgressRepository
+      .createQueryBuilder('s')
+      .select([
+        'Sum(s.winsCount) as "winsCount"',
+        'Sum(s.lossesCount) as "lossesCount"',
+        'Sum(s.drawsCount) as "drawsCount"',
+        'Sum(s.gamesCount) as "gamesCount"',
+        'Sum(s.score) as score',
+      ])
+      .where('s.player ::jsonb @> :player', {
+        player: {
+          id: userId,
+        },
+      })
+      .getRawOne();
+
+    const sumScore = Number(first.score) + Number(second.score);
+    const gamesCount = Number(first.gamesCount) + Number(second.gamesCount);
+
+    return {
+      sumScore: sumScore,
+      avgScores: Number((sumScore / gamesCount).toFixed(2)),
+      gamesCount: gamesCount,
+      winsCount: Number(first.winsCount) + Number(second.winsCount),
+      lossesCount: Number(first.lossesCount) + Number(second.lossesCount),
+      drawsCount: Number(first.drawsCount) + Number(second.drawsCount),
+    };
   }
 }

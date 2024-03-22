@@ -100,6 +100,9 @@ import { JoinOrCreateGameForMainUseCase } from './game/pairQuizGame/use-cases/jo
 import { ChangeStatusToFinishedUseCase } from './game/pairQuizGame/use-cases/changeStatusToFinished.use-case';
 import { ChangeAnswerStatusFirstPlayerUseCase } from './game/pairQuizGame/use-cases/changeAnswerStatusFirstPlayer.use-case';
 import { ChangeAnswerStatusSecondPlayerUseCase } from './game/pairQuizGame/use-cases/changeAnswerStatusSecondPlayer.use-case';
+import { GetAllUserGamesUseCase } from './game/pairQuizGame/use-cases/getAllUserGames.use-case';
+import { WinRateCountUseCase } from './game/pairQuizGame/use-cases/winRateCount.use-case';
+import { GetStatisticUseCase } from './game/pairQuizGame/use-cases/getStatistic.use-case';
 
 const authUseCases = [
   CheckCredentialsUseCase,
@@ -148,6 +151,9 @@ const gameUseCases = [
   ChangeStatusToFinishedUseCase,
   ChangeAnswerStatusFirstPlayerUseCase,
   ChangeAnswerStatusSecondPlayerUseCase,
+  GetAllUserGamesUseCase,
+  WinRateCountUseCase,
+  GetStatisticUseCase,
 ];
 
 const questionUseCases = [

@@ -196,6 +196,7 @@ export class PairQuizGameQueryRepository {
     pageNumber: number,
     pageSize: number,
   ) {
+    console.log(sortBy, sortDirection, `g.${sortBy}`);
     const countGames = await this.pairQuizGameRepository
       .createQueryBuilder('g')
       .where(

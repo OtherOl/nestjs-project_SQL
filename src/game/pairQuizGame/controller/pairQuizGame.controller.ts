@@ -20,7 +20,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { GetAllUserGamesUseCase } from '../use-cases/getAllUserGames.use-case';
 import { GetStatisticUseCase } from '../use-cases/getStatistic.use-case';
 
-@Controller('pair-game-quiz/pairs')
+@Controller('pair-game-quiz')
 export class PairQuizGameController {
   constructor(
     private getUnfinishedGameUseCase: GetUnfinishedGameUseCase,
@@ -32,7 +32,7 @@ export class PairQuizGameController {
   ) {}
 
   @SkipThrottle()
-  @Get('my')
+  @Get('pairs/my')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
   async getAllMyGames(
@@ -49,7 +49,7 @@ export class PairQuizGameController {
   }
 
   @SkipThrottle()
-  @Get('my-statistic')
+  @Get('users/my-statistic')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
   async getMyStatistic(@Req() req: Request) {
@@ -57,7 +57,7 @@ export class PairQuizGameController {
   }
 
   @SkipThrottle()
-  @Get('my-current')
+  @Get('pairs/my-current')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
   async getUnfinishedGame(@Req() req: Request) {
@@ -65,7 +65,7 @@ export class PairQuizGameController {
   }
 
   @SkipThrottle()
-  @Get(':id')
+  @Get('pairs/:id')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
   async getGameById(@Req() req: Request, @Param('id', ParseUUIDPipe) id: string) {
@@ -73,7 +73,7 @@ export class PairQuizGameController {
   }
 
   @SkipThrottle()
-  @Post('connection')
+  @Post('pairs/connection')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
   async createOrConnectGame(@Req() req: Request) {
@@ -81,7 +81,7 @@ export class PairQuizGameController {
   }
 
   @SkipThrottle()
-  @Post('my-current/answers')
+  @Post('pairs/my-current/answers')
   @UseGuards(AccessTokenGuard)
   @HttpCode(200)
   async sendAnswer(@Req() req: Request, @Body('answer') answer: string) {

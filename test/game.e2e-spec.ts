@@ -3,7 +3,6 @@ import { beforeGetAppAndCleanDb, questionCreateModel, userCreateModel } from './
 import { userModel } from '../src/base/types/users.model';
 import request from 'supertest';
 import { GameViewModel, QuestionsViewModel } from '../src/base/types/game.model';
-// import { PairQuizGame } from '../src/game/pairQuizGame/domain/pairQuizGame.entity';
 import { QuizQuestions } from '../src/game/quizQuestions/domain/quizQuestions.entity';
 
 jest.setTimeout(25000);

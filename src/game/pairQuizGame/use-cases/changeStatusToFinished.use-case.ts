@@ -19,15 +19,16 @@ export class ChangeStatusToFinishedUseCase {
       firstPlayer!.answers.length === gameQuestions.length &&
       secondPlayer!.answers.length === gameQuestions.length
     ) {
-      await this.winRateCountUseCase.changeWinRate(gameId);
       await this.pairQuizGameRepository.increaseGamesCountFirstPlayer(gameId);
       await this.pairQuizGameRepository.increaseGamesCountSecondPlayer(gameId);
       if (firstPlayer!.answerFinishDate < secondPlayer!.answerFinishDate) {
         await this.pairQuizGameRepository.addBonusFirstPlayer(gameId);
+        await this.winRateCountUseCase.changeWinRate(gameId);
         return await this.pairQuizGameRepository.changeGameStatusToFinished(gameId);
       }
       if (secondPlayer!.answerFinishDate < firstPlayer!.answerFinishDate) {
         await this.pairQuizGameRepository.addBonusSecondPlayer(gameId);
+        await this.winRateCountUseCase.changeWinRate(gameId);
         return await this.pairQuizGameRepository.changeGameStatusToFinished(gameId);
       }
     }

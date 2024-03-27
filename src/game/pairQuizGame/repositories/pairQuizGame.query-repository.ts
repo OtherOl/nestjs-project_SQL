@@ -196,7 +196,6 @@ export class PairQuizGameQueryRepository {
     pageNumber: number,
     pageSize: number,
   ) {
-    console.log(sortBy, sortDirection, `g.${sortBy}`);
     const countGames = await this.pairQuizGameRepository
       .createQueryBuilder('g')
       .where(
@@ -250,12 +249,25 @@ export class PairQuizGameQueryRepository {
       .offset((pageNumber - 1) * pageSize)
       .getMany();
 
+    const userGames = game.map((game) => {
+      return {
+        id: game.id,
+        firstPlayerProgress: game.firstPlayerProgress,
+        secondPlayerProgress: game.secondPlayerProgress,
+        questions: game.questions,
+        status: game.status,
+        pairCreatedDate: game.pairCreatedDate,
+        startGameDate: game.startGameDate,
+        finishGameDate: game.finishGameDate,
+      };
+    });
+
     return {
       pagesCount: Math.ceil(Number(countGames) / pageSize),
       page: pageNumber,
       pageSize: pageSize,
       totalCount: Number(countGames),
-      items: game,
+      items: userGames,
     };
   }
 
@@ -294,10 +306,11 @@ export class PairQuizGameQueryRepository {
 
     const sumScore = Number(first.score) + Number(second.score);
     const gamesCount = Number(first.gamesCount) + Number(second.gamesCount);
+    const avgScore = Number((sumScore / gamesCount).toFixed(2));
 
     return {
       sumScore: sumScore,
-      avgScores: Number((sumScore / gamesCount).toFixed(2)),
+      avgScores: avgScore === Infinity ? 0 : avgScore || 0,
       gamesCount: gamesCount,
       winsCount: Number(first.winsCount) + Number(second.winsCount),
       lossesCount: Number(first.lossesCount) + Number(second.lossesCount),

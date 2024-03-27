@@ -66,7 +66,7 @@ export class PairQuizGameRepository {
       .update()
       .set({
         answers: () =>
-          `"answers" || '{"questionId": "${answer.questionId}", "answerStatus": "${answer.answerStatus}", "addedAt": "${answer.addedAt}"}' ::jsonb`,
+          `"answers" || '{"addedAt": "${answer.addedAt}", "answerStatus": "${answer.answerStatus}", "questionId": "${answer.questionId}"}' ::jsonb`,
         score: () => `score ${score}`,
       })
       .where('gameId = :gameId', { gameId })
@@ -79,7 +79,7 @@ export class PairQuizGameRepository {
       .update()
       .set({
         answers: () =>
-          `"answers" || '{"questionId": "${answer.questionId}", "answerStatus": "${answer.answerStatus}", "addedAt": "${answer.addedAt}"}' ::jsonb`,
+          `"answers" || '{"addedAt": "${answer.addedAt}", "answerStatus": "${answer.answerStatus}", "questionId": "${answer.questionId}"}' ::jsonb`,
         score: () => `score ${score}`,
       })
       .where('gameId = :gameId', { gameId })

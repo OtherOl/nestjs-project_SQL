@@ -1057,4 +1057,12 @@ describe('Testing Game', () => {
       });
     });
   }
+
+  it('Should return user statistic => 200 status', async () => {
+    const statistic = await request(app.getHttpServer())
+      .get('/pair-game-quiz/users/my-statistic')
+      .set('Authorization', 'bearer ' + accessToken1);
+    console.log(statistic.body);
+    expect(statistic.status).toBe(200);
+  });
 });

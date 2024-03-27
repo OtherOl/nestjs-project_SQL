@@ -34,18 +34,18 @@ export class FirstPlayerSendAnswerUseCase {
         await this.pairQuizGameRepository.sendAnswerFirstPlayer(
           gameId,
           {
-            questionId: answer.questionId,
-            answerStatus: answer.answerStatus,
             addedAt: answer.addedAt,
+            answerStatus: answer.answerStatus,
+            questionId: answer.questionId,
           },
           '+ 1',
         );
         await this.changeAnswerStatusFirstPlayerUseCase.changeStatus(gameId, gameQuestions);
         await this.changeStatusToFinishedUseCase.changeToFinished(gameId, gameQuestions);
         return {
-          questionId: answer.questionId,
-          answerStatus: answer.answerStatus,
           addedAt: answer.addedAt,
+          answerStatus: answer.answerStatus,
+          questionId: answer.questionId,
         };
       } else if (!question!.correctAnswers.includes(inputAnswer)) {
         const answer = Answer.createAnswer(question!.id, AnswerStatus.Incorrect);
@@ -53,18 +53,18 @@ export class FirstPlayerSendAnswerUseCase {
         await this.pairQuizGameRepository.sendAnswerFirstPlayer(
           gameId,
           {
-            questionId: answer.questionId,
-            answerStatus: answer.answerStatus,
             addedAt: answer.addedAt,
+            answerStatus: answer.answerStatus,
+            questionId: answer.questionId,
           },
           '- 0',
         );
         await this.changeAnswerStatusFirstPlayerUseCase.changeStatus(gameId, gameQuestions);
         await this.changeStatusToFinishedUseCase.changeToFinished(gameId, gameQuestions);
         return {
-          questionId: answer.questionId,
-          answerStatus: answer.answerStatus,
           addedAt: answer.addedAt,
+          answerStatus: answer.answerStatus,
+          questionId: answer.questionId,
         };
       }
     }

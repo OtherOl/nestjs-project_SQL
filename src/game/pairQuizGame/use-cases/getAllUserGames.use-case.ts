@@ -13,7 +13,7 @@ export class GetAllUserGamesUseCase {
   async getGames(
     accessToken: string,
     sortBy: string = 'pairCreatedDate',
-    sortDirection: string,
+    sortDirection: string = 'desc',
     pageNumber: number = 1,
     pageSize: number = 10,
   ) {

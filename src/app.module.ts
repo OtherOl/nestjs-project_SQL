@@ -182,7 +182,7 @@ const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD } = process.env;
       autoLoadEntities: true,
       synchronize: true,
       ssl: true,
-      // logging: ['query'],
+      logging: ['query'],
     }),
     TypeOrmModule.forFeature([
       Blog,

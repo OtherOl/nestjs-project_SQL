@@ -304,17 +304,17 @@ export class PairQuizGameQueryRepository {
       })
       .getRawOne();
 
-    const sumScore = Number(first.score) + Number(second.score);
-    const gamesCount = Number(first.gamesCount) + Number(second.gamesCount);
+    const sumScore = +first.score + +second.score;
+    const gamesCount = +first.gamesCount + +second.gamesCount;
     const avgScore = Number((sumScore / gamesCount).toFixed(2));
 
     return {
       sumScore: sumScore,
       avgScores: avgScore === Infinity ? 0 : avgScore || 0,
       gamesCount: gamesCount,
-      winsCount: Number(first.winsCount) + Number(second.winsCount),
-      lossesCount: Number(first.lossesCount) + Number(second.lossesCount),
-      drawsCount: Number(first.drawsCount) + Number(second.drawsCount),
+      winsCount: +first.winsCount + +second.winsCount,
+      lossesCount: +first.lossesCount + +second.lossesCount,
+      drawsCount: +first.drawsCount + +second.drawsCount,
     };
   }
 }

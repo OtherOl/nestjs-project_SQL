@@ -17,24 +17,10 @@ export class CreateOrConnectGameUseCase {
     const userId = await this.authService.getUserIdByToken(accessToken.split(' ')[1]);
     const user = await this.usersQueryRepository.getUserById(userId);
     const game = await this.pairQuizGameQueryRepository.getUnfinishedGame(userId);
-    // const firstPlayer = await this.pairQuizGameQueryRepository.getFirstPlayerByUserId(userId);
-    // const secondPlayer = await this.pairQuizGameQueryRepository.getSecondPlayerByUserId(userId);
-    // if (firstPlayer) {
-    //   const game = await this.pairQuizGameQueryRepository.getGameById(firstPlayer.gameId);
-    //   if (game!.status !== 'Finished') {
-    //     throw new ForbiddenException('user is already participating in active pair');
-    //   } else if (game!.status === 'Finished') {
-    //     return await this.joinOrCreateGameForMainUseCase.joinOrCreateGame(userId, user!);
-    //   }
-    // } else if (secondPlayer) {
-    //   const game = await this.pairQuizGameQueryRepository.getGameById(secondPlayer.gameId);
-    //   if (game!.status !== 'Finished') {
-    //     throw new ForbiddenException('user is already participating in active pair');
-    //   } else if (game!.status === 'Finished') {
-    //     return await this.joinOrCreateGameForMainUseCase.joinOrCreateGame(userId, user!);
-    //   }
-    // } else {
-    //   return await this.joinOrCreateGameForMainUseCase.joinOrCreateGame(userId, user!);
-    // }
+    if (game) {
+      throw new ForbiddenException('user is already participating in active pair');
+    } else if (!game) {
+      return await this.joinOrCreateGameForMainUseCase.joinOrCreateGame(userId, user!);
+    }
   }
 }

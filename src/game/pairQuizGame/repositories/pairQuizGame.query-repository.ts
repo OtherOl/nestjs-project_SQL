@@ -16,30 +16,6 @@ export class PairQuizGameQueryRepository {
     private secondPlayerProgressRepository: Repository<SecondPlayerProgress>,
   ) {}
 
-  async getFirstPlayerByUserId(userId: string): Promise<FirstPlayerProgress | null> {
-    return await this.firstPlayerProgressRepository
-      .createQueryBuilder('p')
-      .select()
-      .where('p.player ::jsonb @> :player', {
-        player: {
-          id: userId,
-        },
-      })
-      .getOne();
-  }
-
-  async getSecondPlayerByUserId(userId: string): Promise<SecondPlayerProgress | null> {
-    return await this.secondPlayerProgressRepository
-      .createQueryBuilder('p')
-      .select()
-      .where('p.player ::jsonb @> :player', {
-        player: {
-          id: userId,
-        },
-      })
-      .getOne();
-  }
-
   async getFirstPlayerByGameId(gameId: string) {
     return await this.firstPlayerProgressRepository.findOneBy({ gameId });
   }

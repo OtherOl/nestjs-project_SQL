@@ -21,16 +21,17 @@ export class ChangeStatusToFinishedUseCase {
     ) {
       await this.pairQuizGameRepository.increaseGamesCountFirstPlayer(gameId);
       await this.pairQuizGameRepository.increaseGamesCountSecondPlayer(gameId);
-      if (firstPlayer!.answerFinishDate < secondPlayer!.answerFinishDate) {
+      if (firstPlayer!.answerFinishDate < secondPlayer!.answerFinishDate && firstPlayer!.score >= 1) {
         await this.pairQuizGameRepository.addBonusFirstPlayer(gameId);
         await this.winRateCountUseCase.changeWinRate(gameId);
         return await this.pairQuizGameRepository.changeGameStatusToFinished(gameId);
       }
-      if (secondPlayer!.answerFinishDate < firstPlayer!.answerFinishDate) {
+      if (secondPlayer!.answerFinishDate < firstPlayer!.answerFinishDate && secondPlayer!.score >= 1) {
         await this.pairQuizGameRepository.addBonusSecondPlayer(gameId);
         await this.winRateCountUseCase.changeWinRate(gameId);
         return await this.pairQuizGameRepository.changeGameStatusToFinished(gameId);
       }
+      return;
     }
   }
 }

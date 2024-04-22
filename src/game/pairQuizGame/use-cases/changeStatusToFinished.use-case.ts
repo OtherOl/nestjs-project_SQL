@@ -31,7 +31,13 @@ export class ChangeStatusToFinishedUseCase {
         await this.winRateCountUseCase.changeWinRate(gameId);
         return await this.pairQuizGameRepository.changeGameStatusToFinished(gameId);
       }
-      return;
+      if (firstPlayer!.score > secondPlayer!.score) {
+        await this.winRateCountUseCase.changeWinRate(gameId);
+        return await this.pairQuizGameRepository.changeGameStatusToFinished(gameId);
+      } else {
+        await this.winRateCountUseCase.changeWinRate(gameId);
+        return await this.pairQuizGameRepository.changeGameStatusToFinished(gameId);
+      }
     }
   }
 }

@@ -221,6 +221,7 @@ export class PairQuizGameQueryRepository {
         'g.finishGameDate',
       ])
       .orderBy(`g.${sortBy}`, sortDirection)
+      .addOrderBy('g.pairCreatedDate', 'DESC')
       .limit(pageSize)
       .offset((pageNumber - 1) * pageSize)
       .getMany();
